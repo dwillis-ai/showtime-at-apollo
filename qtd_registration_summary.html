@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Q2 2026 QTD — Sell-Through Registration Summary by Product Line</title>
+<title>Q2 2026 QTD — Sell-Through Registration Summary</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -13,13 +13,8 @@
   header span { font-size: 0.85rem; color: #94a3b8; }
   .container { max-width: 1280px; margin: 0 auto; padding: 28px 24px; }
 
-  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-  .kpi { background: white; border-radius: 10px; padding: 20px 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
-  .kpi label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; font-weight: 600; }
-  .kpi .value { font-size: 1.7rem; font-weight: 700; margin-top: 6px; color: #1a1a2e; }
-  .kpi .sub { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
-
-  .filters { background: white; border-radius: 10px; padding: 16px 24px; margin-bottom: 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; }
+  /* ── Master Filters ── */
+  .filters { background: white; border-radius: 10px; padding: 16px 24px; margin-bottom: 28px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; }
   .filters label { font-size: 0.8rem; font-weight: 600; color: #475569; }
   .filter-group { display: flex; flex-direction: column; gap: 5px; }
   select { padding: 7px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.85rem; background: #f8fafc; cursor: pointer; min-width: 200px; }
@@ -28,12 +23,26 @@
   .reset-btn:hover { background: #2d3a5e; }
   .filter-hint { font-size: 0.75rem; color: #94a3b8; margin-top: 3px; }
 
-  .charts-top { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
-  .card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
-  .card-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; margin-bottom: 18px; }
-  canvas { max-height: 320px; }
+  /* ── KPIs ── */
+  .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi { background: white; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  .kpi label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; font-weight: 600; }
+  .kpi .value { font-size: 1.55rem; font-weight: 700; margin-top: 6px; color: #1a1a2e; }
+  .kpi .sub { font-size: 0.78rem; color: #94a3b8; margin-top: 4px; }
 
-  .table-card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  /* ── Section heading ── */
+  .section-heading { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 16px; margin-top: 36px; }
+
+  /* ── Charts ── */
+  .charts-top { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  .card-full { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 20px; }
+  .card-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+  canvas { max-height: 340px; }
+
+  /* ── Table ── */
+  .table-card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 20px; }
   .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
   .table-header h3 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; }
   input[type=text] { padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.83rem; width: 240px; }
@@ -50,21 +59,50 @@
   .workbook a:hover { text-decoration: underline; }
   .badge { display: inline-block; font-size: 0.7rem; padding: 2px 7px; border-radius: 10px; background: #e0e7ff; color: #3730a3; font-weight: 600; margin-left: 6px; }
   .row-count { font-size: 0.78rem; color: #94a3b8; margin-top: 10px; }
+  .omni-link { font-size: 0.76rem; color: #3b82f6; text-decoration: none; font-weight: 500; }
+  .omni-link:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 <header>
   <h1>Q2 2026 — QTD Registration Summary</h1>
-  <span>Sell-Through Registrations · By Product Line &amp; Product ID · Source: Omni Redshift</span>
+  <span>Sell-Through Registrations · Source: Omni Redshift · Updated Apr 23, 2026</span>
 </header>
 
 <div class="container">
+
+  <!-- ══ MASTER FILTERS ══ -->
+  <div class="filters">
+    <div class="filter-group">
+      <label>Product Line</label>
+      <select id="f-line"><option value="">All Product Lines</option></select>
+      <div class="filter-hint" id="f-line-hint"></div>
+    </div>
+    <div class="filter-group">
+      <label>Product ID <span class="badge" id="pid-badge">All</span></label>
+      <select id="f-pid"><option value="">All Product IDs</option></select>
+      <div class="filter-hint" id="f-pid-hint">Select a Product Line to filter SKUs</div>
+    </div>
+    <div class="filter-group">
+      <label>Adaptive Insights Level</label>
+      <select id="f-ai"><option value="">All Dealers</option></select>
+    </div>
+    <button class="reset-btn" onclick="resetFilters()">Reset Filters</button>
+  </div>
+
+  <!-- ══ SECTION 1: QTD SUMMARY ══ -->
+  <div class="section-heading">QTD Registrations</div>
 
   <div class="kpis">
     <div class="kpi">
       <label>Total Registrations</label>
       <div class="value" id="kpi-total">0</div>
       <div class="sub">Sell-through · QTD</div>
+    </div>
+    <div class="kpi">
+      <label>Reg Dollars (Static ASP)</label>
+      <div class="value" id="kpi-rd">$0</div>
+      <div class="sub">QTD Revenue</div>
     </div>
     <div class="kpi">
       <label id="kpi-top-label">Top Product Line</label>
@@ -81,20 +119,6 @@
       <div class="value" id="kpi-skus">0</div>
       <div class="sub" id="kpi-avg-sub">Avg per SKU</div>
     </div>
-  </div>
-
-  <div class="filters">
-    <div class="filter-group">
-      <label>Product Line</label>
-      <select id="f-line"><option value="">All Product Lines</option></select>
-      <div class="filter-hint" id="f-line-hint"></div>
-    </div>
-    <div class="filter-group">
-      <label>Product ID <span class="badge" id="pid-badge">All</span></label>
-      <select id="f-pid"><option value="">All Product IDs</option></select>
-      <div class="filter-hint" id="f-pid-hint">Select a Product Line to filter SKUs</div>
-    </div>
-    <button class="reset-btn" onclick="resetFilters()">Reset Filters</button>
   </div>
 
   <div class="charts-top">
@@ -119,6 +143,7 @@
           <th onclick="sortBy('pl')">Product Line ↕</th>
           <th onclick="sortBy('pid')">Product ID ↕</th>
           <th class="num" onclick="sortBy('n')">Registrations ↕</th>
+          <th class="num" onclick="sortBy('rd')">Reg Dollars ↕</th>
           <th class="num">% of Total</th>
           <th class="num">Share</th>
         </tr>
@@ -126,74 +151,213 @@
       <tbody id="table-body"></tbody>
     </table>
     <div class="row-count" id="row-count"></div>
-    <div class="workbook">View in Omni: <a href="https://universalaudio.omniapp.co/e/1:XJeFoyx2/1" target="_blank">Sell-Through Registration Summary Workbook</a></div>
+    <div class="workbook">View in Omni: <a href="https://universalaudio.omniapp.co/e/1:GcSwM73r/1" target="_blank">QTD Static ASP Sell-Through Workbook</a></div>
   </div>
 
-</div>
+  <!-- ══ SECTION 2: WEEKLY REG DOLLARS vs OPLAN ══ -->
+  <div class="section-heading">Weekly Reg Dollars vs Oplan Sell-In Pace</div>
+
+  <div class="card-full">
+    <div class="card-title">
+      <span id="combo-title">Weekly Reg Dollars vs Oplan Channel Perpetual (Sell-In Pace)</span>
+      <a class="omni-link" href="https://universalaudio.omniapp.co/e/1:Jj9W8XfE/1" target="_blank">View in Omni ↗</a>
+    </div>
+    <canvas id="comboChart" style="max-height:360px"></canvas>
+    <div style="font-size:0.76rem;color:#94a3b8;margin-top:12px;">
+      Bars = QTD Reg Dollars (Static ASP) · Line = Oplan Channel Perpetual Sell-In · Weeks after Apr 20 are forward-looking oplan only
+    </div>
+  </div>
+
+  <!-- ══ SECTION 3: WEEKLY REGISTRATIONS ══ -->
+  <div class="section-heading">Weekly Registrations by Product Line</div>
+
+  <div class="card-full">
+    <div class="card-title">
+      <span id="weekly-reg-title">Weekly Sell-Through Registrations by Product Line</span>
+      <a class="omni-link" href="https://universalaudio.omniapp.co/e/1:Jj9W8XfE/1" target="_blank">View in Omni ↗</a>
+    </div>
+    <canvas id="weeklyRegChart" style="max-height:360px"></canvas>
+  </div>
+
+  <!-- ══ SECTION 4: DEALER REGISTRATIONS ══ -->
+  <div class="section-heading">Dealer Registrations by Adaptive Insights Level</div>
+
+  <div class="charts-row">
+    <div class="card">
+      <div class="card-title">
+        <span>Top 15 Dealers by Registrations</span>
+        <a class="omni-link" href="https://universalaudio.omniapp.co/e/1:Kb_RQG4m/1" target="_blank">View in Omni ↗</a>
+      </div>
+      <canvas id="dealerRegChart" style="max-height:380px"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Top 15 Dealers by Reg Dollars</div>
+      <canvas id="dealerRdChart" style="max-height:380px"></canvas>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header">
+      <h3>Dealer Detail — by AI Level</h3>
+      <input type="text" id="dealer-search" placeholder="Search dealer..." oninput="renderDealerTable()">
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th onclick="dealerSortBy('ai')">Adaptive Insights Level ↕</th>
+          <th class="num" onclick="dealerSortBy('n')">Registrations ↕</th>
+          <th class="num" onclick="dealerSortBy('rd')">Reg Dollars ↕</th>
+          <th class="num">% Regs</th>
+          <th class="num">Share</th>
+        </tr>
+      </thead>
+      <tbody id="dealer-table-body"></tbody>
+    </table>
+    <div class="row-count" id="dealer-row-count"></div>
+    <div class="workbook">View in Omni: <a href="https://universalaudio.omniapp.co/e/1:Kb_RQG4m/1" target="_blank">Dealer AI Level Workbook</a></div>
+  </div>
+
+</div><!-- /container -->
 
 <script>
+// ══════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════
+
 const RAW = [
-  {pl:"AIB",pid:"GPM-ANTI",n:42},{pl:"AIB",pid:"GPM-DRM",n:191},{pl:"AIB",pid:"GPM-ENIG",n:115},
-  {pl:"AIB",pid:"GPM-KNUC",n:42},{pl:"AIB",pid:"GPM-LION",n:105},{pl:"AIB",pid:"GPM-RUBY",n:56},{pl:"AIB",pid:"GPM-WDR",n:23},
-  {pl:"Amp Top Box",pid:"OX",n:49},
-  {pl:"Analog Mics",pid:"MIC-UA167",n:1},{pl:"Analog Mics",pid:"MIC-UA187",n:1},{pl:"Analog Mics",pid:"MIC-UA187-REFURB",n:1},
-  {pl:"Apollo Desktop",pid:"APE1X",n:24},{pl:"Apollo Desktop",pid:"APE2M",n:26},
-  {pl:"Apollo Desktop",pid:"APLS",n:155},{pl:"Apollo Desktop",pid:"APLS-HE",n:144},
-  {pl:"Apollo Desktop",pid:"APLSU",n:4},{pl:"Apollo Desktop",pid:"APLSU-HE",n:110},{pl:"Apollo Desktop",pid:"APLSU-REFURB",n:5},
-  {pl:"Apollo Desktop",pid:"APLTWD",n:1},{pl:"Apollo Desktop",pid:"APLTWDII",n:8},{pl:"Apollo Desktop",pid:"APLTWDII-HE",n:11},
-  {pl:"Apollo Desktop",pid:"APLTWDII-HE-REFURB",n:1},{pl:"Apollo Desktop",pid:"APLTWDU-HE",n:28},{pl:"Apollo Desktop",pid:"APLTWDU-REFURB",n:4},
-  {pl:"Apollo Desktop",pid:"APLTWS-REFURB",n:1},{pl:"Apollo Desktop",pid:"APLTWXD",n:3},{pl:"Apollo Desktop",pid:"APLTWXD-HE",n:33},
-  {pl:"Apollo Desktop",pid:"APLTWXDU-HE",n:172},{pl:"Apollo Desktop",pid:"APLTWXQ",n:4},{pl:"Apollo Desktop",pid:"APLTWXQ-HE",n:10},
-  {pl:"Apollo Desktop",pid:"APLTWXQ-HE-REFURB",n:2},{pl:"Apollo Desktop",pid:"APTXDG2-ESS",n:679},
-  {pl:"Apollo Desktop",pid:"APTXDG2-ESS-REFURB",n:1},{pl:"Apollo Desktop",pid:"APTXDG2-STU",n:124},
-  {pl:"Apollo Desktop",pid:"APTXQG2-ESS",n:152},{pl:"Apollo Desktop",pid:"APTXQG2-STU",n:62},
-  {pl:"Apollo Desktop",pid:"APX4",n:2},{pl:"Apollo Desktop",pid:"APX4-HE",n:12},{pl:"Apollo Desktop",pid:"APX4-REFURB",n:2},
-  {pl:"Apollo Desktop",pid:"APX4G2-ESS",n:157},{pl:"Apollo Desktop",pid:"APX4G2-STU",n:37},{pl:"Apollo Desktop",pid:"ARROW",n:5},
-  {pl:"Apollo Rackmount",pid:"APL16",n:1},{pl:"Apollo Rackmount",pid:"APL8Q",n:1},
-  {pl:"Apollo Rackmount",pid:"APX16",n:2},{pl:"Apollo Rackmount",pid:"APX16-HE",n:4},{pl:"Apollo Rackmount",pid:"APX16-REFURB",n:1},
-  {pl:"Apollo Rackmount",pid:"APX16DG2-ESS",n:30},{pl:"Apollo Rackmount",pid:"APX16DG2-ULT",n:2},
-  {pl:"Apollo Rackmount",pid:"APX16G2-ESS",n:38},{pl:"Apollo Rackmount",pid:"APX16G2-ULT",n:5},
-  {pl:"Apollo Rackmount",pid:"APX6",n:2},{pl:"Apollo Rackmount",pid:"APX6-HE",n:3},
-  {pl:"Apollo Rackmount",pid:"APX6G2-ESS",n:67},{pl:"Apollo Rackmount",pid:"APX6G2-STU",n:19},
-  {pl:"Apollo Rackmount",pid:"APX8",n:10},{pl:"Apollo Rackmount",pid:"APX8-HE",n:6},{pl:"Apollo Rackmount",pid:"APX8-REFURB",n:1},
-  {pl:"Apollo Rackmount",pid:"APX8G2-ESS",n:83},{pl:"Apollo Rackmount",pid:"APX8G2-STU",n:32},
-  {pl:"Apollo Rackmount",pid:"APX8P",n:4},{pl:"Apollo Rackmount",pid:"APX8P-HE",n:11},
-  {pl:"Apollo Rackmount",pid:"APX8PG2-ESS",n:93},{pl:"Apollo Rackmount",pid:"APX8PG2-STU",n:23},
-  {pl:"GPM",pid:"GPM-ASTRA",n:13},{pl:"GPM",pid:"GPM-DLVRB",n:76},{pl:"GPM",pid:"GPM-GLXY",n:24},
-  {pl:"GPM",pid:"GPM-GOLD",n:64},{pl:"GPM",pid:"GPM-MAX",n:28},{pl:"GPM",pid:"GPM-OXSTP",n:46},
-  {pl:"GPM",pid:"GPM-STAR",n:32},{pl:"GPM",pid:"GPM-STAR-REFURB",n:1},{pl:"GPM",pid:"GPM-OXSTP-REFURB",n:1},
-  {pl:"GPS",pid:"GPS-1176",n:74},{pl:"GPS",pid:"GPS-BRGD-REFURB",n:12},{pl:"GPS",pid:"GPS-EVMR",n:35},
-  {pl:"GPS",pid:"GPS-FLOW",n:8},{pl:"GPS",pid:"GPS-HVNLY",n:20},{pl:"GPS",pid:"GPS-LA2A",n:27},{pl:"GPS",pid:"GPS-ORN",n:16},
-  {pl:"Modeling Mics",pid:"MIC-TLL22",n:33},{pl:"Modeling Mics",pid:"MIC-UADLX",n:87},{pl:"Modeling Mics",pid:"MIC-UALX",n:70},
-  {pl:"Modeling Mics",pid:"MIC-UASC-1",n:36},{pl:"Modeling Mics",pid:"MIC-UASD-1",n:111},{pl:"Modeling Mics",pid:"MIC-UASD-3",n:20},
-  {pl:"Modeling Mics",pid:"MIC-UASD-5",n:14},{pl:"Modeling Mics",pid:"MIC-UASD-7",n:19},{pl:"Modeling Mics",pid:"MIC-UASP-1",n:35},
-  {pl:"UAD",pid:"PCI2O-C",n:1},{pl:"UAD",pid:"SATQ-C",n:1},
-  {pl:"UAD",pid:"TB3SATO-C",n:45},{pl:"UAD",pid:"TB3SATO-X",n:1},
-  {pl:"UAD",pid:"TB3SATQ-C",n:51},{pl:"UAD",pid:"TB3SATQ-C-REFURB",n:1},
-  {pl:"UAD",pid:"TBSATO-C",n:2},{pl:"UAD",pid:"TBSATO-U5",n:1},
-  {pl:"UAD",pid:"USBSATO-C",n:7},{pl:"UAD",pid:"USBSATQ-C",n:1},
-  {pl:"Volt Desktop",pid:"VOLT1",n:819},{pl:"Volt Desktop",pid:"VOLT176",n:384},{pl:"Volt Desktop",pid:"VOLT2",n:1041},
-  {pl:"Volt Desktop",pid:"VOLT2-P",n:7},{pl:"Volt Desktop",pid:"VOLT2-REFURB",n:23},{pl:"Volt Desktop",pid:"VOLT276",n:562},
-  {pl:"Volt Desktop",pid:"VOLT276-REFURB",n:32},{pl:"Volt Desktop",pid:"VOLT4",n:28},{pl:"Volt Desktop",pid:"VOLT476",n:175},
-  {pl:"Volt Desktop",pid:"VOLT476P",n:208},{pl:"Volt Desktop",pid:"VOLT876",n:149}
+  {pl:"AIB",pid:"GPM-ANTI",n:43,rd:12095.37},{pl:"AIB",pid:"GPM-DRM",n:194,rd:51141.38},{pl:"AIB",pid:"GPM-ENIG",n:116,rd:29595.26},
+  {pl:"AIB",pid:"GPM-KNUC",n:42,rd:12138.17},{pl:"AIB",pid:"GPM-LION",n:106,rd:29604.35},{pl:"AIB",pid:"GPM-RUBY",n:59,rd:16275.09},{pl:"AIB",pid:"GPM-WDR",n:23,rd:6626.00},
+  {pl:"Amp Top Box",pid:"OX",n:50,rd:48839.11},
+  {pl:"Analog Mics",pid:"MIC-UA167",n:1,rd:1785.91},{pl:"Analog Mics",pid:"MIC-UA187",n:1,rd:801.99},{pl:"Analog Mics",pid:"MIC-UA187-REFURB",n:1,rd:0},
+  {pl:"Apollo Desktop",pid:"APE1X",n:24,rd:5250.03},{pl:"Apollo Desktop",pid:"APE2M",n:26,rd:8845.75},
+  {pl:"Apollo Desktop",pid:"APLS",n:157,rd:69381.18},{pl:"Apollo Desktop",pid:"APLS-HE",n:147,rd:65307.03},
+  {pl:"Apollo Desktop",pid:"APLSU",n:4,rd:1396.00},{pl:"Apollo Desktop",pid:"APLSU-HE",n:111,rd:46043.36},{pl:"Apollo Desktop",pid:"APLSU-REFURB",n:5,rd:2074.03},
+  {pl:"Apollo Desktop",pid:"APLTWD",n:1,rd:0},{pl:"Apollo Desktop",pid:"APLTWDII",n:8,rd:4920.00},{pl:"Apollo Desktop",pid:"APLTWDII-HE",n:12,rd:7484.20},
+  {pl:"Apollo Desktop",pid:"APLTWDII-HE-REFURB",n:1,rd:623.68},{pl:"Apollo Desktop",pid:"APLTWDU-HE",n:29,rd:16607.76},{pl:"Apollo Desktop",pid:"APLTWDU-REFURB",n:4,rd:2290.73},
+  {pl:"Apollo Desktop",pid:"APLTWS-REFURB",n:1,rd:0},{pl:"Apollo Desktop",pid:"APLTWXD",n:4,rd:3005.64},{pl:"Apollo Desktop",pid:"APLTWXD-HE",n:33,rd:28836.01},
+  {pl:"Apollo Desktop",pid:"APLTWXDU-HE",n:175,rd:115030.41},{pl:"Apollo Desktop",pid:"APLTWXQ",n:4,rd:2493.30},{pl:"Apollo Desktop",pid:"APLTWXQ-HE",n:10,rd:9252.40},
+  {pl:"Apollo Desktop",pid:"APLTWXQ-HE-REFURB",n:2,rd:1850.48},{pl:"Apollo Desktop",pid:"APTXDG2-ESS",n:697,rd:556499.18},
+  {pl:"Apollo Desktop",pid:"APTXDG2-ESS-REFURB",n:1,rd:755.37},{pl:"Apollo Desktop",pid:"APTXDG2-STU",n:126,rd:123559.52},
+  {pl:"Apollo Desktop",pid:"APTXQG2-ESS",n:155,rd:163456.70},{pl:"Apollo Desktop",pid:"APTXQG2-STU",n:62,rd:74814.29},
+  {pl:"Apollo Desktop",pid:"APX4",n:2,rd:2303.45},{pl:"Apollo Desktop",pid:"APX4-HE",n:12,rd:14200.50},{pl:"Apollo Desktop",pid:"APX4-REFURB",n:2,rd:2116.16},
+  {pl:"Apollo Desktop",pid:"APX4G2-ESS",n:159,rd:229080.83},{pl:"Apollo Desktop",pid:"APX4G2-STU",n:37,rd:57276.13},{pl:"Apollo Desktop",pid:"ARROW",n:5,rd:1763.30},
+  {pl:"Apollo Rackmount",pid:"APL16",n:1,rd:0},{pl:"Apollo Rackmount",pid:"APL8Q",n:1,rd:0},
+  {pl:"Apollo Rackmount",pid:"APX16",n:2,rd:5458.00},{pl:"Apollo Rackmount",pid:"APX16-HE",n:4,rd:10916.00},{pl:"Apollo Rackmount",pid:"APX16-REFURB",n:1,rd:0},
+  {pl:"Apollo Rackmount",pid:"APX16DG2-ESS",n:34,rd:65335.03},{pl:"Apollo Rackmount",pid:"APX16DG2-ULT",n:2,rd:5049.59},
+  {pl:"Apollo Rackmount",pid:"APX16G2-ESS",n:38,rd:101780.98},{pl:"Apollo Rackmount",pid:"APX16G2-ULT",n:5,rd:16174.45},
+  {pl:"Apollo Rackmount",pid:"APX6",n:2,rd:2511.97},{pl:"Apollo Rackmount",pid:"APX6-HE",n:3,rd:3048.01},
+  {pl:"Apollo Rackmount",pid:"APX6G2-ESS",n:70,rd:115889.45},{pl:"Apollo Rackmount",pid:"APX6G2-STU",n:19,rd:33906.71},
+  {pl:"Apollo Rackmount",pid:"APX8",n:10,rd:14180.61},{pl:"Apollo Rackmount",pid:"APX8-HE",n:6,rd:10075.80},{pl:"Apollo Rackmount",pid:"APX8-REFURB",n:1,rd:1679.30},
+  {pl:"Apollo Rackmount",pid:"APX8G2-ESS",n:85,rd:162823.14},{pl:"Apollo Rackmount",pid:"APX8G2-STU",n:34,rd:72825.84},
+  {pl:"Apollo Rackmount",pid:"APX8P",n:4,rd:7477.80},{pl:"Apollo Rackmount",pid:"APX8P-HE",n:11,rd:21874.81},
+  {pl:"Apollo Rackmount",pid:"APX8PG2-ESS",n:93,rd:218677.02},{pl:"Apollo Rackmount",pid:"APX8PG2-STU",n:24,rd:58350.27},
+  {pl:"GPM",pid:"GPM-ASTRA",n:13,rd:3931.71},{pl:"GPM",pid:"GPM-DLVRB",n:78,rd:18973.98},{pl:"GPM",pid:"GPM-GLXY",n:24,rd:6289.78},
+  {pl:"GPM",pid:"GPM-GOLD",n:67,rd:18023.82},{pl:"GPM",pid:"GPM-MAX",n:28,rd:6863.52},{pl:"GPM",pid:"GPM-OXSTP",n:49,rd:14307.55},
+  {pl:"GPM",pid:"GPM-STAR",n:33,rd:9196.95},{pl:"GPM",pid:"GPM-STAR-REFURB",n:1,rd:221.19},{pl:"GPM",pid:"GPM-OXSTP-REFURB",n:1,rd:251.37},
+  {pl:"GPS",pid:"GPS-1176",n:76,rd:8303.58},{pl:"GPS",pid:"GPS-BRGD-REFURB",n:12,rd:1241.04},{pl:"GPS",pid:"GPS-EVMR",n:35,rd:4062.19},
+  {pl:"GPS",pid:"GPS-FLOW",n:8,rd:967.00},{pl:"GPS",pid:"GPS-HVNLY",n:20,rd:2353.89},{pl:"GPS",pid:"GPS-LA2A",n:27,rd:3013.54},{pl:"GPS",pid:"GPS-ORN",n:17,rd:1994.07},
+  {pl:"Modeling Mics",pid:"MIC-TLL22",n:33,rd:35884.48},{pl:"Modeling Mics",pid:"MIC-UADLX",n:89,rd:48557.87},{pl:"Modeling Mics",pid:"MIC-UALX",n:72,rd:17247.81},
+  {pl:"Modeling Mics",pid:"MIC-UASC-1",n:37,rd:12016.86},{pl:"Modeling Mics",pid:"MIC-UASD-1",n:114,rd:21658.57},{pl:"Modeling Mics",pid:"MIC-UASD-3",n:21,rd:2311.00},
+  {pl:"Modeling Mics",pid:"MIC-UASD-5",n:15,rd:1943.23},{pl:"Modeling Mics",pid:"MIC-UASD-7",n:22,rd:2091.58},{pl:"Modeling Mics",pid:"MIC-UASP-1",n:36,rd:9483.74},
+  {pl:"UAD",pid:"PCI2O-C",n:1,rd:684.07},{pl:"UAD",pid:"SATQ-C",n:1,rd:113.57},
+  {pl:"UAD",pid:"TB3SATO-C",n:47,rd:33340.46},{pl:"UAD",pid:"TB3SATO-X",n:1,rd:1152.24},
+  {pl:"UAD",pid:"TB3SATQ-C",n:52,rd:26663.49},{pl:"UAD",pid:"TB3SATQ-C-REFURB",n:1,rd:0},
+  {pl:"UAD",pid:"TBSATO-C",n:2,rd:0},{pl:"UAD",pid:"TBSATO-U5",n:1,rd:0},
+  {pl:"UAD",pid:"USBSATO-C",n:7,rd:4536.44},{pl:"UAD",pid:"USBSATQ-C",n:1,rd:534.05},
+  {pl:"Volt Desktop",pid:"VOLT1",n:837,rd:76182.67},{pl:"Volt Desktop",pid:"VOLT176",n:389,rd:47397.68},{pl:"Volt Desktop",pid:"VOLT2",n:1064,rd:129669.27},
+  {pl:"Volt Desktop",pid:"VOLT2-P",n:8,rd:1394.40},{pl:"Volt Desktop",pid:"VOLT2-REFURB",n:23,rd:3957.52},{pl:"Volt Desktop",pid:"VOLT276",n:574,rd:107770.17},
+  {pl:"Volt Desktop",pid:"VOLT276-REFURB",n:34,rd:6495.16},{pl:"Volt Desktop",pid:"VOLT4",n:29,rd:4943.05},{pl:"Volt Desktop",pid:"VOLT476",n:179,rd:41372.27},
+  {pl:"Volt Desktop",pid:"VOLT476P",n:211,rd:63626.20},{pl:"Volt Desktop",pid:"VOLT876",n:153,rd:96447.31}
 ];
 
-const PRODUCT_LINES = [...new Set(RAW.map(r => r.pl))].sort();
+// Weekly by product line — {w, pl, n, rd}
+const WEEKLY = [
+  {w:"Mar 30",pl:"AIB",n:144,rd:38681},{w:"Mar 30",pl:"Amp Top Box",n:9,rd:8791},{w:"Mar 30",pl:"Analog Mics",n:2,rd:1786},
+  {w:"Mar 30",pl:"Apollo Desktop",n:463,rd:376891},{w:"Mar 30",pl:"Apollo Rackmount",n:120,rd:247656},
+  {w:"Mar 30",pl:"GPM",n:56,rd:14753},{w:"Mar 30",pl:"GPS",n:46,rd:5143},
+  {w:"Mar 30",pl:"Modeling Mics",n:91,rd:25566},{w:"Mar 30",pl:"UAD",n:32,rd:16897},{w:"Mar 30",pl:"Volt Desktop",n:771,rd:128813},
+  {w:"Apr 6",pl:"AIB",n:179,rd:48503},{w:"Apr 6",pl:"Amp Top Box",n:17,rd:16605},{w:"Apr 6",pl:"Analog Mics",n:1,rd:802},
+  {w:"Apr 6",pl:"Apollo Desktop",n:616,rd:499768},{w:"Apr 6",pl:"Apollo Rackmount",n:135,rd:277615},
+  {w:"Apr 6",pl:"GPM",n:90,rd:24028},{w:"Apr 6",pl:"GPS",n:63,rd:7105},
+  {w:"Apr 6",pl:"Modeling Mics",n:142,rd:56276},{w:"Apr 6",pl:"UAD",n:37,rd:22252},{w:"Apr 6",pl:"Volt Desktop",n:1126,rd:182192},
+  {w:"Apr 13",pl:"AIB",n:177,rd:47856},{w:"Apr 13",pl:"Amp Top Box",n:17,rd:16605},
+  {w:"Apr 13",pl:"Apollo Desktop",n:645,rd:503416},{w:"Apr 13",pl:"Apollo Rackmount",n:123,rd:252098},
+  {w:"Apr 13",pl:"GPM",n:90,rd:23955},{w:"Apr 13",pl:"GPS",n:59,rd:6700},
+  {w:"Apr 13",pl:"Modeling Mics",n:136,rd:45676},{w:"Apr 13",pl:"UAD",n:34,rd:19993},{w:"Apr 13",pl:"Volt Desktop",n:1073,rd:179853},
+  {w:"Apr 20",pl:"AIB",n:83,rd:22435},{w:"Apr 20",pl:"Amp Top Box",n:7,rd:6837},
+  {w:"Apr 20",pl:"Apollo Desktop",n:292,rd:236442},{w:"Apr 20",pl:"Apollo Rackmount",n:72,rd:150666},
+  {w:"Apr 20",pl:"GPM",n:58,rd:15323},{w:"Apr 20",pl:"GPS",n:27,rd:2988},
+  {w:"Apr 20",pl:"Modeling Mics",n:70,rd:23678},{w:"Apr 20",pl:"UAD",n:11,rd:7883},{w:"Apr 20",pl:"Volt Desktop",n:531,rd:88397}
+];
 
-// Build product ID map by product line
+// Weekly totals — {w, n, rd}
+const WEEKLY_TOTALS = [
+  {w:"Mar 30",n:1734,rd:864977},
+  {w:"Apr 6",n:2406,rd:1135145},
+  {w:"Apr 13",n:2354,rd:1096153},
+  {w:"Apr 20",n:1151,rd:554651}
+];
+
+// Oplan Q2 Channel Perpetual sell-in by week
+const OPLAN = [
+  {w:"Mar 30",v:99771},{w:"Apr 6",v:52546},{w:"Apr 13",v:51268},{w:"Apr 20",v:52033},
+  {w:"Apr 27",v:75118},{w:"May 4",v:67211},{w:"May 11",v:73554},{w:"May 18",v:113768},
+  {w:"May 25",v:96583},{w:"Jun 1",v:141006},{w:"Jun 8",v:91907},{w:"Jun 15",v:85788},
+  {w:"Jun 22",v:115268},{w:"Jun 29",v:76271}
+];
+
+// Dealer by AI level — {ai, n, rd}
+const DEALER_RAW = [
+  {ai:"Guitar Center",n:864,rd:347213},{ai:"Thomann",n:792,rd:394156},{ai:"Sweetwater",n:736,rd:502702},
+  {ai:"Amazon",n:604,rd:172618},{ai:"EMEA_Dist_Gen",n:406,rd:148151},{ai:"Hook Up",n:391,rd:153036},
+  {ai:"KMC",n:345,rd:124038},{ai:"Yorkville",n:319,rd:123883},{ai:"Musical Fulfillment",n:212,rd:105250},
+  {ai:"EMEA_Nord_Gen",n:196,rd:74617},{ai:"Gearlounge",n:192,rd:103404},{ai:"LatAm_Gen",n:160,rd:85688},
+  {ai:"DMT",n:159,rd:103923},{ai:"MidiWare",n:147,rd:75079},{ai:"Musician's Friend",n:144,rd:97614},
+  {ai:"CMI",n:135,rd:59295},{ai:"APAC_Gen",n:116,rd:43901},{ai:"AUDIOSTACJA",n:110,rd:46447},
+  {ai:"Amazon Europe",n:99,rd:17974},{ai:"Fitzpatrick",n:92,rd:40956},{ai:"MediaCast",n:76,rd:25194},
+  {ai:"MAS ACOUSTICS",n:68,rd:38543},{ai:"Woodbrass",n:67,rd:52655},{ai:"Andertons",n:65,rd:34007},
+  {ai:"Music Store Pro GmbH",n:64,rd:30342},{ai:"US_South Central_Gen",n:62,rd:26640},
+  {ai:"US_Western_Gen",n:62,rd:38450},{ai:"B&H Photo",n:56,rd:45537},{ai:"MSonic",n:54,rd:25093},
+  {ai:"US_Southeast_Gen",n:53,rd:16425},{ai:"Promusicals",n:49,rd:24914},{ai:"Non-Channel_US",n:47,rd:41616},
+  {ai:"Star's Music",n:45,rd:24710},{ai:"Alto Music",n:42,rd:26732},{ai:"Gear 4 Music Ltd",n:36,rd:17047},
+  {ai:"US_Northeast_Gen",n:31,rd:18230},{ai:"Benum",n:28,rd:12353},{ai:"Mega Sound SonoVente",n:28,rd:18429},
+  {ai:"Vintage King",n:27,rd:27776},{ai:"EMEA_France_Gen",n:26,rd:9826},{ai:"EMEA_UK_Gen",n:26,rd:9955},
+  {ai:"Guitar Guitar Ltd",n:22,rd:12959},{ai:"EMEA_GAS_East_Gen",n:21,rd:16746},{ai:"Musix AG",n:20,rd:8016},
+  {ai:"ProAudio Star",n:17,rd:9300},{ai:"S & T Audio Limited (PMT)",n:17,rd:4021},
+  {ai:"KMR Audio Ltd",n:16,rd:19195},{ai:"Non-Channel_AMS",n:16,rd:14615},{ai:"Studiocare Pro",n:15,rd:16478},
+  {ai:"House of Sound",n:12,rd:8874},{ai:"Cyber Farm APS",n:11,rd:8658},
+  {ai:"Session GmbH & Co. KG",n:10,rd:4160},{ai:"EMEA_GAS_West_Gen",n:9,rd:4931},
+  {ai:"Gear 4 Music Ltd (DE)",n:9,rd:4661},{ai:"Bax",n:7,rd:1569},
+  {ai:"Guitar Amp and Keyboard",n:4,rd:1768},{ai:"Sam Ash",n:4,rd:1992},
+  {ai:"NeoNet",n:3,rd:475},{ai:"Peakhouse Audio",n:3,rd:2071},
+  {ai:"Absolute Music",n:1,rd:279},{ai:"EMEA_Benelux_Gen",n:1,rd:925},{ai:"Just Music GmbH",n:1,rd:874}
+];
+
+// ══════════════════════════════════════════════
+//  SETUP
+// ══════════════════════════════════════════════
+
+const PRODUCT_LINES = [...new Set(RAW.map(r => r.pl))].sort();
 const PID_BY_LINE = {};
 PRODUCT_LINES.forEach(pl => {
   PID_BY_LINE[pl] = [...new Set(RAW.filter(r => r.pl === pl).map(r => r.pid))].sort();
 });
 const ALL_PIDS = [...new Set(RAW.map(r => r.pid))].sort();
+const ALL_WEEKS = [...new Set(WEEKLY.map(r => r.w))];
+const ALL_PLS_IN_WEEKLY = [...new Set(WEEKLY.map(r => r.pl))].sort();
 
 const fLine = document.getElementById('f-line');
 const fPid  = document.getElementById('f-pid');
+const fAi   = document.getElementById('f-ai');
 
-// Populate product line dropdown
+// Populate dropdowns
 PRODUCT_LINES.forEach(pl => {
   const o = document.createElement('option'); o.value = pl; o.textContent = pl;
   fLine.appendChild(o);
+});
+DEALER_RAW.forEach(d => {
+  const o = document.createElement('option'); o.value = d.ai; o.textContent = d.ai;
+  fAi.appendChild(o);
 });
 
 function populatePidDropdown(line) {
@@ -208,29 +372,54 @@ function populatePidDropdown(line) {
     ? `${pids.length} SKU${pids.length !== 1 ? 's' : ''} in ${line}`
     : 'Select a Product Line to filter SKUs';
 }
-
 populatePidDropdown('');
 
-fLine.onchange = () => {
-  // Fan out: repopulate PIDs for selected line, reset PID selection
-  populatePidDropdown(fLine.value);
-  fPid.value = '';
-  updateAll();
-};
-fPid.onchange = () => updateAll();
+fLine.onchange = () => { populatePidDropdown(fLine.value); fPid.value = ''; updateAll(); };
+fPid.onchange  = () => updateAll();
+fAi.onchange   = () => updateAll();
 
-function filtered() {
+// ══════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════
+
+const LINE_COLORS = ["#2563eb","#dc2626","#16a34a","#d97706","#7c3aed","#0891b2","#db2777","#65a30d","#ea580c","#0284c7","#9333ea","#be123c"];
+
+function fmtDollars(v) {
+  if (v >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+  if (v >= 1e3) return '$' + (v/1e3).toFixed(0) + 'K';
+  return '$' + v.toFixed(0);
+}
+
+function filteredRaw() {
   const line = fLine.value, pid = fPid.value;
   return RAW.filter(r => (!line || r.pl === line) && (!pid || r.pid === pid));
 }
 
-function aggBy(data, key) {
+function aggBy(data, key, valKey) {
   const m = {};
-  data.forEach(r => { m[r[key]] = (m[r[key]] || 0) + r.n; });
+  data.forEach(r => { m[r[key]] = (m[r[key]] || 0) + r[valKey]; });
   return m;
 }
 
-const LINE_COLORS = ["#2563eb","#dc2626","#16a34a","#d97706","#7c3aed","#0891b2","#db2777","#65a30d","#ea580c","#0284c7","#9333ea"];
+// Get the product line for a PID (used to filter weekly data when PID is selected)
+function getActiveLine() {
+  if (fPid.value) return RAW.find(r => r.pid === fPid.value)?.pl || fLine.value;
+  return fLine.value;
+}
+
+// Filter weekly data by active PL/PID
+function filteredWeekly() {
+  const activeLine = getActiveLine();
+  if (!activeLine) return WEEKLY;
+  return WEEKLY.filter(r => r.pl === activeLine);
+}
+
+// ══════════════════════════════════════════════
+//  QTD CHARTS + TABLE
+// ══════════════════════════════════════════════
+
+let sortKey = 'n', sortDir = -1;
+function sortBy(k) { if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = -1; } renderTable(); }
 
 const lineChart = new Chart(document.getElementById('lineChart'), {
   type: 'bar',
@@ -254,17 +443,15 @@ const donutChart = new Chart(document.getElementById('donutChart'), {
   }
 });
 
-let sortKey = 'n', sortDir = -1;
-function sortBy(k) { if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = -1; } renderTable(); }
-
 function renderTable() {
-  const data = filtered();
+  const data = filteredRaw();
   const q = document.getElementById('search').value.toLowerCase();
   const total = data.reduce((s, r) => s + r.n, 0);
   const rows = data.filter(r => !q || r.pl.toLowerCase().includes(q) || r.pid.toLowerCase().includes(q));
   rows.sort((a, b) => {
     if (sortKey === 'pl')  return sortDir * a.pl.localeCompare(b.pl);
     if (sortKey === 'pid') return sortDir * a.pid.localeCompare(b.pid);
+    if (sortKey === 'rd')  return sortDir * (a.rd - b.rd);
     return sortDir * (a.n - b.n);
   });
   const maxN = rows.length ? Math.max(...rows.map(r => r.n)) : 1;
@@ -275,6 +462,7 @@ function renderTable() {
       <td>${r.pl}</td>
       <td><code style="font-size:0.83rem">${r.pid}</code></td>
       <td class="num">${r.n.toLocaleString()}</td>
+      <td class="num">${r.rd > 0 ? fmtDollars(r.rd) : '—'}</td>
       <td class="num">${pct}%</td>
       <td class="num"><div class="bar-cell"><div class="mini-bar" style="width:${barW}px"></div></div></td>
     </tr>`;
@@ -282,24 +470,24 @@ function renderTable() {
   document.getElementById('row-count').textContent = `Showing ${rows.length} SKU${rows.length !== 1 ? 's' : ''}`;
 }
 
-function updateAll() {
-  const data = filtered();
+function updateQtd() {
+  const data = filteredRaw();
   const total = data.reduce((s, r) => s + r.n, 0);
+  const totalRd = data.reduce((s, r) => s + r.rd, 0);
   const selectedLine = fLine.value;
-  const selectedPid  = fPid.value;
 
-  // When a product line is active, drill into product IDs; otherwise roll up by line
   const drillMode = selectedLine !== '';
   const groupKey  = drillMode ? 'pid' : 'pl';
-  const grouped   = aggBy(data, groupKey);
+  const grouped   = aggBy(data, groupKey, 'n');
   const sorted    = Object.entries(grouped).sort((a, b) => b[1] - a[1]);
 
-  // KPIs
-  const byLine = drillMode ? aggBy(data, 'pl') : grouped;
+  const byLine = drillMode ? aggBy(data, 'pl', 'n') : grouped;
   document.getElementById('kpi-total').textContent = total.toLocaleString();
+  document.getElementById('kpi-rd').textContent = fmtDollars(totalRd);
+
   const topEntry = Object.entries(drillMode ? grouped : byLine).sort((a,b) => b[1]-a[1])[0];
   if (topEntry) {
-    document.getElementById('kpi-top-line').textContent = drillMode ? topEntry[0] : topEntry[0];
+    document.getElementById('kpi-top-line').textContent = topEntry[0];
     document.getElementById('kpi-top-line-sub').textContent =
       `${topEntry[1].toLocaleString()} regs (${(topEntry[1]/total*100).toFixed(1)}%)`;
   } else {
@@ -312,13 +500,10 @@ function updateAll() {
   document.getElementById('kpi-avg-sub').textContent = skus > 0
     ? `${Math.round(total / skus).toLocaleString()} avg per SKU`
     : 'Avg per SKU';
-
-  // KPI label
   document.getElementById('kpi-top-label').textContent = drillMode ? 'Top Product ID' : 'Top Product Line';
 
-  // Chart titles
   if (drillMode) {
-    const lineLabel = selectedPid ? `${selectedLine} — ${selectedPid}` : selectedLine;
+    const lineLabel = fPid.value ? `${selectedLine} — ${fPid.value}` : selectedLine;
     document.getElementById('bar-title').textContent   = `Registrations by Product ID — ${lineLabel}`;
     document.getElementById('donut-title').textContent = `Product ID Mix — ${lineLabel}`;
   } else {
@@ -326,7 +511,6 @@ function updateAll() {
     document.getElementById('donut-title').textContent = 'Product Line Mix';
   }
 
-  // Bar chart — rotate labels when showing many SKUs
   const manyBars = sorted.length > 8;
   lineChart.options.scales.x.ticks.maxRotation = manyBars ? 45 : 0;
   lineChart.options.scales.x.ticks.font = { size: manyBars ? 10 : 11 };
@@ -335,7 +519,6 @@ function updateAll() {
   lineChart.data.datasets[0].backgroundColor = sorted.map((_, i) => LINE_COLORS[i % LINE_COLORS.length]);
   lineChart.update();
 
-  // Donut — cap at top 12 + Other to keep it readable
   const top12 = sorted.slice(0, 12);
   const otherSum = sorted.slice(12).reduce((s, e) => s + e[1], 0);
   donutChart.data.labels = [...top12.map(e => e[0]), ...(otherSum > 0 ? ['Other'] : [])];
@@ -346,11 +529,266 @@ function updateAll() {
   renderTable();
 }
 
+// ══════════════════════════════════════════════
+//  COMBO CHART: Weekly Reg $ vs Oplan
+// ══════════════════════════════════════════════
+
+// All weeks across reg + oplan
+const COMBO_WEEKS = [...new Set([...WEEKLY_TOTALS.map(r => r.w), ...OPLAN.map(r => r.w)])];
+
+// Build reg dollars map per week (filterable)
+function getWeeklyRegDollars() {
+  const activeLine = getActiveLine();
+  if (!activeLine) {
+    // Use WEEKLY_TOTALS for unfiltered total
+    const m = {};
+    WEEKLY_TOTALS.forEach(r => { m[r.w] = r.rd; });
+    return m;
+  }
+  // Filter WEEKLY by active line
+  const m = {};
+  WEEKLY.filter(r => r.pl === activeLine).forEach(r => { m[r.w] = (m[r.w] || 0) + r.rd; });
+  return m;
+}
+
+const comboChart = new Chart(document.getElementById('comboChart'), {
+  type: 'bar',
+  data: {
+    labels: COMBO_WEEKS,
+    datasets: [
+      {
+        type: 'bar',
+        label: 'Reg Dollars (Static ASP)',
+        data: [],
+        backgroundColor: '#3b82f6',
+        borderRadius: 4,
+        yAxisID: 'yReg',
+        order: 2
+      },
+      {
+        type: 'line',
+        label: 'Oplan Channel Perpetual (Sell-In)',
+        data: [],
+        borderColor: '#f59e0b',
+        backgroundColor: 'rgba(245,158,11,0.15)',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: '#f59e0b',
+        tension: 0.25,
+        yAxisID: 'yOplan',
+        order: 1,
+        fill: false
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { labels: { font: { size: 11 }, boxWidth: 14 } },
+      tooltip: {
+        callbacks: {
+          label: c => {
+            const v = c.parsed.y;
+            return ` ${c.dataset.label}: ${fmtDollars(v)}`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+      yReg: {
+        type: 'linear', position: 'left',
+        title: { display: true, text: 'Reg Dollars', font: { size: 11 }, color: '#3b82f6' },
+        ticks: { callback: v => fmtDollars(v), color: '#3b82f6', font: { size: 10 } },
+        grid: { color: '#f1f5f9' }
+      },
+      yOplan: {
+        type: 'linear', position: 'right',
+        title: { display: true, text: 'Oplan Sell-In', font: { size: 11 }, color: '#f59e0b' },
+        ticks: { callback: v => fmtDollars(v), color: '#f59e0b', font: { size: 10 } },
+        grid: { display: false }
+      }
+    }
+  }
+});
+
+function updateComboChart() {
+  const rdMap = getWeeklyRegDollars();
+  const oplanMap = {};
+  OPLAN.forEach(r => { oplanMap[r.w] = r.v; });
+
+  comboChart.data.datasets[0].data = COMBO_WEEKS.map(w => rdMap[w] || null);
+  comboChart.data.datasets[1].data = COMBO_WEEKS.map(w => oplanMap[w] || null);
+
+  const activeLine = getActiveLine();
+  const titleEl = document.getElementById('combo-title');
+  titleEl.textContent = activeLine
+    ? `Weekly Reg Dollars vs Oplan Sell-In — ${activeLine}`
+    : 'Weekly Reg Dollars vs Oplan Channel Perpetual (Sell-In Pace)';
+
+  comboChart.update();
+}
+
+// ══════════════════════════════════════════════
+//  WEEKLY REGISTRATIONS CHART (stacked bar by PL)
+// ══════════════════════════════════════════════
+
+// Build stacked datasets for weekly regs
+const weeklyRegChart = new Chart(document.getElementById('weeklyRegChart'), {
+  type: 'bar',
+  data: { labels: ALL_WEEKS, datasets: [] },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12 } },
+      tooltip: {
+        mode: 'index',
+        callbacks: { label: c => ` ${c.dataset.label}: ${c.parsed.y.toLocaleString()}` }
+      }
+    },
+    scales: {
+      x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 } } },
+      y: { stacked: true, ticks: { callback: v => v.toLocaleString() } }
+    }
+  }
+});
+
+function updateWeeklyRegChart() {
+  const activeLine = getActiveLine();
+  const weeks = ALL_WEEKS;
+
+  let datasets;
+  if (activeLine) {
+    // Single line — show bar per week, colored by week
+    const weekData = weeks.map(w => {
+      const row = WEEKLY.find(r => r.w === w && r.pl === activeLine);
+      return row ? row.n : 0;
+    });
+    datasets = [{
+      label: activeLine,
+      data: weekData,
+      backgroundColor: '#2563eb',
+      borderRadius: 4
+    }];
+    weeklyRegChart.options.scales.x.stacked = false;
+    weeklyRegChart.options.scales.y.stacked = false;
+  } else {
+    // All lines stacked
+    datasets = ALL_PLS_IN_WEEKLY.map((pl, i) => ({
+      label: pl,
+      data: weeks.map(w => {
+        const row = WEEKLY.find(r => r.w === w && r.pl === pl);
+        return row ? row.n : 0;
+      }),
+      backgroundColor: LINE_COLORS[i % LINE_COLORS.length],
+      borderRadius: 0
+    }));
+    weeklyRegChart.options.scales.x.stacked = true;
+    weeklyRegChart.options.scales.y.stacked = true;
+  }
+
+  weeklyRegChart.data.labels = weeks;
+  weeklyRegChart.data.datasets = datasets;
+
+  document.getElementById('weekly-reg-title').textContent = activeLine
+    ? `Weekly Sell-Through Registrations — ${activeLine}`
+    : 'Weekly Sell-Through Registrations by Product Line';
+
+  weeklyRegChart.update();
+}
+
+// ══════════════════════════════════════════════
+//  DEALER CHARTS + TABLE
+// ══════════════════════════════════════════════
+
+function filteredDealer() {
+  const ai = fAi.value;
+  return ai ? DEALER_RAW.filter(d => d.ai === ai) : DEALER_RAW;
+}
+
+const dealerRegChart = new Chart(document.getElementById('dealerRegChart'), {
+  type: 'bar',
+  data: { labels: [], datasets: [{ data: [], backgroundColor: '#2563eb', borderRadius: 4 }] },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.parsed.x.toLocaleString()} regs` } } },
+    scales: { x: { ticks: { callback: v => v.toLocaleString(), font: { size: 10 } } }, y: { ticks: { font: { size: 11 } }, grid: { display: false } } }
+  }
+});
+
+const dealerRdChart = new Chart(document.getElementById('dealerRdChart'), {
+  type: 'bar',
+  data: { labels: [], datasets: [{ data: [], backgroundColor: '#7c3aed', borderRadius: 4 }] },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${fmtDollars(c.parsed.x)}` } } },
+    scales: { x: { ticks: { callback: v => fmtDollars(v), font: { size: 10 } } }, y: { ticks: { font: { size: 11 } }, grid: { display: false } } }
+  }
+});
+
+let dealerSortKey = 'n', dealerSortDir = -1;
+function dealerSortBy(k) { if (dealerSortKey === k) dealerSortDir *= -1; else { dealerSortKey = k; dealerSortDir = -1; } renderDealerTable(); }
+
+function renderDealerTable() {
+  const data = filteredDealer();
+  const q = document.getElementById('dealer-search').value.toLowerCase();
+  const totalN = data.reduce((s, d) => s + d.n, 0);
+  let rows = data.filter(d => !q || d.ai.toLowerCase().includes(q));
+  rows.sort((a, b) => {
+    if (dealerSortKey === 'ai') return dealerSortDir * a.ai.localeCompare(b.ai);
+    if (dealerSortKey === 'rd') return dealerSortDir * (a.rd - b.rd);
+    return dealerSortDir * (a.n - b.n);
+  });
+  const maxN = rows.length ? Math.max(...rows.map(d => d.n)) : 1;
+  document.getElementById('dealer-table-body').innerHTML = rows.map(d => {
+    const pct = totalN > 0 ? (d.n / totalN * 100).toFixed(1) : '0.0';
+    const barW = Math.max(2, Math.round(d.n / maxN * 100));
+    return `<tr>
+      <td>${d.ai}</td>
+      <td class="num">${d.n.toLocaleString()}</td>
+      <td class="num">${fmtDollars(d.rd)}</td>
+      <td class="num">${pct}%</td>
+      <td class="num"><div class="bar-cell"><div class="mini-bar" style="width:${barW}px"></div></div></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('dealer-row-count').textContent = `Showing ${rows.length} dealer${rows.length !== 1 ? 's' : ''}`;
+}
+
+function updateDealerCharts() {
+  const data = filteredDealer();
+  const byN  = [...data].sort((a,b) => b.n - a.n).slice(0, 15);
+  const byRd = [...data].sort((a,b) => b.rd - a.rd).slice(0, 15);
+
+  dealerRegChart.data.labels = byN.map(d => d.ai);
+  dealerRegChart.data.datasets[0].data = byN.map(d => d.n);
+  dealerRegChart.update();
+
+  dealerRdChart.data.labels = byRd.map(d => d.ai);
+  dealerRdChart.data.datasets[0].data = byRd.map(d => d.rd);
+  dealerRdChart.update();
+
+  renderDealerTable();
+}
+
+// ══════════════════════════════════════════════
+//  MASTER UPDATE
+// ══════════════════════════════════════════════
+
+function updateAll() {
+  updateQtd();
+  updateComboChart();
+  updateWeeklyRegChart();
+  updateDealerCharts();
+}
+
 function resetFilters() {
-  fLine.value = '';
+  fLine.value = ''; fPid.value = ''; fAi.value = '';
   populatePidDropdown('');
-  fPid.value = '';
   document.getElementById('search').value = '';
+  document.getElementById('dealer-search').value = '';
   updateAll();
 }
 
