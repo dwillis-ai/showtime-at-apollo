@@ -7,217 +7,457 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f0f2f5; color: #1a1a2e; }
-  header { background: #1a1a2e; color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
-  header h1 { font-size: 1.3rem; font-weight: 600; }
-  header span { font-size: 0.85rem; color: #94a3b8; }
-  .container { max-width: 1280px; margin: 0 auto; padding: 28px 24px; }
 
-  /* ── Master Filters ── */
-  .filters { background: white; border-radius: 10px; padding: 16px 24px; margin-bottom: 28px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; }
-  .filters label { font-size: 0.8rem; font-weight: 600; color: #475569; }
-  .filter-group { display: flex; flex-direction: column; gap: 5px; }
-  select { padding: 7px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.85rem; background: #f8fafc; cursor: pointer; min-width: 200px; }
-  select:focus { outline: none; border-color: #3b82f6; }
-  .reset-btn { padding: 7px 16px; background: #1a1a2e; color: white; border: none; border-radius: 6px; font-size: 0.82rem; cursor: pointer; margin-left: auto; align-self: flex-end; }
-  .reset-btn:hover { background: #2d3a5e; }
-  .filter-hint { font-size: 0.75rem; color: #94a3b8; margin-top: 3px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  header {
+    background: #1a1a2e;
+    color: white;
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    border-bottom: 1px solid #2d3a56;
+  }
+  header h1 { font-size: 1.15rem; font-weight: 600; }
+  header span { font-size: 0.82rem; color: #94a3b8; }
+
+  /* ── Page layout ── */
+  .page-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: #1a1a2e;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-right: 1px solid #2d3a56;
+  }
+  .sidebar-hd {
+    padding: 12px 16px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #64748b;
+    border-bottom: 1px solid #2d3a56;
+    flex-shrink: 0;
+  }
+  .sidebar-body {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #2d3a56 transparent;
+  }
+  .sidebar-body::-webkit-scrollbar { width: 4px; }
+  .sidebar-body::-webkit-scrollbar-thumb { background: #2d3a56; border-radius: 2px; }
+
+  .filter-section {
+    padding: 14px 16px;
+    border-bottom: 1px solid #2d3a56;
+  }
+  .filter-section-title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #3b82f6;
+    margin-bottom: 12px;
+  }
+  .filter-group {
+    margin-bottom: 14px;
+  }
+  .filter-group:last-child { margin-bottom: 0; }
+  .filter-group-label {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .sel-badge {
+    font-size: 0.62rem;
+    background: #3b82f6;
+    color: white;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-weight: 700;
+    display: none;
+    margin-left: 5px;
+  }
+  .sel-badge.visible { display: inline-block; }
+  .clear-btn {
+    font-size: 0.66rem;
+    color: #475569;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    display: none;
+  }
+  .clear-btn.visible { display: inline; }
+  .clear-btn:hover { color: #94a3b8; }
+
+  .filter-search {
+    width: 100%;
+    padding: 5px 9px;
+    border: 1px solid #2d3a56;
+    border-radius: 5px;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-size: 0.77rem;
+    margin-bottom: 5px;
+    outline: none;
+  }
+  .filter-search::placeholder { color: #475569; }
+  .filter-search:focus { border-color: #3b82f6; }
+
+  .checkbox-list {
+    max-height: 160px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #2d3a56 transparent;
+  }
+  .checkbox-list.tall { max-height: 220px; }
+  .checkbox-list::-webkit-scrollbar { width: 3px; }
+  .checkbox-list::-webkit-scrollbar-thumb { background: #2d3a56; }
+
+  .cb-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 3px 2px;
+    cursor: pointer;
+    font-size: 0.79rem;
+    color: #94a3b8;
+    border-radius: 3px;
+    user-select: none;
+    transition: color 0.1s;
+  }
+  .cb-item:hover { color: #e2e8f0; }
+  .cb-item.checked { color: #bfdbfe; }
+  .cb-item input[type=checkbox] {
+    accent-color: #3b82f6;
+    width: 13px;
+    height: 13px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  .sidebar-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #2d3a56;
+    flex-shrink: 0;
+  }
+  .reset-all-btn {
+    width: 100%;
+    padding: 8px;
+    background: #2d3a56;
+    color: #e2e8f0;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .reset-all-btn:hover { background: #3b4f6e; }
+
+  /* ── Active filter chips bar ── */
+  .active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 20px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0;
+    min-height: 0;
+    transition: padding 0.15s;
+  }
+  .active-filters:empty { padding: 0; border-bottom: none; }
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px 3px 10px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 500;
+  }
+  .chip-x {
+    cursor: pointer;
+    color: #93c5fd;
+    font-size: 0.9rem;
+    line-height: 1;
+    padding: 0 2px;
+  }
+  .chip-x:hover { color: #1d4ed8; }
+
+  /* ── Main scrollable area ── */
+  .main-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; width: 100%; }
 
   /* ── KPIs ── */
-  .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
-  .kpi { background: white; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 22px; }
+  .kpi { background: white; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
   .kpi label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; font-weight: 600; }
-  .kpi .value { font-size: 1.55rem; font-weight: 700; margin-top: 6px; color: #1a1a2e; }
-  .kpi .sub { font-size: 0.78rem; color: #94a3b8; margin-top: 4px; }
+  .kpi .value { font-size: 1.5rem; font-weight: 700; margin-top: 6px; color: #1a1a2e; }
+  .kpi .sub { font-size: 0.76rem; color: #94a3b8; margin-top: 4px; }
 
   /* ── Section heading ── */
-  .section-heading { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 16px; margin-top: 36px; }
+  .section-heading { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 14px; margin-top: 32px; }
 
   /* ── Charts ── */
-  .charts-top { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
-  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-  .card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
-  .card-full { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 20px; }
-  .card-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+  .charts-top { display: grid; grid-template-columns: 2fr 1fr; gap: 18px; margin-bottom: 18px; }
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+  .card { background: white; border-radius: 10px; padding: 22px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  .card-full { background: white; border-radius: 10px; padding: 22px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 18px; }
+  .card-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
   canvas { max-height: 340px; }
 
   /* ── Table ── */
-  .table-card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 20px; }
-  .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  .table-header h3 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; }
-  input[type=text] { padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.83rem; width: 240px; }
+  .table-card { background: white; border-radius: 10px; padding: 22px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 18px; }
+  .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .table-header h3 { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; }
+  input[type=text] { padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.83rem; width: 220px; }
   table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
-  thead th { padding: 10px 14px; text-align: left; font-weight: 600; color: #64748b; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid #e2e8f0; background: #f8fafc; cursor: pointer; user-select: none; }
+  thead th { padding: 10px 12px; text-align: left; font-weight: 600; color: #64748b; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid #e2e8f0; background: #f8fafc; cursor: pointer; user-select: none; }
   thead th.num { text-align: right; }
-  tbody td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; }
+  tbody td { padding: 9px 12px; border-bottom: 1px solid #f1f5f9; }
   tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
   tbody tr:hover td { background: #f8fafc; }
   .bar-cell { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
   .mini-bar { height: 6px; border-radius: 3px; background: #3b82f6; min-width: 2px; }
-  .workbook { font-size: 0.8rem; margin-top: 14px; color: #3b82f6; }
+  .workbook { font-size: 0.78rem; margin-top: 12px; color: #3b82f6; }
   .workbook a { color: #3b82f6; text-decoration: none; }
   .workbook a:hover { text-decoration: underline; }
   .badge { display: inline-block; font-size: 0.7rem; padding: 2px 7px; border-radius: 10px; background: #e0e7ff; color: #3730a3; font-weight: 600; margin-left: 6px; }
-  .row-count { font-size: 0.78rem; color: #94a3b8; margin-top: 10px; }
+  .row-count { font-size: 0.76rem; color: #94a3b8; margin-top: 10px; }
   .omni-link { font-size: 0.76rem; color: #3b82f6; text-decoration: none; font-weight: 500; }
   .omni-link:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
+
 <header>
   <h1>Q2 2026 — QTD Registration Summary</h1>
-  <span>Sell-Through Registrations · Source: Omni Redshift · Updated Apr 23, 2026</span>
+  <span>Sell-Through Registrations · Source: Omni Redshift · Updated Apr 23, 2026 · <span style="color:#22c55e;font-weight:600">is_sell_through_registration = true</span></span>
 </header>
 
-<div class="container">
+<div class="page-layout">
 
-  <!-- ══ MASTER FILTERS ══ -->
-  <div class="filters">
-    <div class="filter-group">
-      <label>Product Line</label>
-      <select id="f-line"><option value="">All Product Lines</option></select>
-      <div class="filter-hint" id="f-line-hint"></div>
-    </div>
-    <div class="filter-group">
-      <label>Product ID <span class="badge" id="pid-badge">All</span></label>
-      <select id="f-pid"><option value="">All Product IDs</option></select>
-      <div class="filter-hint" id="f-pid-hint">Select a Product Line to filter SKUs</div>
-    </div>
-    <div class="filter-group">
-      <label>Adaptive Insights Level</label>
-      <select id="f-ai"><option value="">All Dealers</option></select>
-    </div>
-    <button class="reset-btn" onclick="resetFilters()">Reset Filters</button>
-  </div>
+  <!-- ══ LEFT SIDEBAR FILTERS ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-hd">Filters</div>
+    <div class="sidebar-body">
 
-  <!-- ══ SECTION 1: QTD SUMMARY ══ -->
-  <div class="section-heading">QTD Registrations</div>
-
-  <div class="kpis">
-    <div class="kpi">
-      <label>Total Registrations</label>
-      <div class="value" id="kpi-total">0</div>
-      <div class="sub">Sell-through · QTD</div>
-    </div>
-    <div class="kpi">
-      <label>Reg Dollars (Static ASP)</label>
-      <div class="value" id="kpi-rd">$0</div>
-      <div class="sub">QTD Revenue</div>
-    </div>
-    <div class="kpi">
-      <label id="kpi-top-label">Top Product Line</label>
-      <div class="value" id="kpi-top-line">—</div>
-      <div class="sub" id="kpi-top-line-sub"></div>
-    </div>
-    <div class="kpi">
-      <label>Product Lines</label>
-      <div class="value" id="kpi-lines">0</div>
-      <div class="sub">Active this QTD</div>
-    </div>
-    <div class="kpi">
-      <label>Unique SKUs</label>
-      <div class="value" id="kpi-skus">0</div>
-      <div class="sub" id="kpi-avg-sub">Avg per SKU</div>
-    </div>
-  </div>
-
-  <div class="charts-top">
-    <div class="card">
-      <div class="card-title" id="bar-title">Registrations by Product Line</div>
-      <canvas id="lineChart"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title" id="donut-title">Product Line Mix</div>
-      <canvas id="donutChart"></canvas>
-    </div>
-  </div>
-
-  <div class="table-card">
-    <div class="table-header">
-      <h3>Registration Detail</h3>
-      <input type="text" id="search" placeholder="Search product line or SKU..." oninput="renderTable()">
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th onclick="sortBy('pl')">Product Line ↕</th>
-          <th onclick="sortBy('pid')">Product ID ↕</th>
-          <th class="num" onclick="sortBy('n')">Registrations ↕</th>
-          <th class="num" onclick="sortBy('rd')">Reg Dollars ↕</th>
-          <th class="num">% of Total</th>
-          <th class="num">Share</th>
-        </tr>
-      </thead>
-      <tbody id="table-body"></tbody>
-    </table>
-    <div class="row-count" id="row-count"></div>
-    <div class="workbook">View in Omni: <a href="https://universalaudio.omniapp.co/e/1:GcSwM73r/1" target="_blank">QTD Static ASP Sell-Through Workbook</a></div>
-  </div>
-
-  <!-- ══ SECTION 2: WEEKLY REG DOLLARS vs OPLAN ══ -->
-  <div class="section-heading">Weekly Reg Dollars vs Oplan Sell-In Pace</div>
-
-  <div class="card-full">
-    <div class="card-title">
-      <span id="combo-title">Weekly Reg Dollars vs Oplan Channel Perpetual (Sell-In Pace)</span>
-      <a class="omni-link" href="https://universalaudio.omniapp.co/e/1:Jj9W8XfE/1" target="_blank">View in Omni ↗</a>
-    </div>
-    <canvas id="comboChart" style="max-height:360px"></canvas>
-    <div style="font-size:0.76rem;color:#94a3b8;margin-top:12px;">
-      Bars = QTD Reg Dollars (Static ASP) · Line = Oplan Channel Perpetual Sell-In · Weeks after Apr 20 are forward-looking oplan only
-    </div>
-  </div>
-
-  <!-- ══ SECTION 3: WEEKLY REGISTRATIONS ══ -->
-  <div class="section-heading">Weekly Registrations by Product Line</div>
-
-  <div class="card-full">
-    <div class="card-title">
-      <span id="weekly-reg-title">Weekly Sell-Through Registrations by Product Line</span>
-      <a class="omni-link" href="https://universalaudio.omniapp.co/e/1:Jj9W8XfE/1" target="_blank">View in Omni ↗</a>
-    </div>
-    <canvas id="weeklyRegChart" style="max-height:360px"></canvas>
-  </div>
-
-  <!-- ══ SECTION 4: DEALER REGISTRATIONS ══ -->
-  <div class="section-heading">Dealer Registrations by Adaptive Insights Level</div>
-
-  <div class="charts-row">
-    <div class="card">
-      <div class="card-title">
-        <span>Top 15 Dealers by Registrations</span>
-        <a class="omni-link" href="https://universalaudio.omniapp.co/e/1:Kb_RQG4m/1" target="_blank">View in Omni ↗</a>
+      <!-- ── Dealer ── -->
+      <div class="filter-section">
+        <div class="filter-section-title">🏪 Dealer</div>
+        <div class="filter-group">
+          <div class="filter-group-label">
+            <span>Adaptive Insights Level <span class="sel-badge" id="badge-ai"></span></span>
+            <button class="clear-btn" id="clear-ai" onclick="clearGroup('ai')">Clear</button>
+          </div>
+          <input class="filter-search" type="text" id="search-ai" placeholder="Search dealers…" oninput="renderSidebarList('ai',this.value)">
+          <div class="checkbox-list tall" id="list-ai"></div>
+        </div>
       </div>
-      <canvas id="dealerRegChart" style="max-height:380px"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title">Top 15 Dealers by Reg Dollars</div>
-      <canvas id="dealerRdChart" style="max-height:380px"></canvas>
-    </div>
-  </div>
 
-  <div class="table-card">
-    <div class="table-header">
-      <h3>Dealer Detail — by AI Level</h3>
-      <input type="text" id="dealer-search" placeholder="Search dealer..." oninput="renderDealerTable()">
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th onclick="dealerSortBy('ai')">Adaptive Insights Level ↕</th>
-          <th class="num" onclick="dealerSortBy('n')">Registrations ↕</th>
-          <th class="num" onclick="dealerSortBy('rd')">Reg Dollars ↕</th>
-          <th class="num">% Regs</th>
-          <th class="num">Share</th>
-        </tr>
-      </thead>
-      <tbody id="dealer-table-body"></tbody>
-    </table>
-    <div class="row-count" id="dealer-row-count"></div>
-    <div class="workbook">View in Omni: <a href="https://universalaudio.omniapp.co/e/1:Kb_RQG4m/1" target="_blank">Dealer AI Level Workbook</a></div>
-  </div>
+      <!-- ── Product ── -->
+      <div class="filter-section">
+        <div class="filter-section-title">📦 Product</div>
+        <div class="filter-group">
+          <div class="filter-group-label">
+            <span>Product Line <span class="sel-badge" id="badge-pl"></span></span>
+            <button class="clear-btn" id="clear-pl" onclick="clearGroup('pl')">Clear</button>
+          </div>
+          <div class="checkbox-list" id="list-pl"></div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-label">
+            <span>Product ID <span class="sel-badge" id="badge-pid"></span></span>
+            <button class="clear-btn" id="clear-pid" onclick="clearGroup('pid')">Clear</button>
+          </div>
+          <input class="filter-search" type="text" id="search-pid" placeholder="Search product IDs…" oninput="renderSidebarList('pid',this.value)">
+          <div class="checkbox-list tall" id="list-pid"></div>
+        </div>
+      </div>
 
-</div><!-- /container -->
+    </div><!-- /sidebar-body -->
+    <div class="sidebar-footer">
+      <button class="reset-all-btn" onclick="resetFilters()">Reset All Filters</button>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN CONTENT ══ -->
+  <div class="main-scroll">
+    <!-- Active filter chips -->
+    <div id="active-filter-bar" class="active-filters"></div>
+
+    <div class="container">
+
+      <!-- ══ SECTION 1: QTD SUMMARY ══ -->
+      <div class="section-heading">QTD Registrations</div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <label>Total Registrations</label>
+          <div class="value" id="kpi-total">0</div>
+          <div class="sub">Sell-through · QTD</div>
+        </div>
+        <div class="kpi">
+          <label>Reg Dollars (Static ASP)</label>
+          <div class="value" id="kpi-rd">$0</div>
+          <div class="sub">QTD Revenue</div>
+        </div>
+        <div class="kpi">
+          <label id="kpi-top-label">Top Product Line</label>
+          <div class="value" id="kpi-top-line">—</div>
+          <div class="sub" id="kpi-top-line-sub"></div>
+        </div>
+        <div class="kpi">
+          <label>Product Lines</label>
+          <div class="value" id="kpi-lines">0</div>
+          <div class="sub">Active this QTD</div>
+        </div>
+        <div class="kpi">
+          <label>Unique SKUs</label>
+          <div class="value" id="kpi-skus">0</div>
+          <div class="sub" id="kpi-avg-sub">Avg per SKU</div>
+        </div>
+      </div>
+
+      <div class="charts-top">
+        <div class="card">
+          <div class="card-title" id="bar-title">Registrations by Product Line</div>
+          <canvas id="lineChart"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title" id="donut-title">Product Line Mix</div>
+          <canvas id="donutChart"></canvas>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <h3>Registration Detail</h3>
+          <input type="text" id="search" placeholder="Search product line or SKU…" oninput="renderTable()">
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th onclick="sortBy('pl')">Product Line ↕</th>
+              <th onclick="sortBy('pid')">Product ID ↕</th>
+              <th class="num" onclick="sortBy('n')">Registrations ↕</th>
+              <th class="num" onclick="sortBy('rd')">Reg Dollars ↕</th>
+              <th class="num">% of Total</th>
+              <th class="num">Share</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+        <div class="row-count" id="row-count"></div>
+        <div class="workbook">View in Omni: <a href="https://universalaudio.omniapp.co/e/1:GcSwM73r/1" target="_blank">QTD Static ASP Sell-Through Workbook</a></div>
+      </div>
+
+      <!-- ══ SECTION 2: WEEKLY REG DOLLARS vs OPLAN ══ -->
+      <div class="section-heading">Weekly Reg Dollars vs Oplan Sell-In Pace</div>
+
+      <div class="card-full">
+        <div class="card-title">
+          <span id="combo-title">Weekly Reg Dollars vs 2026 OPlan Sell-In</span>
+          <a class="omni-link" href="https://universalaudio.omniapp.co/e/1:Jj9W8XfE/1" target="_blank">View in Omni ↗</a>
+        </div>
+        <canvas id="comboChart" style="max-height:360px"></canvas>
+        <div style="font-size:0.74rem;color:#94a3b8;margin-top:10px;">
+          Bars = QTD Reg Dollars (Static ASP) · Line = 2026 OPlan Sell-In (Omni: Adaptive Operating Plan History, evenly paced within each fiscal month) · Weeks after Apr 20 are forward-looking
+        </div>
+      </div>
+
+      <!-- ══ SECTION 3: WEEKLY REGISTRATIONS ══ -->
+      <div class="section-heading">Weekly Registrations by Product Line</div>
+
+      <div class="card-full">
+        <div class="card-title">
+          <span id="weekly-reg-title">Weekly Sell-Through Registrations by Product Line</span>
+          <a class="omni-link" href="https://universalaudio.omniapp.co/e/1:Jj9W8XfE/1" target="_blank">View in Omni ↗</a>
+        </div>
+        <canvas id="weeklyRegChart" style="max-height:360px"></canvas>
+      </div>
+
+      <!-- ══ SECTION 4: DEALER REGISTRATIONS ══ -->
+      <div class="section-heading">Dealer Registrations by Adaptive Insights Level</div>
+
+      <div class="charts-row">
+        <div class="card">
+          <div class="card-title">
+            <span>Top 15 Dealers by Registrations</span>
+            <a class="omni-link" href="https://universalaudio.omniapp.co/e/1:Kb_RQG4m/1" target="_blank">View in Omni ↗</a>
+          </div>
+          <canvas id="dealerRegChart" style="max-height:380px"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">Top 15 Dealers by Reg Dollars</div>
+          <canvas id="dealerRdChart" style="max-height:380px"></canvas>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <h3>Dealer Detail — by AI Level</h3>
+          <input type="text" id="dealer-search" placeholder="Search dealer…" oninput="renderDealerTable()">
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th onclick="dealerSortBy('ai')">Adaptive Insights Level ↕</th>
+              <th class="num" onclick="dealerSortBy('n')">Registrations ↕</th>
+              <th class="num" onclick="dealerSortBy('rd')">Reg Dollars ↕</th>
+              <th class="num">% Regs</th>
+              <th class="num">Share</th>
+            </tr>
+          </thead>
+          <tbody id="dealer-table-body"></tbody>
+        </table>
+        <div class="row-count" id="dealer-row-count"></div>
+        <div class="workbook">View in Omni: <a href="https://universalaudio.omniapp.co/e/1:Kb_RQG4m/1" target="_blank">Dealer AI Level Workbook</a></div>
+      </div>
+
+    </div><!-- /container -->
+  </div><!-- /main-scroll -->
+
+</div><!-- /page-layout -->
 
 <script>
 // ══════════════════════════════════════════════
@@ -225,158 +465,254 @@
 // ══════════════════════════════════════════════
 
 const RAW = [
-  {pl:"AIB",pid:"GPM-ANTI",n:43,rd:12095.37},{pl:"AIB",pid:"GPM-DRM",n:194,rd:51141.38},{pl:"AIB",pid:"GPM-ENIG",n:116,rd:29595.26},
-  {pl:"AIB",pid:"GPM-KNUC",n:42,rd:12138.17},{pl:"AIB",pid:"GPM-LION",n:106,rd:29604.35},{pl:"AIB",pid:"GPM-RUBY",n:59,rd:16275.09},{pl:"AIB",pid:"GPM-WDR",n:23,rd:6626.00},
-  {pl:"Amp Top Box",pid:"OX",n:50,rd:48839.11},
-  {pl:"Analog Mics",pid:"MIC-UA167",n:1,rd:1785.91},{pl:"Analog Mics",pid:"MIC-UA187",n:1,rd:801.99},{pl:"Analog Mics",pid:"MIC-UA187-REFURB",n:1,rd:0},
-  {pl:"Apollo Desktop",pid:"APE1X",n:24,rd:5250.03},{pl:"Apollo Desktop",pid:"APE2M",n:26,rd:8845.75},
-  {pl:"Apollo Desktop",pid:"APLS",n:157,rd:69381.18},{pl:"Apollo Desktop",pid:"APLS-HE",n:147,rd:65307.03},
-  {pl:"Apollo Desktop",pid:"APLSU",n:4,rd:1396.00},{pl:"Apollo Desktop",pid:"APLSU-HE",n:111,rd:46043.36},{pl:"Apollo Desktop",pid:"APLSU-REFURB",n:5,rd:2074.03},
-  {pl:"Apollo Desktop",pid:"APLTWD",n:1,rd:0},{pl:"Apollo Desktop",pid:"APLTWDII",n:8,rd:4920.00},{pl:"Apollo Desktop",pid:"APLTWDII-HE",n:12,rd:7484.20},
-  {pl:"Apollo Desktop",pid:"APLTWDII-HE-REFURB",n:1,rd:623.68},{pl:"Apollo Desktop",pid:"APLTWDU-HE",n:29,rd:16607.76},{pl:"Apollo Desktop",pid:"APLTWDU-REFURB",n:4,rd:2290.73},
-  {pl:"Apollo Desktop",pid:"APLTWS-REFURB",n:1,rd:0},{pl:"Apollo Desktop",pid:"APLTWXD",n:4,rd:3005.64},{pl:"Apollo Desktop",pid:"APLTWXD-HE",n:33,rd:28836.01},
-  {pl:"Apollo Desktop",pid:"APLTWXDU-HE",n:175,rd:115030.41},{pl:"Apollo Desktop",pid:"APLTWXQ",n:4,rd:2493.30},{pl:"Apollo Desktop",pid:"APLTWXQ-HE",n:10,rd:9252.40},
-  {pl:"Apollo Desktop",pid:"APLTWXQ-HE-REFURB",n:2,rd:1850.48},{pl:"Apollo Desktop",pid:"APTXDG2-ESS",n:697,rd:556499.18},
-  {pl:"Apollo Desktop",pid:"APTXDG2-ESS-REFURB",n:1,rd:755.37},{pl:"Apollo Desktop",pid:"APTXDG2-STU",n:126,rd:123559.52},
-  {pl:"Apollo Desktop",pid:"APTXQG2-ESS",n:155,rd:163456.70},{pl:"Apollo Desktop",pid:"APTXQG2-STU",n:62,rd:74814.29},
-  {pl:"Apollo Desktop",pid:"APX4",n:2,rd:2303.45},{pl:"Apollo Desktop",pid:"APX4-HE",n:12,rd:14200.50},{pl:"Apollo Desktop",pid:"APX4-REFURB",n:2,rd:2116.16},
-  {pl:"Apollo Desktop",pid:"APX4G2-ESS",n:159,rd:229080.83},{pl:"Apollo Desktop",pid:"APX4G2-STU",n:37,rd:57276.13},{pl:"Apollo Desktop",pid:"ARROW",n:5,rd:1763.30},
-  {pl:"Apollo Rackmount",pid:"APL16",n:1,rd:0},{pl:"Apollo Rackmount",pid:"APL8Q",n:1,rd:0},
-  {pl:"Apollo Rackmount",pid:"APX16",n:2,rd:5458.00},{pl:"Apollo Rackmount",pid:"APX16-HE",n:4,rd:10916.00},{pl:"Apollo Rackmount",pid:"APX16-REFURB",n:1,rd:0},
-  {pl:"Apollo Rackmount",pid:"APX16DG2-ESS",n:34,rd:65335.03},{pl:"Apollo Rackmount",pid:"APX16DG2-ULT",n:2,rd:5049.59},
-  {pl:"Apollo Rackmount",pid:"APX16G2-ESS",n:38,rd:101780.98},{pl:"Apollo Rackmount",pid:"APX16G2-ULT",n:5,rd:16174.45},
-  {pl:"Apollo Rackmount",pid:"APX6",n:2,rd:2511.97},{pl:"Apollo Rackmount",pid:"APX6-HE",n:3,rd:3048.01},
-  {pl:"Apollo Rackmount",pid:"APX6G2-ESS",n:70,rd:115889.45},{pl:"Apollo Rackmount",pid:"APX6G2-STU",n:19,rd:33906.71},
-  {pl:"Apollo Rackmount",pid:"APX8",n:10,rd:14180.61},{pl:"Apollo Rackmount",pid:"APX8-HE",n:6,rd:10075.80},{pl:"Apollo Rackmount",pid:"APX8-REFURB",n:1,rd:1679.30},
-  {pl:"Apollo Rackmount",pid:"APX8G2-ESS",n:85,rd:162823.14},{pl:"Apollo Rackmount",pid:"APX8G2-STU",n:34,rd:72825.84},
-  {pl:"Apollo Rackmount",pid:"APX8P",n:4,rd:7477.80},{pl:"Apollo Rackmount",pid:"APX8P-HE",n:11,rd:21874.81},
-  {pl:"Apollo Rackmount",pid:"APX8PG2-ESS",n:93,rd:218677.02},{pl:"Apollo Rackmount",pid:"APX8PG2-STU",n:24,rd:58350.27},
-  {pl:"GPM",pid:"GPM-ASTRA",n:13,rd:3931.71},{pl:"GPM",pid:"GPM-DLVRB",n:78,rd:18973.98},{pl:"GPM",pid:"GPM-GLXY",n:24,rd:6289.78},
-  {pl:"GPM",pid:"GPM-GOLD",n:67,rd:18023.82},{pl:"GPM",pid:"GPM-MAX",n:28,rd:6863.52},{pl:"GPM",pid:"GPM-OXSTP",n:49,rd:14307.55},
-  {pl:"GPM",pid:"GPM-STAR",n:33,rd:9196.95},{pl:"GPM",pid:"GPM-STAR-REFURB",n:1,rd:221.19},{pl:"GPM",pid:"GPM-OXSTP-REFURB",n:1,rd:251.37},
-  {pl:"GPS",pid:"GPS-1176",n:76,rd:8303.58},{pl:"GPS",pid:"GPS-BRGD-REFURB",n:12,rd:1241.04},{pl:"GPS",pid:"GPS-EVMR",n:35,rd:4062.19},
-  {pl:"GPS",pid:"GPS-FLOW",n:8,rd:967.00},{pl:"GPS",pid:"GPS-HVNLY",n:20,rd:2353.89},{pl:"GPS",pid:"GPS-LA2A",n:27,rd:3013.54},{pl:"GPS",pid:"GPS-ORN",n:17,rd:1994.07},
-  {pl:"Modeling Mics",pid:"MIC-TLL22",n:33,rd:35884.48},{pl:"Modeling Mics",pid:"MIC-UADLX",n:89,rd:48557.87},{pl:"Modeling Mics",pid:"MIC-UALX",n:72,rd:17247.81},
-  {pl:"Modeling Mics",pid:"MIC-UASC-1",n:37,rd:12016.86},{pl:"Modeling Mics",pid:"MIC-UASD-1",n:114,rd:21658.57},{pl:"Modeling Mics",pid:"MIC-UASD-3",n:21,rd:2311.00},
-  {pl:"Modeling Mics",pid:"MIC-UASD-5",n:15,rd:1943.23},{pl:"Modeling Mics",pid:"MIC-UASD-7",n:22,rd:2091.58},{pl:"Modeling Mics",pid:"MIC-UASP-1",n:36,rd:9483.74},
-  {pl:"UAD",pid:"PCI2O-C",n:1,rd:684.07},{pl:"UAD",pid:"SATQ-C",n:1,rd:113.57},
-  {pl:"UAD",pid:"TB3SATO-C",n:47,rd:33340.46},{pl:"UAD",pid:"TB3SATO-X",n:1,rd:1152.24},
-  {pl:"UAD",pid:"TB3SATQ-C",n:52,rd:26663.49},{pl:"UAD",pid:"TB3SATQ-C-REFURB",n:1,rd:0},
-  {pl:"UAD",pid:"TBSATO-C",n:2,rd:0},{pl:"UAD",pid:"TBSATO-U5",n:1,rd:0},
-  {pl:"UAD",pid:"USBSATO-C",n:7,rd:4536.44},{pl:"UAD",pid:"USBSATQ-C",n:1,rd:534.05},
-  {pl:"Volt Desktop",pid:"VOLT1",n:837,rd:76182.67},{pl:"Volt Desktop",pid:"VOLT176",n:389,rd:47397.68},{pl:"Volt Desktop",pid:"VOLT2",n:1064,rd:129669.27},
-  {pl:"Volt Desktop",pid:"VOLT2-P",n:8,rd:1394.40},{pl:"Volt Desktop",pid:"VOLT2-REFURB",n:23,rd:3957.52},{pl:"Volt Desktop",pid:"VOLT276",n:574,rd:107770.17},
-  {pl:"Volt Desktop",pid:"VOLT276-REFURB",n:34,rd:6495.16},{pl:"Volt Desktop",pid:"VOLT4",n:29,rd:4943.05},{pl:"Volt Desktop",pid:"VOLT476",n:179,rd:41372.27},
-  {pl:"Volt Desktop",pid:"VOLT476P",n:211,rd:63626.20},{pl:"Volt Desktop",pid:"VOLT876",n:153,rd:96447.31}
+  // is_sell_through_registration = true · QTD Apr 6–20 2026
+  {pl:"AIB",pid:"GPM-DRM",n:128,rd:32686},{pl:"AIB",pid:"GPM-LION",n:71,rd:18414},{pl:"AIB",pid:"GPM-ENIG",n:69,rd:0},
+  {pl:"AIB",pid:"GPM-RUBY",n:38,rd:9704},{pl:"AIB",pid:"GPM-KNUC",n:29,rd:0},{pl:"AIB",pid:"GPM-ANTI",n:25,rd:0},{pl:"AIB",pid:"GPM-WDR",n:20,rd:5107},
+  {pl:"Amp Top Box",pid:"OX",n:37,rd:35496},
+  {pl:"Analog Mics",pid:"MIC-UA187",n:1,rd:799},
+  {pl:"Apollo Desktop",pid:"APTXDG2-ESS",n:475,rd:0},{pl:"Apollo Desktop",pid:"APLTWXDU-HE",n:120,rd:76723},
+  {pl:"Apollo Desktop",pid:"APLS",n:102,rd:32575},{pl:"Apollo Desktop",pid:"APTXQG2-ESS",n:99,rd:0},
+  {pl:"Apollo Desktop",pid:"APX4G2-ESS",n:98,rd:0},{pl:"Apollo Desktop",pid:"APLS-HE",n:98,rd:31297},
+  {pl:"Apollo Desktop",pid:"APTXDG2-STU",n:84,rd:0},{pl:"Apollo Desktop",pid:"APLSU-HE",n:81,rd:25868},
+  {pl:"Apollo Desktop",pid:"APTXQG2-STU",n:34,rd:0},{pl:"Apollo Desktop",pid:"APX4G2-STU",n:26,rd:0},
+  {pl:"Apollo Desktop",pid:"APLTWDU-HE",n:21,rd:12083},{pl:"Apollo Desktop",pid:"APE1X",n:19,rd:0},
+  {pl:"Apollo Desktop",pid:"APLTWXD-HE",n:19,rd:10932},{pl:"Apollo Desktop",pid:"APE2M",n:13,rd:0},
+  {pl:"Apollo Desktop",pid:"APX4-HE",n:8,rd:0},{pl:"Apollo Desktop",pid:"APLTWXQ-HE",n:6,rd:0},
+  {pl:"Apollo Desktop",pid:"APLTWDII-HE",n:6,rd:0},{pl:"Apollo Desktop",pid:"APLTWDII",n:5,rd:0},
+  {pl:"Apollo Desktop",pid:"APLTWDU-REFURB",n:4,rd:2301},{pl:"Apollo Desktop",pid:"APLSU-REFURB",n:4,rd:1277},
+  {pl:"Apollo Desktop",pid:"APLTWXQ",n:4,rd:0},{pl:"Apollo Desktop",pid:"APLTWXQ-HE-REFURB",n:2,rd:0},
+  {pl:"Apollo Desktop",pid:"APLSU",n:2,rd:0},{pl:"Apollo Desktop",pid:"APX4",n:2,rd:0},
+  {pl:"Apollo Desktop",pid:"APTXQG2-ESS-REFURB",n:1,rd:0},{pl:"Apollo Desktop",pid:"APTXDG2-ESS-REFURB",n:1,rd:0},
+  {pl:"Apollo Desktop",pid:"APX4-REFURB",n:1,rd:0},{pl:"Apollo Desktop",pid:"APLTWXDU-HE-REFURB",n:1,rd:575},
+  {pl:"Apollo Desktop",pid:"APLTWS-REFURB",n:1,rd:0},{pl:"Apollo Desktop",pid:"APLTWDII-HE-REFURB",n:1,rd:0},
+  {pl:"Apollo Desktop",pid:"ARROW",n:1,rd:0},{pl:"Apollo Desktop",pid:"APLTWXD",n:1,rd:0},
+  {pl:"Apollo Rackmount",pid:"APX8PG2-ESS",n:60,rd:0},{pl:"Apollo Rackmount",pid:"APX8G2-ESS",n:58,rd:0},
+  {pl:"Apollo Rackmount",pid:"APX6G2-ESS",n:37,rd:0},{pl:"Apollo Rackmount",pid:"APX16G2-ESS",n:26,rd:0},
+  {pl:"Apollo Rackmount",pid:"APX16DG2-ESS",n:18,rd:0},{pl:"Apollo Rackmount",pid:"APX8G2-STU",n:14,rd:0},
+  {pl:"Apollo Rackmount",pid:"APX8PG2-STU",n:12,rd:0},{pl:"Apollo Rackmount",pid:"APX6G2-STU",n:11,rd:0},
+  {pl:"Apollo Rackmount",pid:"APX8",n:7,rd:10748},{pl:"Apollo Rackmount",pid:"APX8-HE",n:6,rd:0},
+  {pl:"Apollo Rackmount",pid:"APX8P-HE",n:4,rd:0},{pl:"Apollo Rackmount",pid:"APX16G2-ULT",n:3,rd:0},
+  {pl:"Apollo Rackmount",pid:"APX8P",n:3,rd:0},{pl:"Apollo Rackmount",pid:"APX16-HE",n:3,rd:0},
+  {pl:"Apollo Rackmount",pid:"APX6-HE",n:2,rd:0},{pl:"Apollo Rackmount",pid:"APX16DG2-ULT",n:1,rd:0},
+  {pl:"Apollo Rackmount",pid:"APL16",n:1,rd:0},{pl:"Apollo Rackmount",pid:"APL8Q",n:1,rd:0},{pl:"Apollo Rackmount",pid:"APX6",n:1,rd:0},
+  {pl:"GPM",pid:"GPM-DLVRB",n:49,rd:10945},{pl:"GPM",pid:"GPM-GOLD",n:40,rd:10214},
+  {pl:"GPM",pid:"GPM-OXSTP",n:33,rd:7371},{pl:"GPM",pid:"GPM-STAR",n:22,rd:5618},
+  {pl:"GPM",pid:"GPM-MAX",n:21,rd:4691},{pl:"GPM",pid:"GPM-GLXY",n:16,rd:3574},
+  {pl:"GPM",pid:"GPM-ASTRA",n:10,rd:2554},{pl:"GPM",pid:"GPM-STAR-REFURB",n:1,rd:0},{pl:"GPM",pid:"GPM-OXSTP-REFURB",n:1,rd:0},
+  {pl:"GPS",pid:"GPS-1176",n:50,rd:6368},{pl:"GPS",pid:"GPS-EVMR",n:27,rd:3784},
+  {pl:"GPS",pid:"GPS-LA2A",n:19,rd:2705},{pl:"GPS",pid:"GPS-HVNLY",n:15,rd:2102},
+  {pl:"GPS",pid:"GPS-ORN",n:11,rd:1542},{pl:"GPS",pid:"GPS-BRGD-REFURB",n:5,rd:647},{pl:"GPS",pid:"GPS-FLOW",n:5,rd:647},
+  {pl:"Modeling Mics",pid:"MIC-UASD-1",n:67,rd:12821},{pl:"Modeling Mics",pid:"MIC-UADLX",n:60,rd:57562},
+  {pl:"Modeling Mics",pid:"MIC-UALX",n:48,rd:30689},{pl:"Modeling Mics",pid:"MIC-TLL22",n:29,rd:0},
+  {pl:"Modeling Mics",pid:"MIC-UASC-1",n:27,rd:8757},{pl:"Modeling Mics",pid:"MIC-UASP-1",n:21,rd:5363},
+  {pl:"Modeling Mics",pid:"MIC-UASD-7",n:14,rd:0},{pl:"Modeling Mics",pid:"MIC-UASD-3",n:13,rd:837},
+  {pl:"Modeling Mics",pid:"MIC-UASD-5",n:12,rd:1552},{pl:"Modeling Mics",pid:"MIC-UASD-3-REFURB",n:4,rd:907},
+  {pl:"UAD",pid:"TB3SATQ-C",n:37,rd:16552},{pl:"UAD",pid:"TB3SATO-C",n:28,rd:17902},
+  {pl:"UAD",pid:"USBSATO-C",n:4,rd:2557},{pl:"UAD",pid:"PCI2O-C",n:1,rd:639},
+  {pl:"UAD",pid:"USBSATQ-C",n:1,rd:0},{pl:"UAD",pid:"TBSATO-U5",n:1,rd:0},{pl:"UAD",pid:"TB3SATO-X",n:1,rd:0},
+  {pl:"Volt Desktop",pid:"VOLT2",n:721,rd:87212},{pl:"Volt Desktop",pid:"VOLT1",n:586,rd:52131},
+  {pl:"Volt Desktop",pid:"VOLT276",n:378,rd:72334},{pl:"Volt Desktop",pid:"VOLT176",n:243,rd:30948},
+  {pl:"Volt Desktop",pid:"VOLT476P",n:141,rd:42323},{pl:"Volt Desktop",pid:"VOLT476",n:108,rd:25505},
+  {pl:"Volt Desktop",pid:"VOLT876",n:106,rd:0},{pl:"Volt Desktop",pid:"VOLT2-REFURB",n:23,rd:3665},
+  {pl:"Volt Desktop",pid:"VOLT276-REFURB",n:20,rd:4595},{pl:"Volt Desktop",pid:"VOLT4",n:19,rd:3149}
 ];
 
-// Weekly by product line — {w, pl, n, rd}
+// Weekly by product line — {w, pl, n, rd} · is_sell_through_registration = true
 const WEEKLY = [
-  {w:"Mar 30",pl:"AIB",n:144,rd:38681},{w:"Mar 30",pl:"Amp Top Box",n:9,rd:8791},{w:"Mar 30",pl:"Analog Mics",n:2,rd:1786},
-  {w:"Mar 30",pl:"Apollo Desktop",n:463,rd:376891},{w:"Mar 30",pl:"Apollo Rackmount",n:120,rd:247656},
-  {w:"Mar 30",pl:"GPM",n:56,rd:14753},{w:"Mar 30",pl:"GPS",n:46,rd:5143},
-  {w:"Mar 30",pl:"Modeling Mics",n:91,rd:25566},{w:"Mar 30",pl:"UAD",n:32,rd:16897},{w:"Mar 30",pl:"Volt Desktop",n:771,rd:128813},
-  {w:"Apr 6",pl:"AIB",n:179,rd:48503},{w:"Apr 6",pl:"Amp Top Box",n:17,rd:16605},{w:"Apr 6",pl:"Analog Mics",n:1,rd:802},
-  {w:"Apr 6",pl:"Apollo Desktop",n:616,rd:499768},{w:"Apr 6",pl:"Apollo Rackmount",n:135,rd:277615},
-  {w:"Apr 6",pl:"GPM",n:90,rd:24028},{w:"Apr 6",pl:"GPS",n:63,rd:7105},
-  {w:"Apr 6",pl:"Modeling Mics",n:142,rd:56276},{w:"Apr 6",pl:"UAD",n:37,rd:22252},{w:"Apr 6",pl:"Volt Desktop",n:1126,rd:182192},
-  {w:"Apr 13",pl:"AIB",n:177,rd:47856},{w:"Apr 13",pl:"Amp Top Box",n:17,rd:16605},
-  {w:"Apr 13",pl:"Apollo Desktop",n:645,rd:503416},{w:"Apr 13",pl:"Apollo Rackmount",n:123,rd:252098},
-  {w:"Apr 13",pl:"GPM",n:90,rd:23955},{w:"Apr 13",pl:"GPS",n:59,rd:6700},
-  {w:"Apr 13",pl:"Modeling Mics",n:136,rd:45676},{w:"Apr 13",pl:"UAD",n:34,rd:19993},{w:"Apr 13",pl:"Volt Desktop",n:1073,rd:179853},
-  {w:"Apr 20",pl:"AIB",n:83,rd:22435},{w:"Apr 20",pl:"Amp Top Box",n:7,rd:6837},
-  {w:"Apr 20",pl:"Apollo Desktop",n:292,rd:236442},{w:"Apr 20",pl:"Apollo Rackmount",n:72,rd:150666},
-  {w:"Apr 20",pl:"GPM",n:58,rd:15323},{w:"Apr 20",pl:"GPS",n:27,rd:2988},
-  {w:"Apr 20",pl:"Modeling Mics",n:70,rd:23678},{w:"Apr 20",pl:"UAD",n:11,rd:7883},{w:"Apr 20",pl:"Volt Desktop",n:531,rd:88397}
+  {w:"Mar 30",pl:"AIB",n:209,rd:53589},{w:"Mar 30",pl:"Amp Top Box",n:10,rd:9594},{w:"Mar 30",pl:"Analog Mics",n:3,rd:4078},
+  {w:"Mar 30",pl:"Apollo Desktop",n:635,rd:274790},{w:"Mar 30",pl:"Apollo Rackmount",n:154,rd:236445},
+  {w:"Mar 30",pl:"GPM",n:77,rd:18095},{w:"Mar 30",pl:"GPS",n:59,rd:7902},
+  {w:"Mar 30",pl:"Modeling Mics",n:121,rd:59254},{w:"Mar 30",pl:"UAD",n:52,rd:27794},{w:"Mar 30",pl:"Volt Desktop",n:1091,rd:161354},
+  {w:"Apr 6",pl:"AIB",n:179,rd:45899},{w:"Apr 6",pl:"Amp Top Box",n:17,rd:16309},{w:"Apr 6",pl:"Analog Mics",n:1,rd:799},
+  {w:"Apr 6",pl:"Apollo Desktop",n:616,rd:267650},{w:"Apr 6",pl:"Apollo Rackmount",n:135,rd:207274},
+  {w:"Apr 6",pl:"GPM",n:90,rd:21222},{w:"Apr 6",pl:"GPS",n:63,rd:8465},
+  {w:"Apr 6",pl:"Modeling Mics",n:142,rd:65891},{w:"Apr 6",pl:"UAD",n:37,rd:20003},{w:"Apr 6",pl:"Volt Desktop",n:1126,rd:162049},
+  {w:"Apr 13",pl:"AIB",n:177,rd:45403},{w:"Apr 13",pl:"Amp Top Box",n:17,rd:16309},
+  {w:"Apr 13",pl:"Apollo Desktop",n:645,rd:277027},{w:"Apr 13",pl:"Apollo Rackmount",n:123,rd:188849},
+  {w:"Apr 13",pl:"GPM",n:90,rd:21203},{w:"Apr 13",pl:"GPS",n:59,rd:8024},
+  {w:"Apr 13",pl:"Modeling Mics",n:136,rd:64498},{w:"Apr 13",pl:"UAD",n:34,rd:17980},{w:"Apr 13",pl:"Volt Desktop",n:1073,rd:152742},
+  {w:"Apr 20",pl:"AIB",n:146,rd:37450},{w:"Apr 20",pl:"Amp Top Box",n:17,rd:16309},{w:"Apr 20",pl:"Analog Mics",n:1,rd:1919},
+  {w:"Apr 20",pl:"Apollo Desktop",n:545,rd:241474},{w:"Apr 20",pl:"Apollo Rackmount",n:117,rd:179637},
+  {w:"Apr 20",pl:"GPM",n:100,rd:23629},{w:"Apr 20",pl:"GPS",n:53,rd:7078},
+  {w:"Apr 20",pl:"Modeling Mics",n:106,rd:47246},{w:"Apr 20",pl:"UAD",n:28,rd:16366},{w:"Apr 20",pl:"Volt Desktop",n:993,rd:145148}
 ];
 
 // Weekly totals — {w, n, rd}
 const WEEKLY_TOTALS = [
-  {w:"Mar 30",n:1734,rd:864977},
-  {w:"Apr 6",n:2406,rd:1135145},
-  {w:"Apr 13",n:2354,rd:1096153},
-  {w:"Apr 20",n:1151,rd:554651}
+  {w:"Mar 30",n:2411,rd:852895},
+  {w:"Apr 6",n:2406,rd:815561},
+  {w:"Apr 13",n:2354,rd:792035},
+  {w:"Apr 20",n:2106,rd:716256}
 ];
 
-// Oplan Q2 Channel Perpetual sell-in by week
+// 2026 OPlan sell-in by week — sourced from Omni: HW Sales and Forecast v2 · Adaptive Operating Plan History
+// Monthly OPlan distributed evenly across fiscal weeks within each period:
+//   Mar 30 period ($4,498,716 / 4 wks), Apr 27 period ($6,254,324 / 5 wks),
+//   Jun 1 period ($6,501,861 / 4 wks), Jun 29 period ($4,339,133 / 4 wks)
 const OPLAN = [
-  {w:"Mar 30",v:99771},{w:"Apr 6",v:52546},{w:"Apr 13",v:51268},{w:"Apr 20",v:52033},
-  {w:"Apr 27",v:75118},{w:"May 4",v:67211},{w:"May 11",v:73554},{w:"May 18",v:113768},
-  {w:"May 25",v:96583},{w:"Jun 1",v:141006},{w:"Jun 8",v:91907},{w:"Jun 15",v:85788},
-  {w:"Jun 22",v:115268},{w:"Jun 29",v:76271}
+  {w:"Mar 30",v:1124679},{w:"Apr 6",v:1124679},{w:"Apr 13",v:1124679},{w:"Apr 20",v:1124679},
+  {w:"Apr 27",v:1250865},{w:"May 4",v:1250865},{w:"May 11",v:1250865},{w:"May 18",v:1250865},{w:"May 25",v:1250865},
+  {w:"Jun 1",v:1625465},{w:"Jun 8",v:1625465},{w:"Jun 15",v:1625465},{w:"Jun 22",v:1625465},
+  {w:"Jun 29",v:1084783}
 ];
 
-// Dealer by AI level — {ai, n, rd}
+// Dealer by AI level — {ai, n, rd} · is_sell_through_registration = true
 const DEALER_RAW = [
-  {ai:"Guitar Center",n:864,rd:347213},{ai:"Thomann",n:792,rd:394156},{ai:"Sweetwater",n:736,rd:502702},
-  {ai:"Amazon",n:604,rd:172618},{ai:"EMEA_Dist_Gen",n:406,rd:148151},{ai:"Hook Up",n:391,rd:153036},
-  {ai:"KMC",n:345,rd:124038},{ai:"Yorkville",n:319,rd:123883},{ai:"Musical Fulfillment",n:212,rd:105250},
-  {ai:"EMEA_Nord_Gen",n:196,rd:74617},{ai:"Gearlounge",n:192,rd:103404},{ai:"LatAm_Gen",n:160,rd:85688},
-  {ai:"DMT",n:159,rd:103923},{ai:"MidiWare",n:147,rd:75079},{ai:"Musician's Friend",n:144,rd:97614},
-  {ai:"CMI",n:135,rd:59295},{ai:"APAC_Gen",n:116,rd:43901},{ai:"AUDIOSTACJA",n:110,rd:46447},
-  {ai:"Amazon Europe",n:99,rd:17974},{ai:"Fitzpatrick",n:92,rd:40956},{ai:"MediaCast",n:76,rd:25194},
-  {ai:"MAS ACOUSTICS",n:68,rd:38543},{ai:"Woodbrass",n:67,rd:52655},{ai:"Andertons",n:65,rd:34007},
-  {ai:"Music Store Pro GmbH",n:64,rd:30342},{ai:"US_South Central_Gen",n:62,rd:26640},
-  {ai:"US_Western_Gen",n:62,rd:38450},{ai:"B&H Photo",n:56,rd:45537},{ai:"MSonic",n:54,rd:25093},
-  {ai:"US_Southeast_Gen",n:53,rd:16425},{ai:"Promusicals",n:49,rd:24914},{ai:"Non-Channel_US",n:47,rd:41616},
-  {ai:"Star's Music",n:45,rd:24710},{ai:"Alto Music",n:42,rd:26732},{ai:"Gear 4 Music Ltd",n:36,rd:17047},
-  {ai:"US_Northeast_Gen",n:31,rd:18230},{ai:"Benum",n:28,rd:12353},{ai:"Mega Sound SonoVente",n:28,rd:18429},
-  {ai:"Vintage King",n:27,rd:27776},{ai:"EMEA_France_Gen",n:26,rd:9826},{ai:"EMEA_UK_Gen",n:26,rd:9955},
-  {ai:"Guitar Guitar Ltd",n:22,rd:12959},{ai:"EMEA_GAS_East_Gen",n:21,rd:16746},{ai:"Musix AG",n:20,rd:8016},
-  {ai:"ProAudio Star",n:17,rd:9300},{ai:"S & T Audio Limited (PMT)",n:17,rd:4021},
-  {ai:"KMR Audio Ltd",n:16,rd:19195},{ai:"Non-Channel_AMS",n:16,rd:14615},{ai:"Studiocare Pro",n:15,rd:16478},
-  {ai:"House of Sound",n:12,rd:8874},{ai:"Cyber Farm APS",n:11,rd:8658},
-  {ai:"Session GmbH & Co. KG",n:10,rd:4160},{ai:"EMEA_GAS_West_Gen",n:9,rd:4931},
-  {ai:"Gear 4 Music Ltd (DE)",n:9,rd:4661},{ai:"Bax",n:7,rd:1569},
-  {ai:"Guitar Amp and Keyboard",n:4,rd:1768},{ai:"Sam Ash",n:4,rd:1992},
-  {ai:"NeoNet",n:3,rd:475},{ai:"Peakhouse Audio",n:3,rd:2071},
-  {ai:"Absolute Music",n:1,rd:279},{ai:"EMEA_Benelux_Gen",n:1,rd:925},{ai:"Just Music GmbH",n:1,rd:874}
+  {ai:"Guitar Center",n:575,rd:102477},{ai:"Thomann",n:499,rd:132066},{ai:"Sweetwater",n:468,rd:153190},
+  {ai:"Amazon",n:405,rd:68319},{ai:"EMEA_Dist_Gen",n:289,rd:67526},{ai:"Hook Up",n:266,rd:61151},
+  {ai:"KMC",n:231,rd:50768},{ai:"Yorkville",n:225,rd:50108},{ai:"Musical Fulfillment",n:144,rd:38574},
+  {ai:"EMEA_Nord_Gen",n:118,rd:18945},{ai:"Gearlounge",n:114,rd:33933},{ai:"LatAm_Gen",n:113,rd:35581},
+  {ai:"DMT",n:108,rd:25669},{ai:"CMI",n:91,rd:19638},{ai:"Musician's Friend",n:91,rd:27948},
+  {ai:"MidiWare",n:87,rd:21445},{ai:"Fitzpatrick",n:76,rd:18132},{ai:"AUDIOSTACJA",n:75,rd:15739},
+  {ai:"APAC_Gen",n:71,rd:14240},{ai:"Amazon Europe",n:59,rd:10696},
+  {ai:"MAS ACOUSTICS",n:53,rd:17992},{ai:"MediaCast",n:49,rd:7989},{ai:"Music Store Pro GmbH",n:47,rd:13469},
+  {ai:"US_South Central_Gen",n:41,rd:9146},{ai:"US_Western_Gen",n:41,rd:9874},
+  {ai:"US_Southeast_Gen",n:39,rd:7140},{ai:"MSonic",n:38,rd:6110},{ai:"Woodbrass",n:38,rd:11163},
+  {ai:"B&H Photo",n:34,rd:12583},{ai:"Non-Channel_US",n:34,rd:7071},
+  {ai:"Star's Music",n:33,rd:8305},{ai:"Andertons",n:32,rd:7647},{ai:"Promusicals",n:32,rd:6691},
+  {ai:"Alto Music",n:31,rd:7865},{ai:"Gear 4 Music Ltd",n:25,rd:4797},
+  {ai:"EMEA_UK_Gen",n:20,rd:4798},{ai:"EMEA_France_Gen",n:19,rd:3884},
+  {ai:"Mega Sound SonoVente",n:17,rd:4108},{ai:"US_Northeast_Gen",n:17,rd:2606},{ai:"Vintage King",n:17,rd:7714},
+  {ai:"Benum",n:16,rd:4362},{ai:"Guitar Guitar Ltd",n:15,rd:3172},{ai:"ProAudio Star",n:14,rd:3197},
+  {ai:"S & T Audio Limited (PMT)",n:13,rd:1878},{ai:"EMEA_GAS_East_Gen",n:12,rd:3496},
+  {ai:"KMR Audio Ltd",n:11,rd:1331},{ai:"Musix AG",n:11,rd:2633},{ai:"Non-Channel_AMS",n:10,rd:3859},
+  {ai:"Gear 4 Music Ltd (DE)",n:8,rd:1879},{ai:"EMEA_GAS_West_Gen",n:7,rd:1581},
+  {ai:"House of Sound",n:7,rd:2415},{ai:"Session GmbH & Co. KG",n:7,rd:2182},
+  {ai:"Cyber Farm APS",n:6,rd:1647},{ai:"Studiocare Pro",n:6,rd:2492},
+  {ai:"Bax",n:4,rd:861},{ai:"Guitar Amp and Keyboard",n:3,rd:734},{ai:"Sam Ash",n:3,rd:824},
+  {ai:"NeoNet",n:3,rd:484},{ai:"Absolute Music",n:1,rd:259},{ai:"Just Music GmbH",n:1,rd:575}
 ];
 
+
+// Cross-dimensional: Dealer (AI Level) × Product Line × Week · is_sell_through_registration = true
+const CROSS_WEEKLY = [{ai:"APAC_Gen",pl:"Apollo Desktop",w:"Mar 30",n:6,rd:3644.16},{ai:"APAC_Gen",pl:"Apollo Rackmount",w:"Mar 30",n:1,rd:0},{ai:"APAC_Gen",pl:"GPM",w:"Mar 30",n:2,rd:478.72},{ai:"APAC_Gen",pl:"GPS",w:"Mar 30",n:1,rd:127.36},{ai:"APAC_Gen",pl:"Volt Desktop",w:"Mar 30",n:23,rd:3257.13},{ai:"AUDIOSTACJA",pl:"AIB",w:"Mar 30",n:2,rd:510.72},{ai:"AUDIOSTACJA",pl:"Apollo Desktop",w:"Mar 30",n:7,rd:2683.52},{ai:"AUDIOSTACJA",pl:"Apollo Rackmount",w:"Mar 30",n:1,rd:0},{ai:"AUDIOSTACJA",pl:"GPM",w:"Mar 30",n:1,rd:255.36},{ai:"AUDIOSTACJA",pl:"Volt Desktop",w:"Mar 30",n:10,rd:1664},{ai:"Alto Music",pl:"AIB",w:"Mar 30",n:2,rd:510.72},{ai:"Alto Music",pl:"Analog Mics",w:"Mar 30",n:1,rd:0},{ai:"Alto Music",pl:"Apollo Rackmount",w:"Mar 30",n:3,rd:0},{ai:"Alto Music",pl:"UAD",w:"Mar 30",n:2,rd:1278.72},{ai:"Amazon",pl:"AIB",w:"Mar 30",n:6,rd:1532.16},{ai:"Amazon",pl:"Amp Top Box",w:"Mar 30",n:1,rd:959.36},{ai:"Amazon",pl:"Apollo Desktop",w:"Mar 30",n:33,rd:11142.31},{ai:"Amazon",pl:"Apollo Rackmount",w:"Mar 30",n:1,rd:0},{ai:"Amazon",pl:"GPM",w:"Mar 30",n:2,rd:446.72},{ai:"Amazon",pl:"GPS",w:"Mar 30",n:7,rd:961.89},{ai:"Amazon",pl:"Modeling Mics",w:"Mar 30",n:4,rd:1095.42},{ai:"Amazon",pl:"Volt Desktop",w:"Mar 30",n:89,rd:12007.04},{ai:"Amazon Europe",pl:"AIB",w:"Mar 30",n:9,rd:2305.42},{ai:"Amazon Europe",pl:"GPM",w:"Mar 30",n:3,rd:702.08},{ai:"Amazon Europe",pl:"Volt Desktop",w:"Mar 30",n:22,rd:3211.52},{ai:"Andertons",pl:"AIB",w:"Mar 30",n:4,rd:1037.4},{ai:"Andertons",pl:"Apollo Desktop",w:"Mar 30",n:7,rd:2235.52},{ai:"Andertons",pl:"Apollo Rackmount",w:"Mar 30",n:2,rd:0},{ai:"Andertons",pl:"GPM",w:"Mar 30",n:2,rd:478.72},{ai:"Andertons",pl:"GPS",w:"Mar 30",n:2,rd:280.32},{ai:"Andertons",pl:"Modeling Mics",w:"Mar 30",n:1,rd:0},{ai:"Andertons",pl:"UAD",w:"Mar 30",n:2,rd:1278.72},{ai:"Andertons",pl:"Volt Desktop",w:"Mar 30",n:6,rd:1231.36},{ai:"B&H Photo",pl:"Apollo Desktop",w:"Mar 30",n:4,rd:1277.44},{ai:"B&H Photo",pl:"Apollo Rackmount",w:"Mar 30",n:1,rd:0},{ai:"B&H Photo",pl:"GPM",w:"Mar 30",n:1,rd:223.36},{ai:"B&H Photo",pl:"Modeling Mics",w:"Mar 30",n:1,rd:324.35},{ai:"B&H Photo",pl:"UAD",w:"Mar 30",n:2,rd:1278.72},{ai:"B&H Photo",pl:"Volt Desktop",w:"Mar 30",n:2,rd:389.12},{ai:"Bax",pl:"AIB",w:"Mar 30",n:1,rd:259.35},{ai:"Benum",pl:"Amp Top Box",w:"Mar 30",n:1,rd:959.36},{ai:"Benum",pl:"Apollo Desktop",w:"Mar 30",n:2,rd:0},{ai:"Benum",pl:"Volt Desktop",w:"Mar 30",n:4,rd:567.04},{ai:"CMI",pl:"AIB",w:"Mar 30",n:4,rd:1029.42},{ai:"CMI",pl:"Apollo Desktop",w:"Mar 30",n:4,rd:0},{ai:"CMI",pl:"GPM",w:"Mar 30",n:1,rd:223.36},{ai:"CMI",pl:"GPS",w:"Mar 30",n:1,rd:127.36},{ai:"CMI",pl:"Volt Desktop",w:"Mar 30",n:13,rd:2007.68},{ai:"Cyber Farm APS",pl:"Apollo Desktop",w:"Mar 30",n:2,rd:0},{ai:"Cyber Farm APS",pl:"Modeling Mics",w:"Mar 30",n:1,rd:639.36},{ai:"DMT",pl:"Apollo Desktop",w:"Mar 30",n:8,rd:4261.55},{ai:"DMT",pl:"Apollo Rackmount",w:"Mar 30",n:8,rd:0},{ai:"DMT",pl:"Modeling Mics",w:"Mar 30",n:2,rd:1278.72},{ai:"DMT",pl:"UAD",w:"Mar 30",n:1,rd:639.36},{ai:"DMT",pl:"Volt Desktop",w:"Mar 30",n:11,rd:1669.76},{ai:"EMEA_Benelux_Gen",pl:"Apollo Desktop",w:"Mar 30",n:1,rd:0},{ai:"EMEA_Dist_Gen",pl:"AIB",w:"Mar 30",n:2,rd:510.72},{ai:"EMEA_Dist_Gen",pl:"Apollo Desktop",w:"Mar 30",n:13,rd:4151.68},{ai:"EMEA_Dist_Gen",pl:"Apollo Rackmount",w:"Mar 30",n:2,rd:0},{ai:"EMEA_Dist_Gen",pl:"GPM",w:"Mar 30",n:2,rd:478.72},{ai:"EMEA_Dist_Gen",pl:"GPS",w:"Mar 30",n:1,rd:140.16},{ai:"EMEA_Dist_Gen",pl:"Modeling Mics",w:"Mar 30",n:2,rd:382.72},{ai:"EMEA_Dist_Gen",pl:"UAD",w:"Mar 30",n:1,rd:639.36},{ai:"EMEA_Dist_Gen",pl:"Volt Desktop",w:"Mar 30",n:53,rd:7239.31},{ai:"EMEA_France_Gen",pl:"Apollo Desktop",w:"Mar 30",n:2,rd:894.72},{ai:"EMEA_France_Gen",pl:"Volt Desktop",w:"Mar 30",n:4,rd:541.44},{ai:"EMEA_GAS_East_Gen",pl:"AIB",w:"Mar 30",n:1,rd:255.36},{ai:"EMEA_GAS_East_Gen",pl:"Apollo Desktop",w:"Mar 30",n:2,rd:638.72},{ai:"EMEA_GAS_East_Gen",pl:"Apollo Rackmount",w:"Mar 30",n:2,rd:0},{ai:"EMEA_GAS_East_Gen",pl:"Volt Desktop",w:"Mar 30",n:3,rd:593.28},{ai:"EMEA_GAS_West_Gen",pl:"Apollo Desktop",w:"Mar 30",n:1,rd:0},{ai:"EMEA_Nord_Gen",pl:"Apollo Desktop",w:"Mar 30",n:9,rd:2874.24},{ai:"EMEA_Nord_Gen",pl:"Apollo Rackmount",w:"Mar 30",n:2,rd:0},{ai:"EMEA_Nord_Gen",pl:"GPM",w:"Mar 30",n:2,rd:510.72},{ai:"EMEA_Nord_Gen",pl:"Modeling Mics",w:"Mar 30",n:2,rd:1598.72},{ai:"EMEA_Nord_Gen",pl:"Volt Desktop",w:"Mar 30",n:35,rd:4582.78},{ai:"EMEA_UK_Gen",pl:"Apollo Desktop",w:"Mar 30",n:1,rd:0},{ai:"EMEA_UK_Gen",pl:"GPM",w:"Mar 30",n:1,rd:223.36},{ai:"EMEA_UK_Gen",pl:"Modeling Mics",w:"Mar 30",n:1,rd:191.36},{ai:"EMEA_UK_Gen",pl:"Volt Desktop",w:"Mar 30",n:1,rd:300.16},{ai:"Fitzpatrick",pl:"Apollo Desktop",w:"Mar 30",n:5,rd:0},{ai:"Fitzpatrick",pl:"Apollo Rackmount",w:"Mar 30",n:1,rd:0},{ai:"Fitzpatrick",pl:"GPM",w:"Mar 30",n:1,rd:255.36},{ai:"Fitzpatrick",pl:"Volt Desktop",w:"Mar 30",n:3,rd:314.88},{ai:"Gear 4 Music Ltd",pl:"AIB",w:"Mar 30",n:3,rd:766.08},{ai:"Gear 4 Music Ltd",pl:"Apollo Desktop",w:"Mar 30",n:2,rd:638.72},{ai:"Gear 4 Music Ltd",pl:"Modeling Mics",w:"Mar 30",n:3,rd:1215.07},{ai:"Gear 4 Music Ltd (DE)",pl:"Volt Desktop",w:"Mar 30",n:1,rd:300.16},{ai:"Gearlounge",pl:"AIB",w:"Mar 30",n:7,rd:1801.49},{ai:"Gearlounge",pl:"Apollo Desktop",w:"Mar 30",n:18,rd:9588.48},{ai:"Gearlounge",pl:"Apollo Rackmount",w:"Mar 30",n:4,rd:0},{ai:"Gearlounge",pl:"GPM",w:"Mar 30",n:1,rd:223.36},{ai:"Gearlounge",pl:"Modeling Mics",w:"Mar 30",n:2,rd:830.72},{ai:"Gearlounge",pl:"UAD",w:"Mar 30",n:2,rd:1278.72},{ai:"Gearlounge",pl:"Volt Desktop",w:"Mar 30",n:13,rd:2231.68},{ai:"Guitar Center",pl:"AIB",w:"Mar 30",n:3,rd:770.07},{ai:"Guitar Center",pl:"Amp Top Box",w:"Mar 30",n:1,rd:959.36},{ai:"Guitar Center",pl:"Apollo Desktop",w:"Mar 30",n:62,rd:23957.27},{ai:"Guitar Center",pl:"Apollo Rackmount",w:"Mar 30",n:6,rd:0},{ai:"Guitar Center",pl:"Modeling Mics",w:"Mar 30",n:3,rd:638.08},{ai:"Guitar Center",pl:"Volt Desktop",w:"Mar 30",n:132,rd:17472.95},{ai:"Guitar Guitar Ltd",pl:"Apollo Desktop",w:"Mar 30",n:4,rd:2557.44},{ai:"Guitar Guitar Ltd",pl:"Volt Desktop",w:"Mar 30",n:1,rd:191.36},{ai:"Hook Up",pl:"AIB",w:"Mar 30",n:18,rd:4596.48},{ai:"Hook Up",pl:"Amp Top Box",w:"Mar 30",n:1,rd:959.36},{ai:"Hook Up",pl:"Apollo Desktop",w:"Mar 30",n:17,rd:5429.12},{ai:"Hook Up",pl:"Apollo Rackmount",w:"Mar 30",n:4,rd:0},{ai:"Hook Up",pl:"GPM",w:"Mar 30",n:4,rd:893.44},{ai:"Hook Up",pl:"GPS",w:"Mar 30",n:1,rd:129.35},{ai:"Hook Up",pl:"Modeling Mics",w:"Mar 30",n:3,rd:2110.08},{ai:"Hook Up",pl:"UAD",w:"Mar 30",n:2,rd:1278.72},{ai:"Hook Up",pl:"Volt Desktop",w:"Mar 30",n:32,rd:4901.33},{ai:"House of Sound",pl:"Apollo Rackmount",w:"Mar 30",n:1,rd:0},{ai:"House of Sound",pl:"Modeling Mics",w:"Mar 30",n:1,rd:959.36},{ai:"KMC",pl:"AIB",w:"Mar 30",n:5,rd:1286.78},{ai:"KMC",pl:"Apollo Desktop",w:"Mar 30",n:28,rd:10734.08},{ai:"KMC",pl:"Apollo Rackmount",w:"Mar 30",n:4,rd:6141.44},{ai:"KMC",pl:"GPM",w:"Mar 30",n:4,rd:989.44},{ai:"KMC",pl:"Modeling Mics",w:"Mar 30",n:5,rd:1857.79},{ai:"KMC",pl:"Volt Desktop",w:"Mar 30",n:39,rd:6606.3},{ai:"LatAm_Gen",pl:"AIB",w:"Mar 30",n:3,rd:766.08},{ai:"LatAm_Gen",pl:"Apollo Desktop",w:"Mar 30",n:7,rd:2608.85},{ai:"LatAm_Gen",pl:"Apollo Rackmount",w:"Mar 30",n:3,rd:0},{ai:"LatAm_Gen",pl:"GPM",w:"Mar 30",n:1,rd:223.36},{ai:"LatAm_Gen",pl:"Modeling Mics",w:"Mar 30",n:6,rd:2108.16},{ai:"LatAm_Gen",pl:"Volt Desktop",w:"Mar 30",n:12,rd:2283.52},{ai:"MAS ACOUSTICS",pl:"AIB",w:"Mar 30",n:2,rd:510.72},{ai:"MAS ACOUSTICS",pl:"Apollo Desktop",w:"Mar 30",n:2,rd:0},{ai:"MAS ACOUSTICS",pl:"Modeling Mics",w:"Mar 30",n:1,rd:255.36},{ai:"MAS ACOUSTICS",pl:"Volt Desktop",w:"Mar 30",n:3,rd:369.28},{ai:"MSonic",pl:"AIB",w:"Mar 30",n:1,rd:0},{ai:"MSonic",pl:"Apollo Desktop",w:"Mar 30",n:2,rd:638.72},{ai:"MSonic",pl:"Apollo Rackmount",w:"Mar 30",n:2,rd:0},{ai:"MSonic",pl:"Modeling Mics",w:"Mar 30",n:1,rd:191.36},{ai:"MSonic",pl:"Volt Desktop",w:"Mar 30",n:2,rd:312.32},{ai:"MediaCast",pl:"Apollo Desktop",w:"Mar 30",n:3,rd:1918.08},{ai:"MediaCast",pl:"Volt Desktop",w:"Mar 30",n:18,rd:2343.68},{ai:"Mega Sound SonoVente",pl:"Apollo Desktop",w:"Mar 30",n:3,rd:0},{ai:"Mega Sound SonoVente",pl:"Apollo Rackmount",w:"Mar 30",n:1,rd:1535.36},{ai:"Mega Sound SonoVente",pl:"Volt Desktop",w:"Mar 30",n:4,rd:733.44},{ai:"MidiWare",pl:"AIB",w:"Mar 30",n:5,rd:1283.45},{ai:"MidiWare",pl:"Apollo Desktop",w:"Mar 30",n:17,rd:5429.12},{ai:"MidiWare",pl:"Apollo Rackmount",w:"Mar 30",n:2,rd:0},{ai:"MidiWare",pl:"GPS",w:"Mar 30",n:1,rd:140.16},{ai:"MidiWare",pl:"Modeling Mics",w:"Mar 30",n:4,rd:2109.44},{ai:"MidiWare",pl:"Volt Desktop",w:"Mar 30",n:8,rd:1201.74},{ai:"Music Store Pro GmbH",pl:"AIB",w:"Mar 30",n:1,rd:0},{ai:"Music Store Pro GmbH",pl:"Apollo Desktop",w:"Mar 30",n:3,rd:1598.08},{ai:"Music Store Pro GmbH",pl:"Apollo Rackmount",w:"Mar 30",n:2,rd:0},{ai:"Music Store Pro GmbH",pl:"GPS",w:"Mar 30",n:1,rd:127.36},{ai:"Music Store Pro GmbH",pl:"Modeling Mics",w:"Mar 30",n:1,rd:191.36},{ai:"Music Store Pro GmbH",pl:"Volt Desktop",w:"Mar 30",n:3,rd:330.88},{ai:"Musical Fulfillment",pl:"AIB",w:"Mar 30",n:3,rd:766.08},{ai:"Musical Fulfillment",pl:"Amp Top Box",w:"Mar 30",n:3,rd:2878.08},{ai:"Musical Fulfillment",pl:"Apollo Desktop",w:"Mar 30",n:11,rd:3512.96},{ai:"Musical Fulfillment",pl:"Apollo Rackmount",w:"Mar 30",n:1,rd:0},{ai:"Musical Fulfillment",pl:"GPM",w:"Mar 30",n:5,rd:1180.8},{ai:"Musical Fulfillment",pl:"GPS",w:"Mar 30",n:2,rd:280.32},{ai:"Musical Fulfillment",pl:"Modeling Mics",w:"Mar 30",n:6,rd:1996.54},{ai:"Musical Fulfillment",pl:"Volt Desktop",w:"Mar 30",n:12,rd:2392.32},{ai:"Musician's Friend",pl:"AIB",w:"Mar 30",n:2,rd:514.71},{ai:"Musician's Friend",pl:"Apollo Desktop",w:"Mar 30",n:11,rd:5859.63},{ai:"Musician's Friend",pl:"Apollo Rackmount",w:"Mar 30",n:4,rd:0},{ai:"Musician's Friend",pl:"GPM",w:"Mar 30",n:3,rd:766.08},{ai:"Musician's Friend",pl:"Modeling Mics",w:"Mar 30",n:3,rd:1854.08},{ai:"Musician's Friend",pl:"Volt Desktop",w:"Mar 30",n:11,rd:2335.36},{ai:"Musix AG",pl:"AIB",w:"Mar 30",n:2,rd:518.7},{ai:"Musix AG",pl:"Apollo Desktop",w:"Mar 30",n:3,rd:1470.08},{ai:"Musix AG",pl:"GPM",w:"Mar 30",n:1,rd:223.36},{ai:"Musix AG",pl:"GPS",w:"Mar 30",n:1,rd:127.36},{ai:"Musix AG",pl:"Volt Desktop",w:"Mar 30",n:1,rd:300.16},{ai:"Non-Channel_AMS",pl:"GPM",w:"Mar 30",n:1,rd:223.36},{ai:"Non-Channel_AMS",pl:"UAD",w:"Mar 30",n:1,rd:639.36},{ai:"Non-Channel_AMS",pl:"Volt Desktop",w:"Mar 30",n:1,rd:0},{ai:"Non-Channel_US",pl:"AIB",w:"Mar 30",n:1,rd:0},{ai:"Non-Channel_US",pl:"Analog Mics",w:"Mar 30",n:1,rd:1919.36},{ai:"Non-Channel_US",pl:"Apollo Desktop",w:"Mar 30",n:1,rd:0},{ai:"Non-Channel_US",pl:"Apollo Rackmount",w:"Mar 30",n:2,rd:0},{ai:"Non-Channel_US",pl:"Modeling Mics",w:"Mar 30",n:1,rd:191.36},{ai:"Non-Channel_US",pl:"Volt Desktop",w:"Mar 30",n:2,rd:600.32},{ai:"Peakhouse Audio",pl:"Volt Desktop",w:"Mar 30",n:1,rd:0},{ai:"ProAudio Star",pl:"AIB",w:"Mar 30",n:1,rd:0},{ai:"ProAudio Star",pl:"Apollo Rackmount",w:"Mar 30",n:1,rd:0},{ai:"ProAudio Star",pl:"GPM",w:"Mar 30",n:1,rd:223.36},{ai:"Promusicals",pl:"Apollo Desktop",w:"Mar 30",n:4,rd:1277.44},{ai:"Promusicals",pl:"Apollo Rackmount",w:"Mar 30",n:1,rd:0},{ai:"Promusicals",pl:"Volt Desktop",w:"Mar 30",n:6,rd:744.96},{ai:"S & T Audio Limited (PMT)",pl:"Volt Desktop",w:"Mar 30",n:1,rd:120.96},{ai:"Session GmbH & Co. KG",pl:"Volt Desktop",w:"Mar 30",n:1,rd:120.96},{ai:"Star's Music",pl:"Apollo Desktop",w:"Mar 30",n:2,rd:0},{ai:"Star's Music",pl:"Apollo Rackmount",w:"Mar 30",n:1,rd:0},{ai:"Star's Music",pl:"Volt Desktop",w:"Mar 30",n:3,rd:516.48},{ai:"Studiocare Pro",pl:"Apollo Desktop",w:"Mar 30",n:1,rd:0},{ai:"Studiocare Pro",pl:"Apollo Rackmount",w:"Mar 30",n:3,rd:0},{ai:"Studiocare Pro",pl:"Modeling Mics",w:"Mar 30",n:1,rd:959.36},{ai:"Sweetwater",pl:"AIB",w:"Mar 30",n:19,rd:4869.33},{ai:"Sweetwater",pl:"Amp Top Box",w:"Mar 30",n:2,rd:1918.72},{ai:"Sweetwater",pl:"Apollo Desktop",w:"Mar 30",n:67,rd:35372.82},{ai:"Sweetwater",pl:"Apollo Rackmount",w:"Mar 30",n:25,rd:0},{ai:"Sweetwater",pl:"GPM",w:"Mar 30",n:6,rd:1404.16},{ai:"Sweetwater",pl:"GPS",w:"Mar 30",n:11,rd:1430.94},{ai:"Sweetwater",pl:"Modeling Mics",w:"Mar 30",n:14,rd:9685.39},{ai:"Sweetwater",pl:"UAD",w:"Mar 30",n:4,rd:2173.44},{ai:"Sweetwater",pl:"Volt Desktop",w:"Mar 30",n:44,rd:7963.19},{ai:"Thomann",pl:"AIB",w:"Mar 30",n:27,rd:6939.61},{ai:"Thomann",pl:"Apollo Desktop",w:"Mar 30",n:57,rd:25333.7},{ai:"Thomann",pl:"Apollo Rackmount",w:"Mar 30",n:14,rd:0},{ai:"Thomann",pl:"GPM",w:"Mar 30",n:5,rd:1116.8},{ai:"Thomann",pl:"GPS",w:"Mar 30",n:13,rd:1766.04},{ai:"Thomann",pl:"Modeling Mics",w:"Mar 30",n:13,rd:6519.68},{ai:"Thomann",pl:"UAD",w:"Mar 30",n:12,rd:5240.32},{ai:"Thomann",pl:"Volt Desktop",w:"Mar 30",n:61,rd:9633.46},{ai:"US_Northeast_Gen",pl:"Apollo Desktop",w:"Mar 30",n:1,rd:0},{ai:"US_Northeast_Gen",pl:"GPM",w:"Mar 30",n:1,rd:223.36},{ai:"US_Northeast_Gen",pl:"Volt Desktop",w:"Mar 30",n:6,rd:834.56},{ai:"US_South Central_Gen",pl:"AIB",w:"Mar 30",n:2,rd:510.72},{ai:"US_South Central_Gen",pl:"Apollo Desktop",w:"Mar 30",n:1,rd:0},{ai:"US_South Central_Gen",pl:"Apollo Rackmount",w:"Mar 30",n:1,rd:0},{ai:"US_South Central_Gen",pl:"GPM",w:"Mar 30",n:1,rd:255.36},{ai:"US_South Central_Gen",pl:"Volt Desktop",w:"Mar 30",n:12,rd:1709.85},{ai:"US_Southeast_Gen",pl:"Volt Desktop",w:"Mar 30",n:10,rd:1363.2},{ai:"US_Western_Gen",pl:"AIB",w:"Mar 30",n:2,rd:510.72},{ai:"US_Western_Gen",pl:"Apollo Desktop",w:"Mar 30",n:1,rd:0},{ai:"US_Western_Gen",pl:"Apollo Rackmount",w:"Mar 30",n:1,rd:0},{ai:"US_Western_Gen",pl:"GPS",w:"Mar 30",n:1,rd:142.35},{ai:"US_Western_Gen",pl:"Volt Desktop",w:"Mar 30",n:7,rd:1352.32},{ai:"Vintage King",pl:"AIB",w:"Mar 30",n:1,rd:0},{ai:"Vintage King",pl:"Apollo Desktop",w:"Mar 30",n:3,rd:958.08},{ai:"Vintage King",pl:"Apollo Rackmount",w:"Mar 30",n:4,rd:0},{ai:"Vintage King",pl:"GPM",w:"Mar 30",n:1,rd:255.36},{ai:"Vintage King",pl:"Volt Desktop",w:"Mar 30",n:1,rd:0},{ai:"Woodbrass",pl:"AIB",w:"Mar 30",n:1,rd:255.36},{ai:"Woodbrass",pl:"Apollo Desktop",w:"Mar 30",n:9,rd:4314.24},{ai:"Woodbrass",pl:"Apollo Rackmount",w:"Mar 30",n:3,rd:0},{ai:"Woodbrass",pl:"GPS",w:"Mar 30",n:1,rd:129.35},{ai:"Woodbrass",pl:"Volt Desktop",w:"Mar 30",n:3,rd:545.28},{ai:"Yorkville",pl:"AIB",w:"Mar 30",n:4,rd:1029.42},{ai:"Yorkville",pl:"Apollo Desktop",w:"Mar 30",n:11,rd:5096.96},{ai:"Yorkville",pl:"Apollo Rackmount",w:"Mar 30",n:4,rd:0},{ai:"Yorkville",pl:"GPM",w:"Mar 30",n:3,rd:702.08},{ai:"Yorkville",pl:"GPS",w:"Mar 30",n:2,rd:254.72},{ai:"Yorkville",pl:"Modeling Mics",w:"Mar 30",n:3,rd:574.08},{ai:"Yorkville",pl:"UAD",w:"Mar 30",n:1,rd:639.36},{ai:"Yorkville",pl:"Volt Desktop",w:"Mar 30",n:37,rd:4962.28},{ai:"APAC_Gen",pl:"AIB",w:"Apr 6",n:3,rd:772.07},{ai:"APAC_Gen",pl:"Apollo Desktop",w:"Apr 6",n:3,rd:958.08},{ai:"APAC_Gen",pl:"Apollo Rackmount",w:"Apr 6",n:3,rd:0},{ai:"APAC_Gen",pl:"Modeling Mics",w:"Apr 6",n:1,rd:324.35},{ai:"APAC_Gen",pl:"UAD",w:"Apr 6",n:1,rd:639.36},{ai:"APAC_Gen",pl:"Volt Desktop",w:"Apr 6",n:28,rd:4564.48},{ai:"AUDIOSTACJA",pl:"AIB",w:"Apr 6",n:1,rd:259.35},{ai:"AUDIOSTACJA",pl:"Apollo Desktop",w:"Apr 6",n:5,rd:2130.13},{ai:"AUDIOSTACJA",pl:"Apollo Rackmount",w:"Apr 6",n:2,rd:0},{ai:"AUDIOSTACJA",pl:"GPM",w:"Apr 6",n:2,rd:510.72},{ai:"AUDIOSTACJA",pl:"Modeling Mics",w:"Apr 6",n:3,rd:638.08},{ai:"AUDIOSTACJA",pl:"Volt Desktop",w:"Apr 6",n:22,rd:2872.32},{ai:"Absolute Music",pl:"AIB",w:"Apr 6",n:1,rd:259.35},{ai:"Alto Music",pl:"Amp Top Box",w:"Apr 6",n:1,rd:959.36},{ai:"Alto Music",pl:"Apollo Rackmount",w:"Apr 6",n:3,rd:0},{ai:"Alto Music",pl:"Volt Desktop",w:"Apr 6",n:4,rd:599.04},{ai:"Amazon",pl:"AIB",w:"Apr 6",n:14,rd:3580.12},{ai:"Amazon",pl:"Apollo Desktop",w:"Apr 6",n:38,rd:13351.68},{ai:"Amazon",pl:"GPM",w:"Apr 6",n:7,rd:1659.52},{ai:"Amazon",pl:"GPS",w:"Apr 6",n:3,rd:394.88},{ai:"Amazon",pl:"Modeling Mics",w:"Apr 6",n:5,rd:1537.79},{ai:"Amazon",pl:"UAD",w:"Apr 6",n:2,rd:1086.72},{ai:"Amazon",pl:"Volt Desktop",w:"Apr 6",n:141,rd:17635.47},{ai:"Amazon Europe",pl:"AIB",w:"Apr 6",n:6,rd:1536.15},{ai:"Amazon Europe",pl:"GPM",w:"Apr 6",n:1,rd:255.36},{ai:"Amazon Europe",pl:"Volt Desktop",w:"Apr 6",n:21,rd:3768.96},{ai:"Andertons",pl:"AIB",w:"Apr 6",n:1,rd:255.36},{ai:"Andertons",pl:"Apollo Desktop",w:"Apr 6",n:8,rd:2554.88},{ai:"Andertons",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"Andertons",pl:"Modeling Mics",w:"Apr 6",n:1,rd:959.36},{ai:"Andertons",pl:"Volt Desktop",w:"Apr 6",n:7,rd:1175.25},{ai:"B&H Photo",pl:"AIB",w:"Apr 6",n:1,rd:0},{ai:"B&H Photo",pl:"Amp Top Box",w:"Apr 6",n:1,rd:959.36},{ai:"B&H Photo",pl:"Apollo Desktop",w:"Apr 6",n:9,rd:5466.24},{ai:"B&H Photo",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"B&H Photo",pl:"Volt Desktop",w:"Apr 6",n:2,rd:357.12},{ai:"Bax",pl:"Apollo Desktop",w:"Apr 6",n:1,rd:319.36},{ai:"Bax",pl:"GPS",w:"Apr 6",n:1,rd:140.16},{ai:"Bax",pl:"Volt Desktop",w:"Apr 6",n:2,rd:401.92},{ai:"Benum",pl:"Apollo Desktop",w:"Apr 6",n:2,rd:1150.72},{ai:"Benum",pl:"GPS",w:"Apr 6",n:1,rd:127.36},{ai:"Benum",pl:"Modeling Mics",w:"Apr 6",n:1,rd:639.36},{ai:"Benum",pl:"Volt Desktop",w:"Apr 6",n:3,rd:414.08},{ai:"CMI",pl:"AIB",w:"Apr 6",n:2,rd:510.72},{ai:"CMI",pl:"Apollo Desktop",w:"Apr 6",n:6,rd:3836.16},{ai:"CMI",pl:"Apollo Rackmount",w:"Apr 6",n:2,rd:0},{ai:"CMI",pl:"GPM",w:"Apr 6",n:2,rd:478.72},{ai:"CMI",pl:"GPS",w:"Apr 6",n:2,rd:269.71},{ai:"CMI",pl:"Modeling Mics",w:"Apr 6",n:4,rd:1597.44},{ai:"CMI",pl:"Volt Desktop",w:"Apr 6",n:19,rd:2717.08},{ai:"Cyber Farm APS",pl:"Apollo Desktop",w:"Apr 6",n:1,rd:0},{ai:"Cyber Farm APS",pl:"Volt Desktop",w:"Apr 6",n:2,rd:241.92},{ai:"DMT",pl:"Apollo Desktop",w:"Apr 6",n:12,rd:6136.32},{ai:"DMT",pl:"Apollo Rackmount",w:"Apr 6",n:6,rd:0},{ai:"DMT",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"DMT",pl:"GPS",w:"Apr 6",n:1,rd:142.35},{ai:"DMT",pl:"Modeling Mics",w:"Apr 6",n:2,rd:1278.72},{ai:"DMT",pl:"Volt Desktop",w:"Apr 6",n:22,rd:2889.08},{ai:"EMEA_Dist_Gen",pl:"AIB",w:"Apr 6",n:3,rd:0},{ai:"EMEA_Dist_Gen",pl:"Apollo Desktop",w:"Apr 6",n:38,rd:16189.01},{ai:"EMEA_Dist_Gen",pl:"Apollo Rackmount",w:"Apr 6",n:3,rd:0},{ai:"EMEA_Dist_Gen",pl:"GPM",w:"Apr 6",n:5,rd:1180.8},{ai:"EMEA_Dist_Gen",pl:"GPS",w:"Apr 6",n:2,rd:254.72},{ai:"EMEA_Dist_Gen",pl:"Modeling Mics",w:"Apr 6",n:13,rd:7991.68},{ai:"EMEA_Dist_Gen",pl:"Volt Desktop",w:"Apr 6",n:68,rd:9454.08},{ai:"EMEA_France_Gen",pl:"Apollo Desktop",w:"Apr 6",n:4,rd:1917.44},{ai:"EMEA_France_Gen",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"EMEA_France_Gen",pl:"Volt Desktop",w:"Apr 6",n:5,rd:508.8},{ai:"EMEA_GAS_East_Gen",pl:"Apollo Desktop",w:"Apr 6",n:1,rd:319.36},{ai:"EMEA_GAS_East_Gen",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"EMEA_GAS_East_Gen",pl:"Modeling Mics",w:"Apr 6",n:1,rd:639.36},{ai:"EMEA_GAS_East_Gen",pl:"Volt Desktop",w:"Apr 6",n:4,rd:496.64},{ai:"EMEA_GAS_West_Gen",pl:"Apollo Desktop",w:"Apr 6",n:1,rd:319.36},{ai:"EMEA_GAS_West_Gen",pl:"Volt Desktop",w:"Apr 6",n:1,rd:236.16},{ai:"EMEA_Nord_Gen",pl:"AIB",w:"Apr 6",n:3,rd:778.05},{ai:"EMEA_Nord_Gen",pl:"Apollo Desktop",w:"Apr 6",n:10,rd:3193.6},{ai:"EMEA_Nord_Gen",pl:"Apollo Rackmount",w:"Apr 6",n:2,rd:0},{ai:"EMEA_Nord_Gen",pl:"GPS",w:"Apr 6",n:2,rd:254.72},{ai:"EMEA_Nord_Gen",pl:"Modeling Mics",w:"Apr 6",n:1,rd:191.36},{ai:"EMEA_Nord_Gen",pl:"Volt Desktop",w:"Apr 6",n:31,rd:4108.16},{ai:"EMEA_UK_Gen",pl:"AIB",w:"Apr 6",n:3,rd:766.08},{ai:"EMEA_UK_Gen",pl:"Apollo Desktop",w:"Apr 6",n:2,rd:638.72},{ai:"EMEA_UK_Gen",pl:"GPM",w:"Apr 6",n:1,rd:255.36},{ai:"EMEA_UK_Gen",pl:"UAD",w:"Apr 6",n:1,rd:639.36},{ai:"EMEA_UK_Gen",pl:"Volt Desktop",w:"Apr 6",n:3,rd:298.88},{ai:"Fitzpatrick",pl:"Apollo Desktop",w:"Apr 6",n:8,rd:0},{ai:"Fitzpatrick",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"Fitzpatrick",pl:"Modeling Mics",w:"Apr 6",n:4,rd:1918.43},{ai:"Fitzpatrick",pl:"UAD",w:"Apr 6",n:1,rd:0},{ai:"Fitzpatrick",pl:"Volt Desktop",w:"Apr 6",n:17,rd:2450.72},{ai:"Gear 4 Music Ltd",pl:"AIB",w:"Apr 6",n:2,rd:510.72},{ai:"Gear 4 Music Ltd",pl:"Apollo Desktop",w:"Apr 6",n:5,rd:1596.8},{ai:"Gear 4 Music Ltd",pl:"GPM",w:"Apr 6",n:1,rd:255.36},{ai:"Gear 4 Music Ltd",pl:"Modeling Mics",w:"Apr 6",n:1,rd:64.35},{ai:"Gear 4 Music Ltd",pl:"Volt Desktop",w:"Apr 6",n:4,rd:701.44},{ai:"Gear 4 Music Ltd (DE)",pl:"Apollo Desktop",w:"Apr 6",n:1,rd:0},{ai:"Gear 4 Music Ltd (DE)",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"Gear 4 Music Ltd (DE)",pl:"Volt Desktop",w:"Apr 6",n:1,rd:191.36},{ai:"Gearlounge",pl:"AIB",w:"Apr 6",n:10,rd:2559.3},{ai:"Gearlounge",pl:"Apollo Desktop",w:"Apr 6",n:16,rd:8949.76},{ai:"Gearlounge",pl:"Apollo Rackmount",w:"Apr 6",n:3,rd:0},{ai:"Gearlounge",pl:"GPM",w:"Apr 6",n:6,rd:1340.16},{ai:"Gearlounge",pl:"GPS",w:"Apr 6",n:3,rd:382.08},{ai:"Gearlounge",pl:"Modeling Mics",w:"Apr 6",n:5,rd:3708.8},{ai:"Gearlounge",pl:"Volt Desktop",w:"Apr 6",n:15,rd:2192},{ai:"Guitar Amp and Keyboard",pl:"Apollo Desktop",w:"Apr 6",n:1,rd:319.36},{ai:"Guitar Amp and Keyboard",pl:"Volt Desktop",w:"Apr 6",n:1,rd:191.36},{ai:"Guitar Center",pl:"AIB",w:"Apr 6",n:5,rd:1280.79},{ai:"Guitar Center",pl:"Amp Top Box",w:"Apr 6",n:1,rd:959.36},{ai:"Guitar Center",pl:"Apollo Desktop",w:"Apr 6",n:85,rd:32585.6},{ai:"Guitar Center",pl:"Apollo Rackmount",w:"Apr 6",n:8,rd:0},{ai:"Guitar Center",pl:"Modeling Mics",w:"Apr 6",n:3,rd:1470.08},{ai:"Guitar Center",pl:"Volt Desktop",w:"Apr 6",n:157,rd:21374.52},{ai:"Guitar Guitar Ltd",pl:"AIB",w:"Apr 6",n:1,rd:255.36},{ai:"Guitar Guitar Ltd",pl:"Apollo Desktop",w:"Apr 6",n:2,rd:638.72},{ai:"Guitar Guitar Ltd",pl:"Apollo Rackmount",w:"Apr 6",n:3,rd:0},{ai:"Guitar Guitar Ltd",pl:"GPM",w:"Apr 6",n:1,rd:255.36},{ai:"Guitar Guitar Ltd",pl:"Volt Desktop",w:"Apr 6",n:3,rd:362.88},{ai:"Hook Up",pl:"AIB",w:"Apr 6",n:24,rd:6168.07},{ai:"Hook Up",pl:"Amp Top Box",w:"Apr 6",n:4,rd:3837.44},{ai:"Hook Up",pl:"Apollo Desktop",w:"Apr 6",n:24,rd:10736.64},{ai:"Hook Up",pl:"Apollo Rackmount",w:"Apr 6",n:5,rd:0},{ai:"Hook Up",pl:"GPM",w:"Apr 6",n:15,rd:3542.4},{ai:"Hook Up",pl:"GPS",w:"Apr 6",n:9,rd:1173.83},{ai:"Hook Up",pl:"Modeling Mics",w:"Apr 6",n:4,rd:2877.44},{ai:"Hook Up",pl:"UAD",w:"Apr 6",n:1,rd:639.36},{ai:"Hook Up",pl:"Volt Desktop",w:"Apr 6",n:55,rd:7756.18},{ai:"House of Sound",pl:"Apollo Desktop",w:"Apr 6",n:1,rd:0},{ai:"House of Sound",pl:"Modeling Mics",w:"Apr 6",n:2,rd:830.72},{ai:"KMC",pl:"AIB",w:"Apr 6",n:11,rd:2808.96},{ai:"KMC",pl:"Apollo Desktop",w:"Apr 6",n:30,rd:15020.8},{ai:"KMC",pl:"Apollo Rackmount",w:"Apr 6",n:2,rd:0},{ai:"KMC",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"KMC",pl:"GPS",w:"Apr 6",n:2,rd:282.51},{ai:"KMC",pl:"Modeling Mics",w:"Apr 6",n:6,rd:2497.15},{ai:"KMC",pl:"Volt Desktop",w:"Apr 6",n:67,rd:10334.08},{ai:"KMR Audio Ltd",pl:"Apollo Desktop",w:"Apr 6",n:1,rd:0},{ai:"KMR Audio Ltd",pl:"Apollo Rackmount",w:"Apr 6",n:2,rd:0},{ai:"KMR Audio Ltd",pl:"Volt Desktop",w:"Apr 6",n:1,rd:120.96},{ai:"LatAm_Gen",pl:"AIB",w:"Apr 6",n:1,rd:0},{ai:"LatAm_Gen",pl:"Amp Top Box",w:"Apr 6",n:1,rd:959.36},{ai:"LatAm_Gen",pl:"Apollo Desktop",w:"Apr 6",n:20,rd:10653.87},{ai:"LatAm_Gen",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"LatAm_Gen",pl:"GPM",w:"Apr 6",n:1,rd:255.36},{ai:"LatAm_Gen",pl:"Modeling Mics",w:"Apr 6",n:4,rd:1981.44},{ai:"LatAm_Gen",pl:"Volt Desktop",w:"Apr 6",n:21,rd:3459.74},{ai:"MAS ACOUSTICS",pl:"AIB",w:"Apr 6",n:2,rd:510.72},{ai:"MAS ACOUSTICS",pl:"Apollo Desktop",w:"Apr 6",n:7,rd:4475.52},{ai:"MAS ACOUSTICS",pl:"Apollo Rackmount",w:"Apr 6",n:2,rd:0},{ai:"MAS ACOUSTICS",pl:"GPM",w:"Apr 6",n:5,rd:1212.8},{ai:"MAS ACOUSTICS",pl:"Volt Desktop",w:"Apr 6",n:8,rd:1409.28},{ai:"MSonic",pl:"AIB",w:"Apr 6",n:1,rd:255.36},{ai:"MSonic",pl:"Apollo Desktop",w:"Apr 6",n:2,rd:638.72},{ai:"MSonic",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"MSonic",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"MSonic",pl:"GPS",w:"Apr 6",n:1,rd:127.36},{ai:"MSonic",pl:"Volt Desktop",w:"Apr 6",n:9,rd:1287.04},{ai:"MediaCast",pl:"Apollo Desktop",w:"Apr 6",n:6,rd:2876.16},{ai:"MediaCast",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"MediaCast",pl:"Volt Desktop",w:"Apr 6",n:13,rd:1604.48},{ai:"Mega Sound SonoVente",pl:"Apollo Desktop",w:"Apr 6",n:4,rd:2557.44},{ai:"Mega Sound SonoVente",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"Mega Sound SonoVente",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"Mega Sound SonoVente",pl:"Volt Desktop",w:"Apr 6",n:5,rd:716.8},{ai:"MidiWare",pl:"AIB",w:"Apr 6",n:2,rd:510.72},{ai:"MidiWare",pl:"Amp Top Box",w:"Apr 6",n:1,rd:959.36},{ai:"MidiWare",pl:"Apollo Desktop",w:"Apr 6",n:6,rd:1916.16},{ai:"MidiWare",pl:"Apollo Rackmount",w:"Apr 6",n:2,rd:0},{ai:"MidiWare",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"MidiWare",pl:"GPS",w:"Apr 6",n:2,rd:280.32},{ai:"MidiWare",pl:"Modeling Mics",w:"Apr 6",n:6,rd:1023.14},{ai:"MidiWare",pl:"UAD",w:"Apr 6",n:2,rd:1278.72},{ai:"MidiWare",pl:"Volt Desktop",w:"Apr 6",n:15,rd:2320},{ai:"Music Store Pro GmbH",pl:"AIB",w:"Apr 6",n:2,rd:518.7},{ai:"Music Store Pro GmbH",pl:"Amp Top Box",w:"Apr 6",n:1,rd:959.36},{ai:"Music Store Pro GmbH",pl:"Apollo Desktop",w:"Apr 6",n:7,rd:4475.52},{ai:"Music Store Pro GmbH",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"Music Store Pro GmbH",pl:"GPM",w:"Apr 6",n:4,rd:957.44},{ai:"Music Store Pro GmbH",pl:"GPS",w:"Apr 6",n:4,rd:537.23},{ai:"Music Store Pro GmbH",pl:"UAD",w:"Apr 6",n:2,rd:1278.72},{ai:"Music Store Pro GmbH",pl:"Volt Desktop",w:"Apr 6",n:10,rd:1555.2},{ai:"Musical Fulfillment",pl:"AIB",w:"Apr 6",n:2,rd:510.72},{ai:"Musical Fulfillment",pl:"Amp Top Box",w:"Apr 6",n:1,rd:959.36},{ai:"Musical Fulfillment",pl:"Analog Mics",w:"Apr 6",n:1,rd:799.36},{ai:"Musical Fulfillment",pl:"Apollo Desktop",w:"Apr 6",n:25,rd:7984},{ai:"Musical Fulfillment",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"Musical Fulfillment",pl:"GPM",w:"Apr 6",n:1,rd:255.36},{ai:"Musical Fulfillment",pl:"Modeling Mics",w:"Apr 6",n:7,rd:3298.32},{ai:"Musical Fulfillment",pl:"UAD",w:"Apr 6",n:1,rd:639.36},{ai:"Musical Fulfillment",pl:"Volt Desktop",w:"Apr 6",n:24,rd:3323.77},{ai:"Musician's Friend",pl:"AIB",w:"Apr 6",n:2,rd:510.72},{ai:"Musician's Friend",pl:"Apollo Desktop",w:"Apr 6",n:15,rd:4790.4},{ai:"Musician's Friend",pl:"Apollo Rackmount",w:"Apr 6",n:6,rd:0},{ai:"Musician's Friend",pl:"GPM",w:"Apr 6",n:2,rd:478.72},{ai:"Musician's Friend",pl:"GPS",w:"Apr 6",n:2,rd:282.51},{ai:"Musician's Friend",pl:"Modeling Mics",w:"Apr 6",n:5,rd:1840.52},{ai:"Musician's Friend",pl:"Volt Desktop",w:"Apr 6",n:11,rd:1767.04},{ai:"Musix AG",pl:"AIB",w:"Apr 6",n:1,rd:0},{ai:"Musix AG",pl:"Apollo Desktop",w:"Apr 6",n:1,rd:575.36},{ai:"Musix AG",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"Musix AG",pl:"Volt Desktop",w:"Apr 6",n:3,rd:612.48},{ai:"Non-Channel_AMS",pl:"Apollo Rackmount",w:"Apr 6",n:2,rd:0},{ai:"Non-Channel_AMS",pl:"Modeling Mics",w:"Apr 6",n:1,rd:959.36},{ai:"Non-Channel_AMS",pl:"Volt Desktop",w:"Apr 6",n:2,rd:472.32},{ai:"Non-Channel_US",pl:"AIB",w:"Apr 6",n:3,rd:766.08},{ai:"Non-Channel_US",pl:"Apollo Desktop",w:"Apr 6",n:3,rd:0},{ai:"Non-Channel_US",pl:"Apollo Rackmount",w:"Apr 6",n:7,rd:0},{ai:"Non-Channel_US",pl:"GPM",w:"Apr 6",n:2,rd:510.72},{ai:"Non-Channel_US",pl:"GPS",w:"Apr 6",n:1,rd:129.35},{ai:"Non-Channel_US",pl:"Modeling Mics",w:"Apr 6",n:2,rd:382.72},{ai:"Non-Channel_US",pl:"Volt Desktop",w:"Apr 6",n:1,rd:120.96},{ai:"ProAudio Star",pl:"AIB",w:"Apr 6",n:2,rd:510.72},{ai:"ProAudio Star",pl:"Apollo Desktop",w:"Apr 6",n:2,rd:0},{ai:"ProAudio Star",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"ProAudio Star",pl:"GPM",w:"Apr 6",n:1,rd:255.36},{ai:"ProAudio Star",pl:"Volt Desktop",w:"Apr 6",n:3,rd:586.88},{ai:"Promusicals",pl:"Apollo Desktop",w:"Apr 6",n:4,rd:2557.44},{ai:"Promusicals",pl:"Apollo Rackmount",w:"Apr 6",n:3,rd:0},{ai:"Promusicals",pl:"Modeling Mics",w:"Apr 6",n:2,rd:963.71},{ai:"Promusicals",pl:"Volt Desktop",w:"Apr 6",n:10,rd:1484.8},{ai:"S & T Audio Limited (PMT)",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"S & T Audio Limited (PMT)",pl:"Modeling Mics",w:"Apr 6",n:1,rd:191.36},{ai:"S & T Audio Limited (PMT)",pl:"Volt Desktop",w:"Apr 6",n:3,rd:330.88},{ai:"Sam Ash",pl:"Volt Desktop",w:"Apr 6",n:1,rd:120.96},{ai:"Session GmbH & Co. KG",pl:"AIB",w:"Apr 6",n:2,rd:510.72},{ai:"Session GmbH & Co. KG",pl:"Apollo Desktop",w:"Apr 6",n:1,rd:319.36},{ai:"Star's Music",pl:"AIB",w:"Apr 6",n:2,rd:514.71},{ai:"Star's Music",pl:"Apollo Desktop",w:"Apr 6",n:8,rd:2554.88},{ai:"Star's Music",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"Star's Music",pl:"Modeling Mics",w:"Apr 6",n:1,rd:191.36},{ai:"Star's Music",pl:"UAD",w:"Apr 6",n:1,rd:639.36},{ai:"Star's Music",pl:"Volt Desktop",w:"Apr 6",n:9,rd:992.64},{ai:"Studiocare Pro",pl:"GPM",w:"Apr 6",n:1,rd:255.36},{ai:"Sweetwater",pl:"AIB",w:"Apr 6",n:22,rd:5650.84},{ai:"Sweetwater",pl:"Amp Top Box",w:"Apr 6",n:5,rd:4796.8},{ai:"Sweetwater",pl:"Apollo Desktop",w:"Apr 6",n:87,rd:38323.75},{ai:"Sweetwater",pl:"Apollo Rackmount",w:"Apr 6",n:29,rd:44525.44},{ai:"Sweetwater",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"Sweetwater",pl:"GPS",w:"Apr 6",n:5,rd:666.78},{ai:"Sweetwater",pl:"Modeling Mics",w:"Apr 6",n:13,rd:8183.68},{ai:"Sweetwater",pl:"UAD",w:"Apr 6",n:2,rd:1278.72},{ai:"Sweetwater",pl:"Volt Desktop",w:"Apr 6",n:78,rd:13501.89},{ai:"Thomann",pl:"AIB",w:"Apr 6",n:32,rd:8220.16},{ai:"Thomann",pl:"Apollo Desktop",w:"Apr 6",n:54,rd:26042.53},{ai:"Thomann",pl:"Apollo Rackmount",w:"Apr 6",n:14,rd:21495.04},{ai:"Thomann",pl:"GPM",w:"Apr 6",n:10,rd:2265.6},{ai:"Thomann",pl:"GPS",w:"Apr 6",n:16,rd:2204.16},{ai:"Thomann",pl:"Modeling Mics",w:"Apr 6",n:14,rd:4794.14},{ai:"Thomann",pl:"UAD",w:"Apr 6",n:20,rd:9523.2},{ai:"Thomann",pl:"Volt Desktop",w:"Apr 6",n:74,rd:11373.17},{ai:"US_Northeast_Gen",pl:"AIB",w:"Apr 6",n:1,rd:259.35},{ai:"US_Northeast_Gen",pl:"Apollo Desktop",w:"Apr 6",n:2,rd:0},{ai:"US_Northeast_Gen",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"US_Northeast_Gen",pl:"Volt Desktop",w:"Apr 6",n:6,rd:802.56},{ai:"US_South Central_Gen",pl:"AIB",w:"Apr 6",n:4,rd:1021.44},{ai:"US_South Central_Gen",pl:"Apollo Desktop",w:"Apr 6",n:1,rd:0},{ai:"US_South Central_Gen",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"US_South Central_Gen",pl:"GPM",w:"Apr 6",n:2,rd:478.72},{ai:"US_South Central_Gen",pl:"GPS",w:"Apr 6",n:1,rd:140.16},{ai:"US_South Central_Gen",pl:"Modeling Mics",w:"Apr 6",n:1,rd:191.36},{ai:"US_South Central_Gen",pl:"Volt Desktop",w:"Apr 6",n:6,rd:917.76},{ai:"US_Southeast_Gen",pl:"AIB",w:"Apr 6",n:1,rd:255.36},{ai:"US_Southeast_Gen",pl:"Apollo Desktop",w:"Apr 6",n:2,rd:0},{ai:"US_Southeast_Gen",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"US_Southeast_Gen",pl:"Volt Desktop",w:"Apr 6",n:13,rd:1719.68},{ai:"US_Western_Gen",pl:"Apollo Desktop",w:"Apr 6",n:7,rd:2235.52},{ai:"US_Western_Gen",pl:"Apollo Rackmount",w:"Apr 6",n:2,rd:0},{ai:"US_Western_Gen",pl:"UAD",w:"Apr 6",n:1,rd:639.36},{ai:"US_Western_Gen",pl:"Volt Desktop",w:"Apr 6",n:5,rd:1020.8},{ai:"Vintage King",pl:"Apollo Desktop",w:"Apr 6",n:1,rd:0},{ai:"Vintage King",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"Vintage King",pl:"UAD",w:"Apr 6",n:1,rd:0},{ai:"Woodbrass",pl:"AIB",w:"Apr 6",n:1,rd:259.35},{ai:"Woodbrass",pl:"Apollo Desktop",w:"Apr 6",n:5,rd:2396.8},{ai:"Woodbrass",pl:"Apollo Rackmount",w:"Apr 6",n:1,rd:0},{ai:"Woodbrass",pl:"GPM",w:"Apr 6",n:1,rd:223.36},{ai:"Woodbrass",pl:"GPS",w:"Apr 6",n:1,rd:127.36},{ai:"Woodbrass",pl:"Volt Desktop",w:"Apr 6",n:5,rd:617.6},{ai:"Yorkville",pl:"AIB",w:"Apr 6",n:2,rd:518.7},{ai:"Yorkville",pl:"Apollo Desktop",w:"Apr 6",n:22,rd:12188.59},{ai:"Yorkville",pl:"Apollo Rackmount",w:"Apr 6",n:3,rd:0},{ai:"Yorkville",pl:"GPM",w:"Apr 6",n:3,rd:702.08},{ai:"Yorkville",pl:"GPS",w:"Apr 6",n:3,rd:407.68},{ai:"Yorkville",pl:"Modeling Mics",w:"Apr 6",n:4,rd:2367.43},{ai:"Yorkville",pl:"Volt Desktop",w:"Apr 6",n:64,rd:9210.8},{ai:"APAC_Gen",pl:"Apollo Desktop",w:"Apr 13",n:5,rd:2396.8},{ai:"APAC_Gen",pl:"Apollo Rackmount",w:"Apr 13",n:2,rd:0},{ai:"APAC_Gen",pl:"GPM",w:"Apr 13",n:1,rd:255.36},{ai:"APAC_Gen",pl:"Modeling Mics",w:"Apr 13",n:1,rd:191.36},{ai:"APAC_Gen",pl:"UAD",w:"Apr 13",n:1,rd:639.36},{ai:"APAC_Gen",pl:"Volt Desktop",w:"Apr 13",n:17,rd:2661.52},{ai:"AUDIOSTACJA",pl:"AIB",w:"Apr 13",n:1,rd:0},{ai:"AUDIOSTACJA",pl:"Apollo Desktop",w:"Apr 13",n:14,rd:5479.04},{ai:"AUDIOSTACJA",pl:"Apollo Rackmount",w:"Apr 13",n:3,rd:0},{ai:"AUDIOSTACJA",pl:"Modeling Mics",w:"Apr 13",n:4,rd:1666.43},{ai:"AUDIOSTACJA",pl:"Volt Desktop",w:"Apr 13",n:16,rd:2108.16},{ai:"Alto Music",pl:"AIB",w:"Apr 13",n:5,rd:1288.77},{ai:"Alto Music",pl:"Apollo Desktop",w:"Apr 13",n:7,rd:2235.52},{ai:"Alto Music",pl:"Apollo Rackmount",w:"Apr 13",n:1,rd:0},{ai:"Alto Music",pl:"GPM",w:"Apr 13",n:2,rd:478.72},{ai:"Alto Music",pl:"GPS",w:"Apr 13",n:2,rd:271.7},{ai:"Alto Music",pl:"Volt Desktop",w:"Apr 13",n:4,rd:778.24},{ai:"Amazon",pl:"AIB",w:"Apr 13",n:12,rd:3076.29},{ai:"Amazon",pl:"Apollo Desktop",w:"Apr 13",n:39,rd:13079.04},{ai:"Amazon",pl:"GPM",w:"Apr 13",n:6,rd:1404.16},{ai:"Amazon",pl:"GPS",w:"Apr 13",n:3,rd:412.06},{ai:"Amazon",pl:"Modeling Mics",w:"Apr 13",n:7,rd:1409.5},{ai:"Amazon",pl:"Volt Desktop",w:"Apr 13",n:98,rd:13036.61},{ai:"Amazon Europe",pl:"AIB",w:"Apr 13",n:3,rd:766.08},{ai:"Amazon Europe",pl:"GPS",w:"Apr 13",n:1,rd:142.35},{ai:"Amazon Europe",pl:"Volt Desktop",w:"Apr 13",n:24,rd:3779.84},{ai:"Andertons",pl:"AIB",w:"Apr 13",n:2,rd:518.7},{ai:"Andertons",pl:"Apollo Desktop",w:"Apr 13",n:3,rd:1918.08},{ai:"Andertons",pl:"GPS",w:"Apr 13",n:2,rd:280.32},{ai:"Andertons",pl:"Volt Desktop",w:"Apr 13",n:6,rd:866.56},{ai:"B&H Photo",pl:"Apollo Desktop",w:"Apr 13",n:7,rd:2235.52},{ai:"B&H Photo",pl:"Apollo Rackmount",w:"Apr 13",n:5,rd:0},{ai:"B&H Photo",pl:"GPM",w:"Apr 13",n:1,rd:223.36},{ai:"B&H Photo",pl:"Modeling Mics",w:"Apr 13",n:2,rd:1598.72},{ai:"B&H Photo",pl:"Volt Desktop",w:"Apr 13",n:4,rd:419.84},{ai:"Benum",pl:"AIB",w:"Apr 13",n:3,rd:766.08},{ai:"Benum",pl:"Apollo Desktop",w:"Apr 13",n:1,rd:0},{ai:"Benum",pl:"Apollo Rackmount",w:"Apr 13",n:1,rd:0},{ai:"Benum",pl:"GPM",w:"Apr 13",n:1,rd:223.36},{ai:"Benum",pl:"Volt Desktop",w:"Apr 13",n:2,rd:382.72},{ai:"CMI",pl:"AIB",w:"Apr 13",n:7,rd:1806.14},{ai:"CMI",pl:"Apollo Desktop",w:"Apr 13",n:12,rd:3832.32},{ai:"CMI",pl:"Apollo Rackmount",w:"Apr 13",n:2,rd:0},{ai:"CMI",pl:"GPM",w:"Apr 13",n:2,rd:478.72},{ai:"CMI",pl:"Modeling Mics",w:"Apr 13",n:2,rd:1214.72},{ai:"CMI",pl:"Volt Desktop",w:"Apr 13",n:23,rd:3644.25},{ai:"Cyber Farm APS",pl:"AIB",w:"Apr 13",n:1,rd:255.36},{ai:"Cyber Farm APS",pl:"Apollo Rackmount",w:"Apr 13",n:1,rd:0},{ai:"Cyber Farm APS",pl:"UAD",w:"Apr 13",n:1,rd:447.36},{ai:"DMT",pl:"AIB",w:"Apr 13",n:3,rd:766.08},{ai:"DMT",pl:"Apollo Desktop",w:"Apr 13",n:16,rd:5963.09},{ai:"DMT",pl:"Apollo Rackmount",w:"Apr 13",n:8,rd:0},{ai:"DMT",pl:"GPM",w:"Apr 13",n:1,rd:223.36},{ai:"DMT",pl:"GPS",w:"Apr 13",n:1,rd:140.16},{ai:"DMT",pl:"Modeling Mics",w:"Apr 13",n:1,rd:639.36},{ai:"DMT",pl:"Volt Desktop",w:"Apr 13",n:22,rd:3429.12},{ai:"EMEA_Dist_Gen",pl:"AIB",w:"Apr 13",n:4,rd:1033.41},{ai:"EMEA_Dist_Gen",pl:"Apollo Desktop",w:"Apr 13",n:40,rd:17752.18},{ai:"EMEA_Dist_Gen",pl:"Apollo Rackmount",w:"Apr 13",n:4,rd:0},{ai:"EMEA_Dist_Gen",pl:"GPM",w:"Apr 13",n:1,rd:223.36},{ai:"EMEA_Dist_Gen",pl:"Modeling Mics",w:"Apr 13",n:15,rd:5406.72},{ai:"EMEA_Dist_Gen",pl:"Volt Desktop",w:"Apr 13",n:77,rd:9793.22},{ai:"EMEA_France_Gen",pl:"AIB",w:"Apr 13",n:1,rd:255.36},{ai:"EMEA_France_Gen",pl:"Apollo Desktop",w:"Apr 13",n:3,rd:0},{ai:"EMEA_France_Gen",pl:"Modeling Mics",w:"Apr 13",n:2,rd:453.7},{ai:"EMEA_France_Gen",pl:"Volt Desktop",w:"Apr 13",n:3,rd:484.48},{ai:"EMEA_GAS_East_Gen",pl:"Apollo Desktop",w:"Apr 13",n:1,rd:0},{ai:"EMEA_GAS_East_Gen",pl:"Apollo Rackmount",w:"Apr 13",n:2,rd:0},{ai:"EMEA_GAS_East_Gen",pl:"Modeling Mics",w:"Apr 13",n:1,rd:639.36},{ai:"EMEA_GAS_West_Gen",pl:"AIB",w:"Apr 13",n:1,rd:255.36},{ai:"EMEA_GAS_West_Gen",pl:"Apollo Desktop",w:"Apr 13",n:2,rd:0},{ai:"EMEA_GAS_West_Gen",pl:"GPS",w:"Apr 13",n:1,rd:127.36},{ai:"EMEA_GAS_West_Gen",pl:"Volt Desktop",w:"Apr 13",n:1,rd:191.36},{ai:"EMEA_Nord_Gen",pl:"AIB",w:"Apr 13",n:3,rd:766.08},{ai:"EMEA_Nord_Gen",pl:"Apollo Desktop",w:"Apr 13",n:10,rd:4153.6},{ai:"EMEA_Nord_Gen",pl:"Apollo Rackmount",w:"Apr 13",n:2,rd:0},{ai:"EMEA_Nord_Gen",pl:"GPS",w:"Apr 13",n:1,rd:140.16},{ai:"EMEA_Nord_Gen",pl:"Modeling Mics",w:"Apr 13",n:1,rd:191.36},{ai:"EMEA_Nord_Gen",pl:"UAD",w:"Apr 13",n:2,rd:1278.72},{ai:"EMEA_Nord_Gen",pl:"Volt Desktop",w:"Apr 13",n:42,rd:4877.08},{ai:"EMEA_UK_Gen",pl:"AIB",w:"Apr 13",n:2,rd:510.72},{ai:"EMEA_UK_Gen",pl:"Apollo Desktop",w:"Apr 13",n:3,rd:958.08},{ai:"EMEA_UK_Gen",pl:"Modeling Mics",w:"Apr 13",n:1,rd:64.35},{ai:"EMEA_UK_Gen",pl:"UAD",w:"Apr 13",n:1,rd:447.36},{ai:"EMEA_UK_Gen",pl:"Volt Desktop",w:"Apr 13",n:2,rd:241.92},{ai:"Fitzpatrick",pl:"Apollo Desktop",w:"Apr 13",n:24,rd:7664.64},{ai:"Fitzpatrick",pl:"GPM",w:"Apr 13",n:1,rd:255.36},{ai:"Fitzpatrick",pl:"GPS",w:"Apr 13",n:1,rd:140.16},{ai:"Fitzpatrick",pl:"Modeling Mics",w:"Apr 13",n:3,rd:2110.08},{ai:"Fitzpatrick",pl:"Volt Desktop",w:"Apr 13",n:13,rd:2193.28},{ai:"Gear 4 Music Ltd",pl:"Apollo Desktop",w:"Apr 13",n:7,rd:2235.52},{ai:"Gear 4 Music Ltd",pl:"Modeling Mics",w:"Apr 13",n:1,rd:64.35},{ai:"Gear 4 Music Ltd",pl:"Volt Desktop",w:"Apr 13",n:2,rd:241.92},{ai:"Gear 4 Music Ltd (DE)",pl:"Apollo Desktop",w:"Apr 13",n:3,rd:958.08},{ai:"Gear 4 Music Ltd (DE)",pl:"Volt Desktop",w:"Apr 13",n:2,rd:241.92},{ai:"Gearlounge",pl:"AIB",w:"Apr 13",n:6,rd:1532.16},{ai:"Gearlounge",pl:"Amp Top Box",w:"Apr 13",n:1,rd:959.36},{ai:"Gearlounge",pl:"Apollo Desktop",w:"Apr 13",n:18,rd:11508.48},{ai:"Gearlounge",pl:"Apollo Rackmount",w:"Apr 13",n:3,rd:4606.08},{ai:"Gearlounge",pl:"GPM",w:"Apr 13",n:4,rd:925.44},{ai:"Gearlounge",pl:"Volt Desktop",w:"Apr 13",n:16,rd:2415.36},{ai:"Guitar Center",pl:"AIB",w:"Apr 13",n:5,rd:1286.78},{ai:"Guitar Center",pl:"Amp Top Box",w:"Apr 13",n:2,rd:1918.72},{ai:"Guitar Center",pl:"Apollo Desktop",w:"Apr 13",n:74,rd:26721.34},{ai:"Guitar Center",pl:"Apollo Rackmount",w:"Apr 13",n:10,rd:15353.6},{ai:"Guitar Center",pl:"GPM",w:"Apr 13",n:2,rd:478.72},{ai:"Guitar Center",pl:"Modeling Mics",w:"Apr 13",n:1,rd:639.36},{ai:"Guitar Center",pl:"Volt Desktop",w:"Apr 13",n:184,rd:24219.31},{ai:"Guitar Guitar Ltd",pl:"AIB",w:"Apr 13",n:2,rd:518.7},{ai:"Guitar Guitar Ltd",pl:"Apollo Desktop",w:"Apr 13",n:1,rd:0},{ai:"Guitar Guitar Ltd",pl:"Volt Desktop",w:"Apr 13",n:1,rd:191.36},{ai:"Hook Up",pl:"AIB",w:"Apr 13",n:23,rd:5896.22},{ai:"Hook Up",pl:"Apollo Desktop",w:"Apr 13",n:21,rd:8946.56},{ai:"Hook Up",pl:"GPM",w:"Apr 13",n:7,rd:1659.52},{ai:"Hook Up",pl:"GPS",w:"Apr 13",n:2,rd:269.71},{ai:"Hook Up",pl:"Modeling Mics",w:"Apr 13",n:7,rd:3369.49},{ai:"Hook Up",pl:"Volt Desktop",w:"Apr 13",n:52,rd:7374.85},{ai:"House of Sound",pl:"Apollo Desktop",w:"Apr 13",n:1,rd:319.36},{ai:"House of Sound",pl:"UAD",w:"Apr 13",n:1,rd:639.36},{ai:"House of Sound",pl:"Volt Desktop",w:"Apr 13",n:2,rd:280.32},{ai:"Just Music GmbH",pl:"Apollo Desktop",w:"Apr 13",n:1,rd:575.36},{ai:"KMC",pl:"AIB",w:"Apr 13",n:14,rd:3591.8},{ai:"KMC",pl:"Amp Top Box",w:"Apr 13",n:2,rd:1918.72},{ai:"KMC",pl:"Apollo Desktop",w:"Apr 13",n:18,rd:8628.48},{ai:"KMC",pl:"GPM",w:"Apr 13",n:8,rd:1850.88},{ai:"KMC",pl:"GPS",w:"Apr 13",n:3,rd:396.87},{ai:"KMC",pl:"Modeling Mics",w:"Apr 13",n:5,rd:1921.79},{ai:"KMC",pl:"UAD",w:"Apr 13",n:1,rd:639.36},{ai:"KMC",pl:"Volt Desktop",w:"Apr 13",n:49,rd:7264.64},{ai:"KMR Audio Ltd",pl:"Apollo Desktop",w:"Apr 13",n:3,rd:0},{ai:"KMR Audio Ltd",pl:"Apollo Rackmount",w:"Apr 13",n:3,rd:0},{ai:"LatAm_Gen",pl:"AIB",w:"Apr 13",n:4,rd:1026.76},{ai:"LatAm_Gen",pl:"Apollo Desktop",w:"Apr 13",n:23,rd:11025.28},{ai:"LatAm_Gen",pl:"Apollo Rackmount",w:"Apr 13",n:4,rd:6141.44},{ai:"LatAm_Gen",pl:"GPM",w:"Apr 13",n:1,rd:255.36},{ai:"LatAm_Gen",pl:"GPS",w:"Apr 13",n:5,rd:666.78},{ai:"LatAm_Gen",pl:"Modeling Mics",w:"Apr 13",n:7,rd:2822.49},{ai:"LatAm_Gen",pl:"Volt Desktop",w:"Apr 13",n:16,rd:2280.96},{ai:"MAS ACOUSTICS",pl:"AIB",w:"Apr 13",n:2,rd:510.72},{ai:"MAS ACOUSTICS",pl:"Apollo Desktop",w:"Apr 13",n:12,rd:6392.32},{ai:"MAS ACOUSTICS",pl:"Apollo Rackmount",w:"Apr 13",n:2,rd:0},{ai:"MAS ACOUSTICS",pl:"GPM",w:"Apr 13",n:1,rd:255.36},{ai:"MAS ACOUSTICS",pl:"Modeling Mics",w:"Apr 13",n:6,rd:2684.16},{ai:"MAS ACOUSTICS",pl:"UAD",w:"Apr 13",n:1,rd:639.36},{ai:"MAS ACOUSTICS",pl:"Volt Desktop",w:"Apr 13",n:2,rd:318.72},{ai:"MSonic",pl:"AIB",w:"Apr 13",n:1,rd:259.35},{ai:"MSonic",pl:"Apollo Desktop",w:"Apr 13",n:3,rd:958.08},{ai:"MSonic",pl:"Apollo Rackmount",w:"Apr 13",n:1,rd:0},{ai:"MSonic",pl:"GPM",w:"Apr 13",n:1,rd:223.36},{ai:"MSonic",pl:"GPS",w:"Apr 13",n:1,rd:142.35},{ai:"MSonic",pl:"Volt Desktop",w:"Apr 13",n:12,rd:1579.52},{ai:"MediaCast",pl:"Apollo Desktop",w:"Apr 13",n:7,rd:2683.52},{ai:"MediaCast",pl:"Apollo Rackmount",w:"Apr 13",n:1,rd:0},{ai:"MediaCast",pl:"Volt Desktop",w:"Apr 13",n:18,rd:1946.88},{ai:"Mega Sound SonoVente",pl:"Apollo Desktop",w:"Apr 13",n:4,rd:0},{ai:"MidiWare",pl:"AIB",w:"Apr 13",n:4,rd:1029.42},{ai:"MidiWare",pl:"Amp Top Box",w:"Apr 13",n:1,rd:959.36},{ai:"MidiWare",pl:"Apollo Desktop",w:"Apr 13",n:15,rd:6590.4},{ai:"MidiWare",pl:"GPM",w:"Apr 13",n:1,rd:223.36},{ai:"MidiWare",pl:"GPS",w:"Apr 13",n:1,rd:127.36},{ai:"MidiWare",pl:"Modeling Mics",w:"Apr 13",n:4,rd:1277.44},{ai:"MidiWare",pl:"Volt Desktop",w:"Apr 13",n:19,rd:2548.2},{ai:"Music Store Pro GmbH",pl:"AIB",w:"Apr 13",n:2,rd:510.72},{ai:"Music Store Pro GmbH",pl:"Apollo Desktop",w:"Apr 13",n:5,rd:3196.8},{ai:"Music Store Pro GmbH",pl:"Modeling Mics",w:"Apr 13",n:2,rd:830.72},{ai:"Music Store Pro GmbH",pl:"UAD",w:"Apr 13",n:1,rd:447.36},{ai:"Music Store Pro GmbH",pl:"Volt Desktop",w:"Apr 13",n:5,rd:1097.6},{ai:"Musical Fulfillment",pl:"AIB",w:"Apr 13",n:6,rd:1532.16},{ai:"Musical Fulfillment",pl:"Amp Top Box",w:"Apr 13",n:2,rd:1918.72},{ai:"Musical Fulfillment",pl:"Apollo Desktop",w:"Apr 13",n:27,rd:10350.72},{ai:"Musical Fulfillment",pl:"Apollo Rackmount",w:"Apr 13",n:1,rd:0},{ai:"Musical Fulfillment",pl:"GPM",w:"Apr 13",n:2,rd:478.72},{ai:"Musical Fulfillment",pl:"Modeling Mics",w:"Apr 13",n:9,rd:2741.45},{ai:"Musical Fulfillment",pl:"UAD",w:"Apr 13",n:1,rd:447.36},{ai:"Musical Fulfillment",pl:"Volt Desktop",w:"Apr 13",n:27,rd:3690.07},{ai:"Musician's Friend",pl:"AIB",w:"Apr 13",n:1,rd:255.36},{ai:"Musician's Friend",pl:"Amp Top Box",w:"Apr 13",n:3,rd:2878.08},{ai:"Musician's Friend",pl:"Apollo Desktop",w:"Apr 13",n:11,rd:5272.96},{ai:"Musician's Friend",pl:"Apollo Rackmount",w:"Apr 13",n:7,rd:0},{ai:"Musician's Friend",pl:"GPM",w:"Apr 13",n:4,rd:989.44},{ai:"Musician's Friend",pl:"Modeling Mics",w:"Apr 13",n:4,rd:2749.44},{ai:"Musician's Friend",pl:"Volt Desktop",w:"Apr 13",n:16,rd:2615.59},{ai:"Musix AG",pl:"Apollo Desktop",w:"Apr 13",n:2,rd:0},{ai:"Musix AG",pl:"Modeling Mics",w:"Apr 13",n:2,rd:382.72},{ai:"Musix AG",pl:"Volt Desktop",w:"Apr 13",n:1,rd:120.96},{ai:"NeoNet",pl:"Volt Desktop",w:"Apr 13",n:3,rd:484.48},{ai:"Non-Channel_AMS",pl:"AIB",w:"Apr 13",n:1,rd:255.36},{ai:"Non-Channel_AMS",pl:"Apollo Desktop",w:"Apr 13",n:1,rd:0},{ai:"Non-Channel_AMS",pl:"GPM",w:"Apr 13",n:2,rd:478.72},{ai:"Non-Channel_US",pl:"AIB",w:"Apr 13",n:3,rd:772.07},{ai:"Non-Channel_US",pl:"Apollo Desktop",w:"Apr 13",n:3,rd:0},{ai:"Non-Channel_US",pl:"Apollo Rackmount",w:"Apr 13",n:3,rd:0},{ai:"Non-Channel_US",pl:"GPM",w:"Apr 13",n:2,rd:510.72},{ai:"Non-Channel_US",pl:"Volt Desktop",w:"Apr 13",n:4,rd:586.24},{ai:"Peakhouse Audio",pl:"Apollo Desktop",w:"Apr 13",n:1,rd:0},{ai:"ProAudio Star",pl:"AIB",w:"Apr 13",n:1,rd:0},{ai:"ProAudio Star",pl:"GPM",w:"Apr 13",n:2,rd:510.72},{ai:"ProAudio Star",pl:"Modeling Mics",w:"Apr 13",n:1,rd:191.36},{ai:"Promusicals",pl:"Apollo Desktop",w:"Apr 13",n:3,rd:958.08},{ai:"Promusicals",pl:"Apollo Rackmount",w:"Apr 13",n:1,rd:0},{ai:"Promusicals",pl:"Volt Desktop",w:"Apr 13",n:7,rd:981.12},{ai:"S & T Audio Limited (PMT)",pl:"Apollo Desktop",w:"Apr 13",n:1,rd:0},{ai:"S & T Audio Limited (PMT)",pl:"Volt Desktop",w:"Apr 13",n:3,rd:433.28},{ai:"Sam Ash",pl:"Apollo Desktop",w:"Apr 13",n:1,rd:575.36},{ai:"Session GmbH & Co. KG",pl:"Apollo Desktop",w:"Apr 13",n:2,rd:1278.72},{ai:"Session GmbH & Co. KG",pl:"GPM",w:"Apr 13",n:1,rd:255.36},{ai:"Session GmbH & Co. KG",pl:"Volt Desktop",w:"Apr 13",n:1,rd:88.96},{ai:"Star's Music",pl:"Apollo Desktop",w:"Apr 13",n:3,rd:1342.08},{ai:"Star's Music",pl:"Apollo Rackmount",w:"Apr 13",n:2,rd:0},{ai:"Star's Music",pl:"GPM",w:"Apr 13",n:1,rd:255.36},{ai:"Star's Music",pl:"Modeling Mics",w:"Apr 13",n:1,rd:959.36},{ai:"Star's Music",pl:"Volt Desktop",w:"Apr 13",n:4,rd:458.24},{ai:"Studiocare Pro",pl:"Apollo Desktop",w:"Apr 13",n:1,rd:0},{ai:"Studiocare Pro",pl:"GPM",w:"Apr 13",n:2,rd:446.72},{ai:"Studiocare Pro",pl:"Modeling Mics",w:"Apr 13",n:1,rd:959.36},{ai:"Sweetwater",pl:"AIB",w:"Apr 13",n:22,rd:5649.27},{ai:"Sweetwater",pl:"Amp Top Box",w:"Apr 13",n:4,rd:3837.44},{ai:"Sweetwater",pl:"Apollo Desktop",w:"Apr 13",n:58,rd:25451.95},{ai:"Sweetwater",pl:"Apollo Rackmount",w:"Apr 13",n:26,rd:39919.36},{ai:"Sweetwater",pl:"GPM",w:"Apr 13",n:8,rd:1850.88},{ai:"Sweetwater",pl:"GPS",w:"Apr 13",n:7,rd:944.91},{ai:"Sweetwater",pl:"Modeling Mics",w:"Apr 13",n:11,rd:8120.96},{ai:"Sweetwater",pl:"UAD",w:"Apr 13",n:7,rd:4283.52},{ai:"Sweetwater",pl:"Volt Desktop",w:"Apr 13",n:55,rd:10042.71},{ai:"Thomann",pl:"AIB",w:"Apr 13",n:14,rd:3587.45},{ai:"Thomann",pl:"Amp Top Box",w:"Apr 13",n:1,rd:959.36},{ai:"Thomann",pl:"Apollo Desktop",w:"Apr 13",n:71,rd:32604.04},{ai:"Thomann",pl:"Apollo Rackmount",w:"Apr 13",n:10,rd:0},{ai:"Thomann",pl:"GPM",w:"Apr 13",n:4,rd:893.44},{ai:"Thomann",pl:"GPS",w:"Apr 13",n:23,rd:3154.84},{ai:"Thomann",pl:"Modeling Mics",w:"Apr 13",n:11,rd:6683.15},{ai:"Thomann",pl:"UAD",w:"Apr 13",n:11,rd:4920.96},{ai:"Thomann",pl:"Volt Desktop",w:"Apr 13",n:93,rd:14592.09},{ai:"US_Northeast_Gen",pl:"Apollo Rackmount",w:"Apr 13",n:2,rd:0},{ai:"US_Northeast_Gen",pl:"Volt Desktop",w:"Apr 13",n:4,rd:624.64},{ai:"US_South Central_Gen",pl:"AIB",w:"Apr 13",n:2,rd:510.72},{ai:"US_South Central_Gen",pl:"Apollo Desktop",w:"Apr 13",n:5,rd:2236.8},{ai:"US_South Central_Gen",pl:"Apollo Rackmount",w:"Apr 13",n:2,rd:0},{ai:"US_South Central_Gen",pl:"GPM",w:"Apr 13",n:5,rd:1180.8},{ai:"US_South Central_Gen",pl:"Volt Desktop",w:"Apr 13",n:7,rd:1038.72},{ai:"US_Southeast_Gen",pl:"AIB",w:"Apr 13",n:3,rd:766.08},{ai:"US_Southeast_Gen",pl:"Apollo Desktop",w:"Apr 13",n:5,rd:1596.8},{ai:"US_Southeast_Gen",pl:"GPM",w:"Apr 13",n:2,rd:478.72},{ai:"US_Southeast_Gen",pl:"UAD",w:"Apr 13",n:1,rd:639.36},{ai:"US_Southeast_Gen",pl:"Volt Desktop",w:"Apr 13",n:9,rd:1165.44},{ai:"US_Western_Gen",pl:"AIB",w:"Apr 13",n:3,rd:766.08},{ai:"US_Western_Gen",pl:"Apollo Desktop",w:"Apr 13",n:3,rd:0},{ai:"US_Western_Gen",pl:"Apollo Rackmount",w:"Apr 13",n:2,rd:0},{ai:"US_Western_Gen",pl:"GPM",w:"Apr 13",n:2,rd:510.72},{ai:"US_Western_Gen",pl:"Modeling Mics",w:"Apr 13",n:1,rd:255.36},{ai:"US_Western_Gen",pl:"Volt Desktop",w:"Apr 13",n:13,rd:2769.28},{ai:"Vintage King",pl:"AIB",w:"Apr 13",n:2,rd:0},{ai:"Vintage King",pl:"Apollo Desktop",w:"Apr 13",n:2,rd:638.72},{ai:"Vintage King",pl:"Apollo Rackmount",w:"Apr 13",n:4,rd:0},{ai:"Vintage King",pl:"GPS",w:"Apr 13",n:1,rd:127.36},{ai:"Vintage King",pl:"Modeling Mics",w:"Apr 13",n:1,rd:959.36},{ai:"Vintage King",pl:"UAD",w:"Apr 13",n:1,rd:639.36},{ai:"Vintage King",pl:"Volt Desktop",w:"Apr 13",n:2,rd:0},{ai:"Woodbrass",pl:"AIB",w:"Apr 13",n:1,rd:255.36},{ai:"Woodbrass",pl:"Apollo Desktop",w:"Apr 13",n:11,rd:7032.96},{ai:"Woodbrass",pl:"GPM",w:"Apr 13",n:1,rd:223.36},{ai:"Woodbrass",pl:"GPS",w:"Apr 13",n:3,rd:397.07},{ai:"Woodbrass",pl:"Modeling Mics",w:"Apr 13",n:1,rd:959.36},{ai:"Woodbrass",pl:"UAD",w:"Apr 13",n:1,rd:447.36},{ai:"Woodbrass",pl:"Volt Desktop",w:"Apr 13",n:3,rd:535.68},{ai:"Yorkville",pl:"AIB",w:"Apr 13",n:5,rd:1280.79},{ai:"Yorkville",pl:"Amp Top Box",w:"Apr 13",n:1,rd:959.36},{ai:"Yorkville",pl:"Apollo Desktop",w:"Apr 13",n:23,rd:12865.28},{ai:"Yorkville",pl:"Apollo Rackmount",w:"Apr 13",n:4,rd:0},{ai:"Yorkville",pl:"GPM",w:"Apr 13",n:8,rd:1818.88},{ai:"Yorkville",pl:"GPS",w:"Apr 13",n:1,rd:142.35},{ai:"Yorkville",pl:"Modeling Mics",w:"Apr 13",n:5,rd:1824.29},{ai:"Yorkville",pl:"Volt Desktop",w:"Apr 13",n:66,rd:9264.88},{ai:"APAC_Gen",pl:"Apollo Desktop",w:"Apr 20",n:10,rd:3193.6},{ai:"APAC_Gen",pl:"GPM",w:"Apr 20",n:3,rd:670.08},{ai:"APAC_Gen",pl:"Volt Desktop",w:"Apr 20",n:15,rd:2109.26},{ai:"AUDIOSTACJA",pl:"AIB",w:"Apr 20",n:1,rd:0},{ai:"AUDIOSTACJA",pl:"Apollo Desktop",w:"Apr 20",n:7,rd:2235.52},{ai:"AUDIOSTACJA",pl:"Modeling Mics",w:"Apr 20",n:1,rd:959.36},{ai:"AUDIOSTACJA",pl:"Volt Desktop",w:"Apr 20",n:19,rd:2471.04},{ai:"Absolute Music",pl:"Volt Desktop",w:"Apr 20",n:1,rd:300.16},{ai:"Alto Music",pl:"AIB",w:"Apr 20",n:3,rd:770.07},{ai:"Alto Music",pl:"Apollo Desktop",w:"Apr 20",n:4,rd:1277.44},{ai:"Alto Music",pl:"Apollo Rackmount",w:"Apr 20",n:1,rd:0},{ai:"Alto Music",pl:"GPS",w:"Apr 20",n:3,rd:414.05},{ai:"Alto Music",pl:"Volt Desktop",w:"Apr 20",n:2,rd:241.92},{ai:"Amazon",pl:"AIB",w:"Apr 20",n:8,rd:2052},{ai:"Amazon",pl:"Amp Top Box",w:"Apr 20",n:3,rd:2878.08},{ai:"Amazon",pl:"Apollo Desktop",w:"Apr 20",n:25,rd:8695.11},{ai:"Amazon",pl:"GPM",w:"Apr 20",n:7,rd:1627.52},{ai:"Amazon",pl:"GPS",w:"Apr 20",n:2,rd:256.71},{ai:"Amazon",pl:"Modeling Mics",w:"Apr 20",n:6,rd:864.63},{ai:"Amazon",pl:"Volt Desktop",w:"Apr 20",n:86,rd:11916.16},{ai:"Amazon Europe",pl:"Modeling Mics",w:"Apr 20",n:1,rd:64.35},{ai:"Amazon Europe",pl:"Volt Desktop",w:"Apr 20",n:14,rd:2256.64},{ai:"Andertons",pl:"Apollo Desktop",w:"Apr 20",n:4,rd:0},{ai:"Andertons",pl:"Apollo Rackmount",w:"Apr 20",n:2,rd:0},{ai:"Andertons",pl:"GPM",w:"Apr 20",n:1,rd:223.36},{ai:"Andertons",pl:"GPS",w:"Apr 20",n:1,rd:127.36},{ai:"Andertons",pl:"Modeling Mics",w:"Apr 20",n:2,rd:1150.72},{ai:"Andertons",pl:"UAD",w:"Apr 20",n:1,rd:639.36},{ai:"Andertons",pl:"Volt Desktop",w:"Apr 20",n:1,rd:88.96},{ai:"B&H Photo",pl:"Amp Top Box",w:"Apr 20",n:1,rd:959.36},{ai:"B&H Photo",pl:"Apollo Desktop",w:"Apr 20",n:6,rd:3068.16},{ai:"B&H Photo",pl:"Apollo Rackmount",w:"Apr 20",n:1,rd:0},{ai:"B&H Photo",pl:"GPM",w:"Apr 20",n:1,rd:223.36},{ai:"B&H Photo",pl:"Volt Desktop",w:"Apr 20",n:7,rd:1217.92},{ai:"Bax",pl:"AIB",w:"Apr 20",n:1,rd:255.36},{ai:"Bax",pl:"Volt Desktop",w:"Apr 20",n:2,rd:241.92},{ai:"Benum",pl:"Apollo Desktop",w:"Apr 20",n:2,rd:0},{ai:"Benum",pl:"UAD",w:"Apr 20",n:1,rd:639.36},{ai:"Benum",pl:"Volt Desktop",w:"Apr 20",n:7,rd:1467.52},{ai:"CMI",pl:"AIB",w:"Apr 20",n:1,rd:0},{ai:"CMI",pl:"Amp Top Box",w:"Apr 20",n:1,rd:959.36},{ai:"CMI",pl:"Apollo Desktop",w:"Apr 20",n:7,rd:2982.19},{ai:"CMI",pl:"Apollo Rackmount",w:"Apr 20",n:2,rd:0},{ai:"CMI",pl:"GPM",w:"Apr 20",n:1,rd:223.36},{ai:"CMI",pl:"GPS",w:"Apr 20",n:1,rd:142.35},{ai:"CMI",pl:"Modeling Mics",w:"Apr 20",n:1,rd:959.36},{ai:"CMI",pl:"Volt Desktop",w:"Apr 20",n:21,rd:3608.64},{ai:"Cyber Farm APS",pl:"AIB",w:"Apr 20",n:1,rd:255.36},{ai:"Cyber Farm APS",pl:"Apollo Desktop",w:"Apr 20",n:1,rd:0},{ai:"Cyber Farm APS",pl:"Apollo Rackmount",w:"Apr 20",n:1,rd:0},{ai:"DMT",pl:"AIB",w:"Apr 20",n:3,rd:772.07},{ai:"DMT",pl:"Apollo Desktop",w:"Apr 20",n:25,rd:14784},{ai:"DMT",pl:"Apollo Rackmount",w:"Apr 20",n:5,rd:0},{ai:"DMT",pl:"GPM",w:"Apr 20",n:1,rd:255.36},{ai:"DMT",pl:"Modeling Mics",w:"Apr 20",n:1,rd:959.36},{ai:"DMT",pl:"Volt Desktop",w:"Apr 20",n:23,rd:3415.68},{ai:"EMEA_Benelux_Gen",pl:"AIB",w:"Apr 20",n:1,rd:255.36},{ai:"EMEA_Dist_Gen",pl:"AIB",w:"Apr 20",n:1,rd:0},{ai:"EMEA_Dist_Gen",pl:"Apollo Desktop",w:"Apr 20",n:22,rd:9439.63},{ai:"EMEA_Dist_Gen",pl:"Apollo Rackmount",w:"Apr 20",n:2,rd:0},{ai:"EMEA_Dist_Gen",pl:"GPM",w:"Apr 20",n:3,rd:702.08},{ai:"EMEA_Dist_Gen",pl:"GPS",w:"Apr 20",n:1,rd:127.36},{ai:"EMEA_Dist_Gen",pl:"Modeling Mics",w:"Apr 20",n:8,rd:2560.58},{ai:"EMEA_Dist_Gen",pl:"Volt Desktop",w:"Apr 20",n:71,rd:9100.16},{ai:"EMEA_France_Gen",pl:"Apollo Desktop",w:"Apr 20",n:3,rd:958.08},{ai:"EMEA_France_Gen",pl:"GPS",w:"Apr 20",n:1,rd:127.36},{ai:"EMEA_France_Gen",pl:"Volt Desktop",w:"Apr 20",n:2,rd:254.72},{ai:"EMEA_GAS_East_Gen",pl:"AIB",w:"Apr 20",n:1,rd:259.35},{ai:"EMEA_GAS_East_Gen",pl:"Volt Desktop",w:"Apr 20",n:2,rd:427.52},{ai:"EMEA_GAS_West_Gen",pl:"Apollo Desktop",w:"Apr 20",n:1,rd:639.36},{ai:"EMEA_Nord_Gen",pl:"AIB",w:"Apr 20",n:2,rd:510.72},{ai:"EMEA_Nord_Gen",pl:"Apollo Desktop",w:"Apr 20",n:6,rd:2876.16},{ai:"EMEA_Nord_Gen",pl:"Apollo Rackmount",w:"Apr 20",n:7,rd:0},{ai:"EMEA_Nord_Gen",pl:"GPM",w:"Apr 20",n:2,rd:478.72},{ai:"EMEA_Nord_Gen",pl:"Modeling Mics",w:"Apr 20",n:1,rd:191.36},{ai:"EMEA_Nord_Gen",pl:"Volt Desktop",w:"Apr 20",n:34,rd:4495.09},{ai:"EMEA_UK_Gen",pl:"GPM",w:"Apr 20",n:1,rd:255.36},{ai:"EMEA_UK_Gen",pl:"Volt Desktop",w:"Apr 20",n:4,rd:509.44},{ai:"Fitzpatrick",pl:"AIB",w:"Apr 20",n:1,rd:255.36},{ai:"Fitzpatrick",pl:"Apollo Desktop",w:"Apr 20",n:4,rd:0},{ai:"Fitzpatrick",pl:"Apollo Rackmount",w:"Apr 20",n:1,rd:0},{ai:"Fitzpatrick",pl:"Volt Desktop",w:"Apr 20",n:11,rd:1733.76},{ai:"Gear 4 Music Ltd",pl:"AIB",w:"Apr 20",n:1,rd:255.36},{ai:"Gear 4 Music Ltd",pl:"Amp Top Box",w:"Apr 20",n:1,rd:959.36},{ai:"Gear 4 Music Ltd",pl:"Apollo Desktop",w:"Apr 20",n:3,rd:958.08},{ai:"Gear 4 Music Ltd",pl:"Volt Desktop",w:"Apr 20",n:4,rd:441.17},{ai:"Gear 4 Music Ltd (DE)",pl:"Volt Desktop",w:"Apr 20",n:3,rd:343.68},{ai:"Gearlounge",pl:"AIB",w:"Apr 20",n:6,rd:1544.13},{ai:"Gearlounge",pl:"Amp Top Box",w:"Apr 20",n:1,rd:959.36},{ai:"Gearlounge",pl:"Apollo Desktop",w:"Apr 20",n:9,rd:5754.24},{ai:"Gearlounge",pl:"Apollo Rackmount",w:"Apr 20",n:4,rd:0},{ai:"Gearlounge",pl:"GPM",w:"Apr 20",n:8,rd:1882.88},{ai:"Gearlounge",pl:"Modeling Mics",w:"Apr 20",n:3,rd:1470.08},{ai:"Gearlounge",pl:"UAD",w:"Apr 20",n:1,rd:639.36},{ai:"Gearlounge",pl:"Volt Desktop",w:"Apr 20",n:22,rd:3339.52},{ai:"Guitar Amp and Keyboard",pl:"Apollo Desktop",w:"Apr 20",n:1,rd:575.36},{ai:"Guitar Amp and Keyboard",pl:"GPM",w:"Apr 20",n:2,rd:478.72},{ai:"Guitar Center",pl:"AIB",w:"Apr 20",n:6,rd:1540.14},{ai:"Guitar Center",pl:"Apollo Desktop",w:"Apr 20",n:64,rd:21402.8},{ai:"Guitar Center",pl:"Apollo Rackmount",w:"Apr 20",n:4,rd:0},{ai:"Guitar Center",pl:"Modeling Mics",w:"Apr 20",n:3,rd:638.08},{ai:"Guitar Center",pl:"Volt Desktop",w:"Apr 20",n:147,rd:19578.95},{ai:"Guitar Guitar Ltd",pl:"AIB",w:"Apr 20",n:2,rd:518.7},{ai:"Guitar Guitar Ltd",pl:"Volt Desktop",w:"Apr 20",n:1,rd:120.96},{ai:"Hook Up",pl:"AIB",w:"Apr 20",n:22,rd:5647.18},{ai:"Hook Up",pl:"Amp Top Box",w:"Apr 20",n:2,rd:1918.72},{ai:"Hook Up",pl:"Apollo Desktop",w:"Apr 20",n:14,rd:5367.04},{ai:"Hook Up",pl:"Apollo Rackmount",w:"Apr 20",n:4,rd:0},{ai:"Hook Up",pl:"GPM",w:"Apr 20",n:5,rd:1148.8},{ai:"Hook Up",pl:"GPS",w:"Apr 20",n:3,rd:384.07},{ai:"Hook Up",pl:"Modeling Mics",w:"Apr 20",n:3,rd:2238.08},{ai:"Hook Up",pl:"Volt Desktop",w:"Apr 20",n:31,rd:4411.09},{ai:"House of Sound",pl:"AIB",w:"Apr 20",n:1,rd:0},{ai:"House of Sound",pl:"Apollo Desktop",w:"Apr 20",n:3,rd:0},{ai:"House of Sound",pl:"Apollo Rackmount",w:"Apr 20",n:2,rd:0},{ai:"KMC",pl:"AIB",w:"Apr 20",n:7,rd:1796.83},{ai:"KMC",pl:"Amp Top Box",w:"Apr 20",n:1,rd:959.36},{ai:"KMC",pl:"Apollo Desktop",w:"Apr 20",n:16,rd:8181.76},{ai:"KMC",pl:"GPM",w:"Apr 20",n:4,rd:989.44},{ai:"KMC",pl:"GPS",w:"Apr 20",n:1,rd:127.36},{ai:"KMC",pl:"Modeling Mics",w:"Apr 20",n:1,rd:639.36},{ai:"KMC",pl:"Volt Desktop",w:"Apr 20",n:39,rd:5420.26},{ai:"KMR Audio Ltd",pl:"Apollo Desktop",w:"Apr 20",n:1,rd:0},{ai:"KMR Audio Ltd",pl:"Apollo Rackmount",w:"Apr 20",n:1,rd:0},{ai:"KMR Audio Ltd",pl:"Modeling Mics",w:"Apr 20",n:1,rd:959.36},{ai:"KMR Audio Ltd",pl:"UAD",w:"Apr 20",n:2,rd:1278.72},{ai:"KMR Audio Ltd",pl:"Volt Desktop",w:"Apr 20",n:3,rd:369.28},{ai:"LatAm_Gen",pl:"AIB",w:"Apr 20",n:3,rd:774.06},{ai:"LatAm_Gen",pl:"Amp Top Box",w:"Apr 20",n:1,rd:959.36},{ai:"LatAm_Gen",pl:"Apollo Desktop",w:"Apr 20",n:14,rd:5964.37},{ai:"LatAm_Gen",pl:"Apollo Rackmount",w:"Apr 20",n:1,rd:0},{ai:"LatAm_Gen",pl:"GPM",w:"Apr 20",n:2,rd:446.72},{ai:"LatAm_Gen",pl:"Modeling Mics",w:"Apr 20",n:1,rd:324.35},{ai:"LatAm_Gen",pl:"UAD",w:"Apr 20",n:1,rd:447.36},{ai:"LatAm_Gen",pl:"Volt Desktop",w:"Apr 20",n:12,rd:1829.12},{ai:"MAS ACOUSTICS",pl:"AIB",w:"Apr 20",n:1,rd:0},{ai:"MAS ACOUSTICS",pl:"Apollo Desktop",w:"Apr 20",n:6,rd:2684.16},{ai:"MAS ACOUSTICS",pl:"Apollo Rackmount",w:"Apr 20",n:2,rd:0},{ai:"MAS ACOUSTICS",pl:"GPM",w:"Apr 20",n:3,rd:766.08},{ai:"MAS ACOUSTICS",pl:"GPS",w:"Apr 20",n:2,rd:269.51},{ai:"MAS ACOUSTICS",pl:"Volt Desktop",w:"Apr 20",n:5,rd:617.6},{ai:"MSonic",pl:"AIB",w:"Apr 20",n:1,rd:259.35},{ai:"MSonic",pl:"Apollo Desktop",w:"Apr 20",n:4,rd:2557.44},{ai:"MSonic",pl:"Apollo Rackmount",w:"Apr 20",n:1,rd:0},{ai:"MSonic",pl:"GPS",w:"Apr 20",n:2,rd:256.71},{ai:"MSonic",pl:"Volt Desktop",w:"Apr 20",n:8,rd:980.48},{ai:"MediaCast",pl:"Apollo Desktop",w:"Apr 20",n:3,rd:1918.08},{ai:"MediaCast",pl:"Apollo Rackmount",w:"Apr 20",n:1,rd:0},{ai:"MediaCast",pl:"GPM",w:"Apr 20",n:1,rd:223.36},{ai:"MediaCast",pl:"Modeling Mics",w:"Apr 20",n:1,rd:191.36},{ai:"MediaCast",pl:"Volt Desktop",w:"Apr 20",n:13,rd:1713.28},{ai:"Mega Sound SonoVente",pl:"Apollo Desktop",w:"Apr 20",n:2,rd:638.72},{ai:"Mega Sound SonoVente",pl:"GPM",w:"Apr 20",n:1,rd:255.36},{ai:"Mega Sound SonoVente",pl:"Volt Desktop",w:"Apr 20",n:3,rd:372.48},{ai:"MidiWare",pl:"AIB",w:"Apr 20",n:3,rd:766.08},{ai:"MidiWare",pl:"Apollo Desktop",w:"Apr 20",n:10,rd:4473.6},{ai:"MidiWare",pl:"Apollo Rackmount",w:"Apr 20",n:3,rd:0},{ai:"MidiWare",pl:"GPM",w:"Apr 20",n:3,rd:734.08},{ai:"MidiWare",pl:"GPS",w:"Apr 20",n:2,rd:267.52},{ai:"MidiWare",pl:"Modeling Mics",w:"Apr 20",n:6,rd:1307.75},{ai:"MidiWare",pl:"Volt Desktop",w:"Apr 20",n:9,rd:1421.44},{ai:"Music Store Pro GmbH",pl:"Apollo Desktop",w:"Apr 20",n:5,rd:3196.8},{ai:"Music Store Pro GmbH",pl:"Apollo Rackmount",w:"Apr 20",n:1,rd:0},{ai:"Music Store Pro GmbH",pl:"GPM",w:"Apr 20",n:5,rd:1212.8},{ai:"Music Store Pro GmbH",pl:"Volt Desktop",w:"Apr 20",n:10,rd:1707.38},{ai:"Musical Fulfillment",pl:"AIB",w:"Apr 20",n:5,rd:1284.78},{ai:"Musical Fulfillment",pl:"Analog Mics",w:"Apr 20",n:1,rd:1919.36},{ai:"Musical Fulfillment",pl:"Apollo Desktop",w:"Apr 20",n:20,rd:6387.2},{ai:"Musical Fulfillment",pl:"Apollo Rackmount",w:"Apr 20",n:2,rd:0},{ai:"Musical Fulfillment",pl:"GPM",w:"Apr 20",n:2,rd:478.72}];
+
+// QTD totals derived from CROSS_WEEKLY (ai × pl)
+const CROSS_QTD = (() => {
+  const m = {};
+  CROSS_WEEKLY.forEach(r => {
+    const k = r.ai + '|' + r.pl;
+    if (!m[k]) m[k] = {ai: r.ai, pl: r.pl, n: 0, rd: 0};
+    m[k].n += r.n;
+    m[k].rd += r.rd;
+  });
+  return Object.values(m);
+})();
+
 // ══════════════════════════════════════════════
-//  SETUP
+//  FILTER STATE  (multi-select Sets)
 // ══════════════════════════════════════════════
 
-const PRODUCT_LINES = [...new Set(RAW.map(r => r.pl))].sort();
-const PID_BY_LINE = {};
-PRODUCT_LINES.forEach(pl => {
-  PID_BY_LINE[pl] = [...new Set(RAW.filter(r => r.pl === pl).map(r => r.pid))].sort();
+const activeAis  = new Set();   // Territory (AI Level)
+const activePls  = new Set();   // Product Lines
+const activePids = new Set();   // Product IDs
+
+// ══════════════════════════════════════════════
+//  SIDEBAR
+// ══════════════════════════════════════════════
+
+const PRODUCT_LINES    = [...new Set(RAW.map(r => r.pl))].sort();
+const ALL_PIDS         = [...new Set(RAW.map(r => r.pid))].sort();
+const ALL_AIS          = [...new Set(DEALER_RAW.map(d => d.ai))].sort((a,b) => {
+  // sort by total registrations descending
+  const na = DEALER_RAW.find(d => d.ai === a)?.n || 0;
+  const nb = DEALER_RAW.find(d => d.ai === b)?.n || 0;
+  return nb - na;
 });
-const ALL_PIDS = [...new Set(RAW.map(r => r.pid))].sort();
-const ALL_WEEKS = [...new Set(WEEKLY.map(r => r.w))];
+const ALL_WEEKS        = [...new Set(WEEKLY.map(r => r.w))];
 const ALL_PLS_IN_WEEKLY = [...new Set(WEEKLY.map(r => r.pl))].sort();
 
-const fLine = document.getElementById('f-line');
-const fPid  = document.getElementById('f-pid');
-const fAi   = document.getElementById('f-ai');
+function renderSidebarList(type, searchQuery) {
+  const q = (searchQuery || '').toLowerCase().trim();
+  let items, activeSet, listEl;
+  if (type === 'ai')  { items = ALL_AIS;          activeSet = activeAis;  listEl = document.getElementById('list-ai');  }
+  else if (type === 'pl') { items = PRODUCT_LINES; activeSet = activePls;  listEl = document.getElementById('list-pl');  }
+  else                { items = ALL_PIDS;          activeSet = activePids; listEl = document.getElementById('list-pid'); }
 
-// Populate dropdowns
-PRODUCT_LINES.forEach(pl => {
-  const o = document.createElement('option'); o.value = pl; o.textContent = pl;
-  fLine.appendChild(o);
-});
-DEALER_RAW.forEach(d => {
-  const o = document.createElement('option'); o.value = d.ai; o.textContent = d.ai;
-  fAi.appendChild(o);
-});
+  const filtered = q ? items.filter(v => v.toLowerCase().includes(q)) : items;
 
-function populatePidDropdown(line) {
-  const pids = line ? PID_BY_LINE[line] : ALL_PIDS;
-  fPid.innerHTML = '<option value="">All Product IDs</option>';
-  pids.forEach(p => {
-    const o = document.createElement('option'); o.value = p; o.textContent = p;
-    fPid.appendChild(o);
-  });
-  document.getElementById('pid-badge').textContent = line ? pids.length + ' SKUs' : 'All';
-  document.getElementById('f-pid-hint').textContent = line
-    ? `${pids.length} SKU${pids.length !== 1 ? 's' : ''} in ${line}`
-    : 'Select a Product Line to filter SKUs';
+  listEl.innerHTML = filtered.map(v => {
+    const checked = activeSet.has(v);
+    const esc = v.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<label class="cb-item${checked ? ' checked' : ''}">
+      <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleFilter('${type}','${esc}',this.checked)">
+      <span>${v}</span>
+    </label>`;
+  }).join('');
 }
-populatePidDropdown('');
 
-fLine.onchange = () => { populatePidDropdown(fLine.value); fPid.value = ''; updateAll(); };
-fPid.onchange  = () => updateAll();
-fAi.onchange   = () => updateAll();
+function updateBadges() {
+  ['ai','pl','pid'].forEach(type => {
+    const set  = type === 'ai' ? activeAis : type === 'pl' ? activePls : activePids;
+    const badge = document.getElementById('badge-' + type);
+    const btn   = document.getElementById('clear-' + type);
+    badge.textContent = set.size;
+    badge.classList.toggle('visible', set.size > 0);
+    btn.classList.toggle('visible', set.size > 0);
+  });
+}
+
+function updateChips() {
+  const bar = document.getElementById('active-filter-bar');
+  const chips = [];
+  const mkChip = (type, icon, v) => {
+    const esc = v.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    chips.push(`<span class="filter-chip">${icon} ${v}<span class="chip-x" onclick="removeFilter('${type}','${esc}')">×</span></span>`);
+  };
+  activeAis.forEach(v  => mkChip('ai',  '🏪', v));
+  activePls.forEach(v  => mkChip('pl',  '📦', v));
+  activePids.forEach(v => mkChip('pid', '🔍', v));
+  bar.innerHTML = chips.join('');
+}
+
+function toggleFilter(type, value, checked) {
+  const set = type === 'ai' ? activeAis : type === 'pl' ? activePls : activePids;
+  checked ? set.add(value) : set.delete(value);
+  const searchEl = document.getElementById('search-' + type);
+  renderSidebarList(type, searchEl ? searchEl.value : '');
+  updateBadges();
+  updateChips();
+  updateAll();
+}
+
+function removeFilter(type, value) {
+  const set = type === 'ai' ? activeAis : type === 'pl' ? activePls : activePids;
+  set.delete(value);
+  const searchEl = document.getElementById('search-' + type);
+  renderSidebarList(type, searchEl ? searchEl.value : '');
+  updateBadges();
+  updateChips();
+  updateAll();
+}
+
+function clearGroup(type) {
+  const set = type === 'ai' ? activeAis : type === 'pl' ? activePls : activePids;
+  set.clear();
+  const searchEl = document.getElementById('search-' + type);
+  renderSidebarList(type, searchEl ? searchEl.value : '');
+  updateBadges();
+  updateChips();
+  updateAll();
+}
+
+function resetFilters() {
+  activeAis.clear(); activePls.clear(); activePids.clear();
+  ['ai','pl','pid'].forEach(t => {
+    const s = document.getElementById('search-' + t);
+    if (s) s.value = '';
+    renderSidebarList(t, '');
+  });
+  document.getElementById('search').value = '';
+  document.getElementById('dealer-search').value = '';
+  updateBadges();
+  updateChips();
+  updateAll();
+}
+
+// Init sidebar
+renderSidebarList('ai');
+renderSidebarList('pl');
+renderSidebarList('pid');
 
 // ══════════════════════════════════════════════
 //  HELPERS
@@ -390,28 +726,84 @@ function fmtDollars(v) {
   return '$' + v.toFixed(0);
 }
 
+// Filter RAW by product lines + product IDs (AND logic, each optional)
 function filteredRaw() {
-  const line = fLine.value, pid = fPid.value;
-  return RAW.filter(r => (!line || r.pl === line) && (!pid || r.pid === pid));
+  return RAW.filter(r =>
+    (activePls.size === 0  || activePls.has(r.pl)) &&
+    (activePids.size === 0 || activePids.has(r.pid))
+  );
+}
+
+// Filter DEALER_RAW by territory
+function filteredDealer() {
+  return activeAis.size === 0 ? DEALER_RAW : DEALER_RAW.filter(d => activeAis.has(d.ai));
+}
+
+// ── Cross-filter helpers ──────────────────────────
+
+// Return PL-level aggregated data respecting ALL active filters
+function getPlData() {
+  if (activeAis.size > 0) {
+    let rows = CROSS_QTD.filter(r => activeAis.has(r.ai));
+    if (activePls.size > 0) rows = rows.filter(r => activePls.has(r.pl));
+    // aggregate across dealers
+    const m = {};
+    rows.forEach(r => {
+      if (!m[r.pl]) m[r.pl] = {pl: r.pl, n: 0, rd: 0};
+      m[r.pl].n += r.n;
+      m[r.pl].rd += r.rd;
+    });
+    return Object.values(m);
+  }
+  // No dealer filter — aggregate RAW by PL (respects PL+PID filters)
+  const data = filteredRaw();
+  const m = {};
+  data.forEach(r => {
+    if (!m[r.pl]) m[r.pl] = {pl: r.pl, n: 0, rd: 0};
+    m[r.pl].n += r.n;
+    m[r.pl].rd += r.rd;
+  });
+  return Object.values(m);
+}
+
+// Return weekly data rows respecting dealer + product filters
+function getWeeklyCrossFiltered() {
+  if (activeAis.size > 0) {
+    let rows = CROSS_WEEKLY.filter(r => activeAis.has(r.ai));
+    if (activePls.size > 0) rows = rows.filter(r => activePls.has(r.pl));
+    else {
+      const pls = effectivePLsForWeekly();
+      if (pls) rows = rows.filter(r => pls.has(r.pl));
+    }
+    return rows;
+  }
+  return filteredWeekly();
+}
+
+// Derive the effective product lines for weekly chart
+// If PIDs are selected, map them to their product lines; combine with any directly selected PLs
+function effectivePLsForWeekly() {
+  if (activePls.size === 0 && activePids.size === 0) return null; // no filter → all
+  const plsFromPids = new Set(RAW.filter(r => activePids.has(r.pid)).map(r => r.pl));
+  const merged = new Set([...activePls, ...plsFromPids]);
+  return merged;
+}
+
+function filteredWeekly() {
+  const pls = effectivePLsForWeekly();
+  if (!pls) return WEEKLY;
+  return WEEKLY.filter(r => pls.has(r.pl));
+}
+
+// True when exactly one product line is selected and no PIDs — drill into SKUs
+function isDrillMode() {
+  return activePls.size === 1 && activePids.size === 0;
 }
 
 function aggBy(data, key, valKey) {
   const m = {};
   data.forEach(r => { m[r[key]] = (m[r[key]] || 0) + r[valKey]; });
   return m;
-}
-
-// Get the product line for a PID (used to filter weekly data when PID is selected)
-function getActiveLine() {
-  if (fPid.value) return RAW.find(r => r.pid === fPid.value)?.pl || fLine.value;
-  return fLine.value;
-}
-
-// Filter weekly data by active PL/PID
-function filteredWeekly() {
-  const activeLine = getActiveLine();
-  if (!activeLine) return WEEKLY;
-  return WEEKLY.filter(r => r.pl === activeLine);
 }
 
 // ══════════════════════════════════════════════
@@ -471,41 +863,76 @@ function renderTable() {
 }
 
 function updateQtd() {
-  const data = filteredRaw();
-  const total = data.reduce((s, r) => s + r.n, 0);
-  const totalRd = data.reduce((s, r) => s + r.rd, 0);
-  const selectedLine = fLine.value;
+  const dealerActive = activeAis.size > 0;
 
-  const drillMode = selectedLine !== '';
-  const groupKey  = drillMode ? 'pid' : 'pl';
-  const grouped   = aggBy(data, groupKey, 'n');
-  const sorted    = Object.entries(grouped).sort((a, b) => b[1] - a[1]);
+  // For KPIs + bar/donut: use PL-level cross data when dealer filter is on
+  const plData = getPlData();
+  const total   = plData.reduce((s, r) => s + r.n, 0);
+  const totalRd = plData.reduce((s, r) => s + r.rd, 0);
 
-  const byLine = drillMode ? aggBy(data, 'pl', 'n') : grouped;
+  // Drill mode only available when no dealer filter
+  const drillMode = !dealerActive && isDrillMode();
+
+  let sorted;
+  let byLine;
+  if (drillMode) {
+    const data = filteredRaw();
+    const grouped = aggBy(data, 'pid', 'n');
+    sorted  = Object.entries(grouped).sort((a, b) => b[1] - a[1]);
+    byLine  = aggBy(data, 'pl', 'n');
+  } else {
+    sorted  = plData.slice().sort((a, b) => b.n - a.n).map(r => [r.pl, r.n]);
+    byLine  = Object.fromEntries(plData.map(r => [r.pl, r.n]));
+  }
+
   document.getElementById('kpi-total').textContent = total.toLocaleString();
   document.getElementById('kpi-rd').textContent = fmtDollars(totalRd);
 
-  const topEntry = Object.entries(drillMode ? grouped : byLine).sort((a,b) => b[1]-a[1])[0];
+  const topEntry = sorted[0];
   if (topEntry) {
     document.getElementById('kpi-top-line').textContent = topEntry[0];
     document.getElementById('kpi-top-line-sub').textContent =
-      `${topEntry[1].toLocaleString()} regs (${(topEntry[1]/total*100).toFixed(1)}%)`;
+      `${topEntry[1].toLocaleString()} regs (${total > 0 ? (topEntry[1]/total*100).toFixed(1) : 0}%)`;
   } else {
     document.getElementById('kpi-top-line').textContent = '—';
     document.getElementById('kpi-top-line-sub').textContent = '';
   }
   document.getElementById('kpi-lines').textContent = Object.keys(byLine).length;
-  const skus = [...new Set(data.map(r => r.pid))].length;
-  document.getElementById('kpi-skus').textContent = skus;
-  document.getElementById('kpi-avg-sub').textContent = skus > 0
-    ? `${Math.round(total / skus).toLocaleString()} avg per SKU`
-    : 'Avg per SKU';
-  document.getElementById('kpi-top-label').textContent = drillMode ? 'Top Product ID' : 'Top Product Line';
 
+  // SKU count: from RAW when no dealer filter, else from CROSS_QTD (PL count only)
+  if (dealerActive) {
+    document.getElementById('kpi-skus').textContent = plData.length;
+    document.getElementById('kpi-avg-sub').textContent = plData.length > 0
+      ? `${Math.round(total / plData.length).toLocaleString()} avg per line`
+      : 'Avg per line';
+    document.getElementById('kpi-top-label').textContent = 'Top Product Line';
+  } else {
+    const skus = [...new Set(filteredRaw().map(r => r.pid))].length;
+    document.getElementById('kpi-skus').textContent = skus;
+    document.getElementById('kpi-avg-sub').textContent = skus > 0
+      ? `${Math.round(total / skus).toLocaleString()} avg per SKU`
+      : 'Avg per SKU';
+    document.getElementById('kpi-top-label').textContent = drillMode ? 'Top Product ID' : 'Top Product Line';
+  }
+
+  // Chart titles
   if (drillMode) {
-    const lineLabel = fPid.value ? `${selectedLine} — ${fPid.value}` : selectedLine;
-    document.getElementById('bar-title').textContent   = `Registrations by Product ID — ${lineLabel}`;
-    document.getElementById('donut-title').textContent = `Product ID Mix — ${lineLabel}`;
+    const lineName = [...activePls][0];
+    document.getElementById('bar-title').textContent   = `Registrations by Product ID — ${lineName}`;
+    document.getElementById('donut-title').textContent = `Product ID Mix — ${lineName}`;
+  } else if (dealerActive && activeAis.size === 1) {
+    const dealerName = [...activeAis][0];
+    document.getElementById('bar-title').textContent   = `Registrations by Product Line — ${dealerName}`;
+    document.getElementById('donut-title').textContent = `Product Mix — ${dealerName}`;
+  } else if (dealerActive) {
+    document.getElementById('bar-title').textContent   = `Registrations by Product Line — ${activeAis.size} Dealers`;
+    document.getElementById('donut-title').textContent = 'Product Mix (filtered)';
+  } else if (activePls.size > 1) {
+    document.getElementById('bar-title').textContent   = `Registrations — ${activePls.size} Product Lines`;
+    document.getElementById('donut-title').textContent = 'Product Line Mix (filtered)';
+  } else if (activePids.size > 0) {
+    document.getElementById('bar-title').textContent   = `Registrations — ${activePids.size} Product ID${activePids.size > 1 ? 's' : ''}`;
+    document.getElementById('donut-title').textContent = 'Product ID Mix (filtered)';
   } else {
     document.getElementById('bar-title').textContent   = 'Registrations by Product Line';
     document.getElementById('donut-title').textContent = 'Product Line Mix';
@@ -533,21 +960,22 @@ function updateQtd() {
 //  COMBO CHART: Weekly Reg $ vs Oplan
 // ══════════════════════════════════════════════
 
-// All weeks across reg + oplan
 const COMBO_WEEKS = [...new Set([...WEEKLY_TOTALS.map(r => r.w), ...OPLAN.map(r => r.w)])];
 
-// Build reg dollars map per week (filterable)
 function getWeeklyRegDollars() {
-  const activeLine = getActiveLine();
-  if (!activeLine) {
-    // Use WEEKLY_TOTALS for unfiltered total
+  if (activeAis.size > 0) {
+    const m = {};
+    getWeeklyCrossFiltered().forEach(r => { m[r.w] = (m[r.w] || 0) + r.rd; });
+    return m;
+  }
+  const pls = effectivePLsForWeekly();
+  if (!pls) {
     const m = {};
     WEEKLY_TOTALS.forEach(r => { m[r.w] = r.rd; });
     return m;
   }
-  // Filter WEEKLY by active line
   const m = {};
-  WEEKLY.filter(r => r.pl === activeLine).forEach(r => { m[r.w] = (m[r.w] || 0) + r.rd; });
+  WEEKLY.filter(r => pls.has(r.pl)).forEach(r => { m[r.w] = (m[r.w] || 0) + r.rd; });
   return m;
 }
 
@@ -557,27 +985,14 @@ const comboChart = new Chart(document.getElementById('comboChart'), {
     labels: COMBO_WEEKS,
     datasets: [
       {
-        type: 'bar',
-        label: 'Reg Dollars (Static ASP)',
-        data: [],
-        backgroundColor: '#3b82f6',
-        borderRadius: 4,
-        yAxisID: 'yReg',
-        order: 2
+        type: 'bar', label: 'Reg Dollars (Static ASP)', data: [],
+        backgroundColor: '#3b82f6', borderRadius: 4, yAxisID: 'yReg', order: 2
       },
       {
-        type: 'line',
-        label: 'Oplan Channel Perpetual (Sell-In)',
-        data: [],
-        borderColor: '#f59e0b',
-        backgroundColor: 'rgba(245,158,11,0.15)',
-        borderWidth: 2.5,
-        pointRadius: 4,
-        pointBackgroundColor: '#f59e0b',
-        tension: 0.25,
-        yAxisID: 'yOplan',
-        order: 1,
-        fill: false
+        type: 'line', label: '2026 OPlan Sell-In (weekly pace)', data: [],
+        borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.15)',
+        borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#f59e0b',
+        tension: 0.25, yAxisID: 'yOplan', order: 1, fill: false
       }
     ]
   },
@@ -586,14 +1001,7 @@ const comboChart = new Chart(document.getElementById('comboChart'), {
     interaction: { mode: 'index', intersect: false },
     plugins: {
       legend: { labels: { font: { size: 11 }, boxWidth: 14 } },
-      tooltip: {
-        callbacks: {
-          label: c => {
-            const v = c.parsed.y;
-            return ` ${c.dataset.label}: ${fmtDollars(v)}`;
-          }
-        }
-      }
+      tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${fmtDollars(c.parsed.y)}` } }
     },
     scales: {
       x: { grid: { display: false }, ticks: { font: { size: 11 } } },
@@ -617,24 +1025,26 @@ function updateComboChart() {
   const rdMap = getWeeklyRegDollars();
   const oplanMap = {};
   OPLAN.forEach(r => { oplanMap[r.w] = r.v; });
-
   comboChart.data.datasets[0].data = COMBO_WEEKS.map(w => rdMap[w] || null);
   comboChart.data.datasets[1].data = COMBO_WEEKS.map(w => oplanMap[w] || null);
 
-  const activeLine = getActiveLine();
-  const titleEl = document.getElementById('combo-title');
-  titleEl.textContent = activeLine
-    ? `Weekly Reg Dollars vs Oplan Sell-In — ${activeLine}`
-    : 'Weekly Reg Dollars vs Oplan Channel Perpetual (Sell-In Pace)';
-
+  const pls = effectivePLsForWeekly();
+  let comboTitle = 'Weekly Reg Dollars vs 2026 OPlan Sell-In';
+  if (activeAis.size > 0 && activePls.size === 0) {
+    comboTitle = activeAis.size === 1
+      ? `Weekly Reg Dollars vs 2026 OPlan — ${[...activeAis][0]}`
+      : `Weekly Reg Dollars vs 2026 OPlan — ${activeAis.size} Dealers`;
+  } else if (pls) {
+    comboTitle = `Weekly Reg Dollars vs 2026 OPlan — ${[...pls].join(', ')}`;
+  }
+  document.getElementById('combo-title').textContent = comboTitle;
   comboChart.update();
 }
 
 // ══════════════════════════════════════════════
-//  WEEKLY REGISTRATIONS CHART (stacked bar by PL)
+//  WEEKLY REGISTRATIONS CHART
 // ══════════════════════════════════════════════
 
-// Build stacked datasets for weekly regs
 const weeklyRegChart = new Chart(document.getElementById('weeklyRegChart'), {
   type: 'bar',
   data: { labels: ALL_WEEKS, datasets: [] },
@@ -642,10 +1052,7 @@ const weeklyRegChart = new Chart(document.getElementById('weeklyRegChart'), {
     responsive: true,
     plugins: {
       legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12 } },
-      tooltip: {
-        mode: 'index',
-        callbacks: { label: c => ` ${c.dataset.label}: ${c.parsed.y.toLocaleString()}` }
-      }
+      tooltip: { mode: 'index', callbacks: { label: c => ` ${c.dataset.label}: ${c.parsed.y.toLocaleString()}` } }
     },
     scales: {
       x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 } } },
@@ -655,46 +1062,57 @@ const weeklyRegChart = new Chart(document.getElementById('weeklyRegChart'), {
 });
 
 function updateWeeklyRegChart() {
-  const activeLine = getActiveLine();
   const weeks = ALL_WEEKS;
-
   let datasets;
-  if (activeLine) {
-    // Single line — show bar per week, colored by week
-    const weekData = weeks.map(w => {
-      const row = WEEKLY.find(r => r.w === w && r.pl === activeLine);
-      return row ? row.n : 0;
-    });
-    datasets = [{
-      label: activeLine,
-      data: weekData,
-      backgroundColor: '#2563eb',
-      borderRadius: 4
-    }];
-    weeklyRegChart.options.scales.x.stacked = false;
-    weeklyRegChart.options.scales.y.stacked = false;
+  let titleSuffix = '';
+
+  if (activeAis.size > 0) {
+    // Use CROSS_WEEKLY filtered by dealers (+ optional PL filter)
+    const crossRows = getWeeklyCrossFiltered();
+    const plsInData = [...new Set(crossRows.map(r => r.pl))].sort();
+
+    if (activeAis.size === 1) titleSuffix = ` — ${[...activeAis][0]}`;
+    else titleSuffix = ` — ${activeAis.size} Dealers`;
+
+    if (plsInData.length === 1) {
+      const pl = plsInData[0];
+      datasets = [{ label: pl, data: weeks.map(w => { const rows = crossRows.filter(r => r.w === w && r.pl === pl); return rows.reduce((s,r) => s+r.n, 0); }), backgroundColor: '#2563eb', borderRadius: 4 }];
+      weeklyRegChart.options.scales.x.stacked = false;
+      weeklyRegChart.options.scales.y.stacked = false;
+    } else {
+      datasets = plsInData.map((pl, i) => ({
+        label: pl,
+        data: weeks.map(w => { const rows = crossRows.filter(r => r.w === w && r.pl === pl); return rows.reduce((s,r) => s+r.n, 0); }),
+        backgroundColor: LINE_COLORS[i % LINE_COLORS.length],
+        borderRadius: 0
+      }));
+      weeklyRegChart.options.scales.x.stacked = true;
+      weeklyRegChart.options.scales.y.stacked = true;
+    }
   } else {
-    // All lines stacked
-    datasets = ALL_PLS_IN_WEEKLY.map((pl, i) => ({
-      label: pl,
-      data: weeks.map(w => {
-        const row = WEEKLY.find(r => r.w === w && r.pl === pl);
-        return row ? row.n : 0;
-      }),
-      backgroundColor: LINE_COLORS[i % LINE_COLORS.length],
-      borderRadius: 0
-    }));
-    weeklyRegChart.options.scales.x.stacked = true;
-    weeklyRegChart.options.scales.y.stacked = true;
+    const pls = effectivePLsForWeekly();
+    if (pls && pls.size === 1) {
+      const pl = [...pls][0];
+      titleSuffix = ` — ${pl}`;
+      datasets = [{ label: pl, data: weeks.map(w => { const r = WEEKLY.find(x => x.w === w && x.pl === pl); return r ? r.n : 0; }), backgroundColor: '#2563eb', borderRadius: 4 }];
+      weeklyRegChart.options.scales.x.stacked = false;
+      weeklyRegChart.options.scales.y.stacked = false;
+    } else {
+      const plsToShow = pls ? [...pls].sort() : ALL_PLS_IN_WEEKLY;
+      datasets = plsToShow.map((pl, i) => ({
+        label: pl,
+        data: weeks.map(w => { const r = WEEKLY.find(x => x.w === w && x.pl === pl); return r ? r.n : 0; }),
+        backgroundColor: LINE_COLORS[i % LINE_COLORS.length],
+        borderRadius: 0
+      }));
+      weeklyRegChart.options.scales.x.stacked = true;
+      weeklyRegChart.options.scales.y.stacked = true;
+    }
   }
 
   weeklyRegChart.data.labels = weeks;
   weeklyRegChart.data.datasets = datasets;
-
-  document.getElementById('weekly-reg-title').textContent = activeLine
-    ? `Weekly Sell-Through Registrations — ${activeLine}`
-    : 'Weekly Sell-Through Registrations by Product Line';
-
+  document.getElementById('weekly-reg-title').textContent = `Weekly Sell-Through Registrations by Product Line${titleSuffix}`;
   weeklyRegChart.update();
 }
 
@@ -702,17 +1120,11 @@ function updateWeeklyRegChart() {
 //  DEALER CHARTS + TABLE
 // ══════════════════════════════════════════════
 
-function filteredDealer() {
-  const ai = fAi.value;
-  return ai ? DEALER_RAW.filter(d => d.ai === ai) : DEALER_RAW;
-}
-
 const dealerRegChart = new Chart(document.getElementById('dealerRegChart'), {
   type: 'bar',
   data: { labels: [], datasets: [{ data: [], backgroundColor: '#2563eb', borderRadius: 4 }] },
   options: {
-    indexAxis: 'y',
-    responsive: true,
+    indexAxis: 'y', responsive: true,
     plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.parsed.x.toLocaleString()} regs` } } },
     scales: { x: { ticks: { callback: v => v.toLocaleString(), font: { size: 10 } } }, y: { ticks: { font: { size: 11 } }, grid: { display: false } } }
   }
@@ -722,8 +1134,7 @@ const dealerRdChart = new Chart(document.getElementById('dealerRdChart'), {
   type: 'bar',
   data: { labels: [], datasets: [{ data: [], backgroundColor: '#7c3aed', borderRadius: 4 }] },
   options: {
-    indexAxis: 'y',
-    responsive: true,
+    indexAxis: 'y', responsive: true,
     plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${fmtDollars(c.parsed.x)}` } } },
     scales: { x: { ticks: { callback: v => fmtDollars(v), font: { size: 10 } } }, y: { ticks: { font: { size: 11 } }, grid: { display: false } } }
   }
@@ -761,15 +1172,12 @@ function updateDealerCharts() {
   const data = filteredDealer();
   const byN  = [...data].sort((a,b) => b.n - a.n).slice(0, 15);
   const byRd = [...data].sort((a,b) => b.rd - a.rd).slice(0, 15);
-
   dealerRegChart.data.labels = byN.map(d => d.ai);
   dealerRegChart.data.datasets[0].data = byN.map(d => d.n);
   dealerRegChart.update();
-
   dealerRdChart.data.labels = byRd.map(d => d.ai);
   dealerRdChart.data.datasets[0].data = byRd.map(d => d.rd);
   dealerRdChart.update();
-
   renderDealerTable();
 }
 
@@ -782,14 +1190,6 @@ function updateAll() {
   updateComboChart();
   updateWeeklyRegChart();
   updateDealerCharts();
-}
-
-function resetFilters() {
-  fLine.value = ''; fPid.value = ''; fAi.value = '';
-  populatePidDropdown('');
-  document.getElementById('search').value = '';
-  document.getElementById('dealer-search').value = '';
-  updateAll();
 }
 
 updateAll();
