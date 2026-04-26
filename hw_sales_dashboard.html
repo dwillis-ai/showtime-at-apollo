@@ -91,7 +91,7 @@
   <div>
     <h1>Hardware Performance Dashboard<span class="badge">Q2 2026</span></h1>
   </div>
-  <span class="meta">As of April 23, 2026 &nbsp;·&nbsp; Sources: fct_registrations · v2 Hardware Sales &amp; Forecast · Bomisco POS</span>
+  <span class="meta">As of April 23, 2026 &nbsp;·&nbsp; Sources: fct_registrations · v2 Hardware Sales &amp; Forecast · Bomisco POS &nbsp;·&nbsp; <span style="color:#22c55e">is_sell_through_registration = true</span></span>
 </header>
 
 <!-- KPI STRIP -->
@@ -123,8 +123,8 @@
   </div>
   <div class="kpi">
     <label>QTD Registrations</label>
-    <div class="val" style="color:#a855f7">11,120</div>
-    <div class="sub">Units · Apr 6–20 (3 wks)</div>
+    <div class="val" style="color:#a855f7">6,866</div>
+    <div class="sub">Units · Apr 6–20 (3 wks) · sell-through only</div>
   </div>
 </div>
 
@@ -143,27 +143,27 @@
   <div class="stat-row">
     <div class="stat-mini">
       <div class="sl">Apr 6 Regs (units)</div>
-      <div class="sv" style="color:var(--blue)">4,479</div>
+      <div class="sv" style="color:var(--blue)">2,406</div>
     </div>
     <div class="stat-mini">
       <div class="sl">Apr 13 Regs (units)</div>
-      <div class="sv" style="color:var(--blue)">4,439</div>
+      <div class="sv" style="color:var(--blue)">2,354</div>
     </div>
     <div class="stat-mini">
       <div class="sl">Apr 20 Regs (partial)</div>
-      <div class="sv" style="color:var(--yellow)">2,202</div>
+      <div class="sv" style="color:var(--yellow)">2,106</div>
     </div>
     <div class="stat-mini">
       <div class="sl">2-Wk Avg Full Weeks</div>
-      <div class="sv" style="color:var(--green)">4,459 / wk</div>
+      <div class="sv" style="color:var(--green)">2,380 / wk</div>
     </div>
     <div class="stat-mini">
       <div class="sl">Apr 6 Reg Dollars</div>
-      <div class="sv" style="color:var(--blue)">$1.91M</div>
+      <div class="sv" style="color:var(--blue)">$0.82M</div>
     </div>
     <div class="stat-mini">
       <div class="sl">Apr 13 Reg Dollars</div>
-      <div class="sv" style="color:var(--blue)">$1.88M</div>
+      <div class="sv" style="color:var(--blue)">$0.79M</div>
     </div>
     <div class="stat-mini">
       <div class="sl">OPlan Weekly Pace</div>
@@ -171,7 +171,7 @@
     </div>
     <div class="stat-mini">
       <div class="sl">Reg vs OPlan Pace</div>
-      <div class="sv" style="color:var(--green)">+70%</div>
+      <div class="sv" style="color:var(--red)">−27.5%</div>
     </div>
   </div>
 
@@ -342,33 +342,33 @@ const LINE_COLORS = {
   'Analog Mics':      '#84cc16',
 };
 const REG_UNITS = {
-  'Apollo Desktop':   [853,  1193, 1224, 579],
-  'Apollo Rackmount': [197,  245,  235,  128],
-  'Volt Desktop':     [1358, 1979, 1984, 990],
-  'AIB':              [285,  430,  387,  210],
-  'Modeling Mics':    [110,  171,  191,  89],
-  'GPM':              [134,  221,  200,  109],
-  'UAD':              [81,   124,  112,  47],
-  'GPS':              [47,   66,   62,   27],
-  'Amp Top Box':      [9,    17,   17,   8],
-  'Analog Mics':      [2,    2,    0,    2],
+  'Apollo Desktop':   [635,  616,  645,  545],
+  'Apollo Rackmount': [154,  135,  123,  117],
+  'Volt Desktop':     [1091, 1126, 1073, 993],
+  'AIB':              [209,  179,  177,  146],
+  'Modeling Mics':    [121,  142,  136,  106],
+  'GPM':              [77,   90,   90,   100],
+  'UAD':              [52,   37,   34,   28],
+  'GPS':              [59,   63,   59,   53],
+  'Amp Top Box':      [10,   17,   17,   17],
+  'Analog Mics':      [3,    1,    0,    1],
 };
 const REG_DOLLARS = {
-  'Apollo Desktop':   [616256,  841532,  851951,  407284],
-  'Apollo Rackmount': [350275,  424093,  391792,  231046],
-  'Volt Desktop':     [222274,  319100,  333277,  162290],
-  'AIB':              [76769,   116709,  104515,  56610],
-  'Modeling Mics':    [33855,   73006,   78265,   33024],
-  'GPM':              [35615,   59474,   53214,   28880],
-  'UAD':              [34131,   51849,   47026,   20955],
-  'GPS':              [5252,    7444,    7040,    2988],
-  'Amp Top Box':      [8791,    16605,   16605,   7814],
-  'Analog Mics':      [1786,    2588,    0,       4894],
+  'Apollo Desktop':   [274790, 267650, 277027, 241474],
+  'Apollo Rackmount': [236445, 207274, 188849, 179637],
+  'Volt Desktop':     [161354, 162049, 152742, 145148],
+  'AIB':              [53589,  45899,  45403,  37450],
+  'Modeling Mics':    [59254,  65891,  64498,  47246],
+  'GPM':              [18095,  21222,  21203,  23629],
+  'UAD':              [27794,  20003,  17980,  16366],
+  'GPS':              [7902,   8465,   8024,   7078],
+  'Amp Top Box':      [9594,   16309,  16309,  16309],
+  'Analog Mics':      [4078,   799,    0,      1919],
 };
 // Q2 only weekly oplan pace (13 weeks: Apr 6 → Jun 29)
 const Q2_WEEKS = ['Apr 6','Apr 13','Apr 20*','Apr 27','May 4','May 11','May 18','May 25','Jun 1','Jun 8','Jun 15','Jun 22','Jun 29'];
 const OPLAN_PACE = [1124679,1124679,1124679,1124679, 1557985,1557985,1557985,1557985, 1285910,1285910,1285910,1285910,1285910];
-const REG_DOLLARS_Q2_ACTUAL = [1912400, 1883685, 954785, null, null, null, null, null, null, null, null, null, null];
+const REG_DOLLARS_Q2_ACTUAL = [815561, 792035, 716256, null, null, null, null, null, null, null, null, null, null];
 
 // --- REVENUE VS PLAN ---
 const MONTHS = ['Apr 2026','May 2026','Jun 2026'];
