@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product ID Field Relationship Patterns — Q2 2026</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f172a; color: #e2e8f0; font-size: 13px; }
+
+header { background: #1e293b; border-bottom: 1px solid #334155; padding: 18px 32px; display: flex; justify-content: space-between; align-items: center; }
+header h1 { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
+header p { font-size: 0.78rem; color: #64748b; margin-top: 3px; }
+.badge-header { background: #dc2626; color: white; padding: 3px 10px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; }
+
+.container { max-width: 1380px; margin: 0 auto; padding: 24px 28px; }
+
+/* Legend */
+.legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.legend-item { display: flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 6px; background: #1e293b; border: 1px solid #334155; font-size: 0.75rem; }
+.dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+/* Pattern summary */
+.summary { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+.sum-card { background: #1e293b; border-radius: 8px; padding: 12px 16px; border-left: 4px solid; }
+.sum-card .count { font-size: 1.6rem; font-weight: 700; }
+.sum-card .label { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Anomaly box */
+.anomaly-box { background: #450a0a; border: 1px solid #dc2626; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; }
+.anomaly-box h3 { color: #fca5a5; font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.anomaly-items { display: flex; flex-wrap: wrap; gap: 8px; }
+.anomaly-tag { background: #7f1d1d; border: 1px solid #dc2626; color: #fca5a5; padding: 3px 10px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; }
+.anomaly-desc { font-size: 0.78rem; color: #fca5a5; margin-bottom: 8px; }
+
+/* Filter tabs */
+.tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab { padding: 6px 14px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: #94a3b8; font-size: 0.78rem; cursor: pointer; transition: all 0.15s; }
+.tab.active { background: #3b82f6; border-color: #3b82f6; color: white; font-weight: 600; }
+.tab:hover:not(.active) { border-color: #64748b; color: #e2e8f0; }
+
+/* Matrix table */
+.matrix-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead th { padding: 9px 12px; text-align: left; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; background: #0f172a; border-bottom: 2px solid #334155; white-space: nowrap; position: sticky; top: 0; z-index: 10; }
+thead th:nth-child(n+2) { text-align: center; }
+thead th:last-child { text-align: right; }
+
+tbody tr { border-bottom: 1px solid #1e293b; transition: background 0.1s; }
+tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+/* Group header rows */
+tr.group-row td { background: #1e293b; color: #94a3b8; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 7px 12px; border-top: 2px solid #334155; }
+
+/* Data cells */
+td { padding: 0; }
+.cell { padding: 6px 10px; display: flex; align-items: center; gap: 5px; min-height: 34px; }
+.cell-pid { border-left: 3px solid transparent; }
+
+/* Field value tags */
+.tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.72rem; white-space: nowrap; max-width: 280px; overflow: hidden; text-overflow: ellipsis; }
+
+/* Pattern colors */
+.pat-full_match          { border-color: #22c55e !important; }
+.pat-core_exact_diff_sku { border-color: #3b82f6 !important; }
+.pat-core_prefix         { border-color: #06b6d4 !important; }
+.pat-core_prefix_variant { border-color: #8b5cf6 !important; }
+.pat-sku_exact_no_core   { border-color: #f59e0b !important; }
+.pat-descriptive_sku_no_core { border-color: #f97316 !important; }
+.pat-refurb_shared_sku   { border-color: #ec4899 !important; }
+.pat-accessory_no_ids    { border-color: #475569 !important; }
+.pat-no_ids              { border-color: #dc2626 !important; }
+.pat-missing_pid         { border-color: #dc2626 !important; }
+
+/* Tag background variants */
+.tag-green  { background: #14532d; color: #86efac; }
+.tag-blue   { background: #1e3a5f; color: #93c5fd; }
+.tag-teal   { background: #164e63; color: #67e8f9; }
+.tag-purple { background: #3b0764; color: #d8b4fe; }
+.tag-amber  { background: #78350f; color: #fde68a; }
+.tag-orange { background: #7c2d12; color: #fdba74; }
+.tag-pink   { background: #831843; color: #fbcfe8; }
+.tag-gray   { background: #1e293b; color: #64748b; }
+.tag-red    { background: #450a0a; color: #fca5a5; }
+.tag-empty  { background: #1e293b; color: #334155; font-style: italic; }
+.tag-anomaly { background: #450a0a; color: #fca5a5; border: 1px solid #dc2626; }
+.tag-shared { background: #3b0764; color: #d8b4fe; border: 1px dashed #8b5cf6; }
+
+/* Booked USD */
+.booked { text-align: right; padding-right: 16px; font-variant-numeric: tabular-nums; color: #94a3b8; font-size: 0.78rem; white-space: nowrap; }
+.booked.high { color: #86efac; }
+.booked.mid  { color: #fde68a; }
+.booked.low  { color: #94a3b8; }
+
+/* Relationship indicator */
+.rel-icon { font-size: 0.65rem; color: #64748b; }
+.sibling-count { background: #1e3a5f; color: #93c5fd; padding: 1px 5px; border-radius: 10px; font-size: 0.65rem; font-weight: 700; margin-left: 4px; }
+
+/* Notes */
+.insight-box { background: #172033; border: 1px solid #1e40af; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; }
+.insight-box h3 { color: #93c5fd; font-size: 0.8rem; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.insights { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.insight { background: #1e293b; border-radius: 6px; padding: 10px 14px; }
+.insight .title { font-size: 0.72rem; font-weight: 700; color: #60a5fa; margin-bottom: 4px; }
+.insight .body  { font-size: 0.72rem; color: #94a3b8; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Product ID · SKU ID · Core Product ID — Field Relationship Patterns</h1>
+    <p>Hardware Sales &amp; Forecast · Q2 2026 · Software excluded · 137 records analyzed</p>
+  </div>
+  <div class="badge-header">⚠ 4 ACTIVE ANOMALIES</div>
+</header>
+
+<div class="container">
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><div class="dot" style="background:#22c55e"></div>Full Match — all 3 fields identical</div>
+  <div class="legend-item"><div class="dot" style="background:#3b82f6"></div>Core = PID, SKU differs (readable form)</div>
+  <div class="legend-item"><div class="dot" style="background:#06b6d4"></div>Core is prefix of PID</div>
+  <div class="legend-item"><div class="dot" style="background:#8b5cf6"></div>Shared Core — sibling variants</div>
+  <div class="legend-item"><div class="dot" style="background:#f59e0b"></div>SKU = PID, no Core (bundles/subscriptions)</div>
+  <div class="legend-item"><div class="dot" style="background:#f97316"></div>Descriptive SKU, missing Core ⚠</div>
+  <div class="legend-item"><div class="dot" style="background:#ec4899"></div>Refurb — shares SKU with original</div>
+  <div class="legend-item"><div class="dot" style="background:#475569"></div>Accessory — no SKU or Core expected</div>
+  <div class="legend-item"><div class="dot" style="background:#dc2626"></div>Missing critical field ⚠</div>
+</div>
+
+<!-- Summary cards -->
+<div class="summary">
+  <div class="sum-card" style="border-color:#22c55e">
+    <div class="count" style="color:#22c55e">18</div>
+    <div class="label">Full Match</div>
+  </div>
+  <div class="sum-card" style="border-color:#3b82f6">
+    <div class="count" style="color:#3b82f6">29</div>
+    <div class="label">Core = PID</div>
+  </div>
+  <div class="sum-card" style="border-color:#8b5cf6">
+    <div class="count" style="color:#8b5cf6">22</div>
+    <div class="label">Core Prefix / Variant</div>
+  </div>
+  <div class="sum-card" style="border-color:#f59e0b">
+    <div class="count" style="color:#f59e0b">31</div>
+    <div class="label">SKU = PID, No Core</div>
+  </div>
+  <div class="sum-card" style="border-color:#dc2626">
+    <div class="count" style="color:#dc2626">4</div>
+    <div class="label">Active Anomalies</div>
+  </div>
+</div>
+
+<!-- Anomaly box -->
+<div class="anomaly-box">
+  <h3>⚠ Active Anomalies — Missing Core Product ID (sibling variants have it populated)</h3>
+  <div class="anomaly-desc">These 3 active Apollo hardware products are missing Core Product ID, yet their ESS/STU sibling carries it. This breaks family-level rollups and Core-based reporting. Also: 1 record has no Product ID at all (SKU: LUNA-UPGRADE, $1,626 booked).</div>
+  <div class="anomaly-items">
+    <span class="anomaly-tag">APX8G2-ESS — $135,667 booked — sibling APX8G2-STU has Core "APX8G2"</span>
+    <span class="anomaly-tag">APX4G2-ESS — $102,297 booked — sibling APX4G2-STU has Core "APX4G2"</span>
+    <span class="anomaly-tag">APTXQG2-ESS — $85,919 booked — sibling APTXQG2-STU has Core "APTXQG2"</span>
+    <span class="anomaly-tag">710TF — $10,719 booked — SKU truncated to "710", no Core</span>
+  </div>
+</div>
+
+<!-- Analyst insights -->
+<div class="insight-box">
+  <h3>Data Analyst Findings</h3>
+  <div class="insights">
+    <div class="insight">
+      <div class="title">SKU Naming Convention Split</div>
+      <div class="body">Apollo/Satellite hardware uses long-form descriptive SKUs (UAD-2-APOLLO-...). Volt, MIC, GPS/GPM Pedals use short-form or exact-match SKUs. These are two distinct naming systems — joins on SKU across product families will fail without normalization.</div>
+    </div>
+    <div class="insight">
+      <div class="title">Core Product ID Coverage Gap</div>
+      <div class="body">31 active records (SKU_EXACT_NO_CORE) are bundles/subscriptions with no Core ID — expected. But 3 high-value Apollo ESS variants ($324K combined) are missing Core while their STU/ULT counterparts have it. This is a data entry inconsistency, not a system rule.</div>
+    </div>
+    <div class="insight">
+      <div class="title">Refurb Shared SKU Pattern</div>
+      <div class="body">All 12 refurb products share their parent's SKU ID but carry a "-REFURB" suffix in Product ID. Only 6176-REFURB has a Core Product ID populated. The other 11 refurbs are invisible in Core-level rollups — a silent undercounting risk.</div>
+    </div>
+    <div class="insight">
+      <div class="title">Pedal Product Consistency</div>
+      <div class="body">GPM and GPS pedal families are the most consistent: Core = Product ID (exact), SKU = readable [NAME]-PEDAL format. Zero anomalies across 20+ pedal SKUs. This family serves as the gold standard naming pattern.</div>
+    </div>
+    <div class="insight">
+      <div class="title">Shared Core Variants</div>
+      <div class="body">6 Core IDs are shared across multiple Product IDs (e.g., APTXDG2 → ESS+STU, APX16G2 → ESS+ULT). These represent product tier variants. The Core ID is the reliable rollup key for "base model" analysis — but only where it's populated.</div>
+    </div>
+    <div class="insight">
+      <div class="title">Missing Product ID Row</div>
+      <div class="body">One record ($1,626) has a blank Product ID with SKU "LUNA-UPGRADE". This record cannot be attributed to a product family, territory rollups will work but product-level reporting will lose this revenue. Needs data correction.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="filterTable('all', this)">All (137)</div>
+  <div class="tab" onclick="filterTable('FULL_MATCH', this)">Full Match (18)</div>
+  <div class="tab" onclick="filterTable('CORE_EXACT_DIFF_SKU', this)">Core = PID (29)</div>
+  <div class="tab" onclick="filterTable('CORE_PREFIX_VARIANT', this)">Variants (12)</div>
+  <div class="tab" onclick="filterTable('CORE_PREFIX', this)">Core Prefix (10)</div>
+  <div class="tab" onclick="filterTable('SKU_EXACT_NO_CORE', this)">Bundles (31)</div>
+  <div class="tab" onclick="filterTable('DESCRIPTIVE_SKU_NO_CORE', this)">⚠ Missing Core (5)</div>
+  <div class="tab" onclick="filterTable('REFURB_SHARED_SKU', this)">Refurbs (12)</div>
+  <div class="tab" onclick="filterTable('ACCESSORY_NO_IDS', this)">Accessories (17)</div>
+  <div class="tab" onclick="filterTable('anomaly', this)">⚠ Anomalies (4)</div>
+</div>
+
+<!-- Matrix table -->
+<div class="matrix-wrap">
+<table id="mainTable">
+<thead>
+  <tr>
+    <th style="width:180px">Product ID</th>
+    <th style="width:290px">SKU ID</th>
+    <th style="width:140px">Core Product ID</th>
+    <th style="width:100px">Pattern</th>
+    <th style="width:90px">Notes</th>
+    <th style="width:110px">Booked USD</th>
+  </tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+const DATA = [{"pid":"APTXDG2-ESS","sku":"UAD-2-APOLLO-TWIN-X-DUO-GEN-2-ESS","core":"APTXDG2","b":312790.76,"pattern":"CORE_PREFIX_VARIANT","siblings_core":["APTXDG2-STU"],"siblings_sku":[]},{"pid":"APX8G2-ESS","sku":"UAD-2-APOLLO-X8-GEN-2-ESS","core":"","b":135666.57,"pattern":"DESCRIPTIVE_SKU_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"APX8PG2-ESS","sku":"UAD-2-APOLLO-X8P-GEN-2-ESS","core":"APX8PG2","b":116149.35,"pattern":"CORE_PREFIX_VARIANT","siblings_core":["APX8PG2-STU"],"siblings_sku":[]},{"pid":"VOLT876","sku":"VOLT-876","core":"VOLT876","b":113119.15,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"APX4G2-ESS","sku":"UAD-2-APOLLO-X4-GEN-2-ESS","core":"","b":102297.31,"pattern":"DESCRIPTIVE_SKU_NO_CORE","siblings_core":[],"siblings_sku":["APX4G2-ESS-REFURB"]},{"pid":"VOLT2","sku":"VOLT-2","core":"VOLT2","b":90060.97,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"VOLT276","sku":"VOLT-276","core":"VOLT276","b":86136.64,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"APTXQG2-ESS","sku":"UAD-2-APOLLO-TWIN-X-QUAD-GEN-2-ESS","core":"","b":85919.3,"pattern":"DESCRIPTIVE_SKU_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"APLTWXDU-HE","sku":"UAD-2-APOLLO-TWIN-X-DUO-USB-HE","core":"APLTWXDU","b":76796.55,"pattern":"CORE_PREFIX","siblings_core":[],"siblings_sku":[]},{"pid":"APTXQG2-STU","sku":"UAD-2-APOLLO-TWIN-X-QUAD-GEN-2-STU","core":"APTXQG2","b":74651.09,"pattern":"CORE_PREFIX","siblings_core":[],"siblings_sku":[]},{"pid":"APLS-HE","sku":"UAD-2-APOLLO-SOLO-HE","core":"APLS","b":71784.1,"pattern":"CORE_PREFIX","siblings_core":[],"siblings_sku":[]},{"pid":"MIC-UADLX","sku":"MIC-UADLX","core":"MIC-UADLX","b":70274.83,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":[]},{"pid":"APTXDG2-STU","sku":"UAD-2-APOLLO-TWIN-X-DUO-GEN-2-STU","core":"APTXDG2","b":63995.07,"pattern":"CORE_PREFIX_VARIANT","siblings_core":["APTXDG2-ESS"],"siblings_sku":[]},{"pid":"VOLT476P","sku":"VOLT-476P","core":"VOLT476P","b":59372.44,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":["VOLT476P-REFURB"]},{"pid":"APX16G2-ESS","sku":"UAD-2-APOLLO-X16-GEN-2-ESS","core":"APX16G2","b":53808.11,"pattern":"CORE_PREFIX_VARIANT","siblings_core":["APX16G2-ULT"],"siblings_sku":[]},{"pid":"APX8PG2-STU","sku":"UAD-2-APOLLO-X8P-GEN-2-STU","core":"APX8PG2","b":53081.13,"pattern":"CORE_PREFIX_VARIANT","siblings_core":["APX8PG2-ESS"],"siblings_sku":[]},{"pid":"APX4G2-STU","sku":"UAD-2-APOLLO-X4-GEN-2-STU","core":"APX4G2","b":49664.85,"pattern":"CORE_PREFIX","siblings_core":[],"siblings_sku":[]},{"pid":"GPM-DRM","sku":"DREAM-PEDAL","core":"GPM-DRM","b":45090.52,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"APX6G2-ESS","sku":"UAD-2-APOLLO-X6-GEN-2-ESS","core":"APX6G2","b":42226.21,"pattern":"CORE_PREFIX_VARIANT","siblings_core":["APX6G2-STU"],"siblings_sku":[]},{"pid":"VOLT1","sku":"VOLT-1","core":"VOLT1","b":41355.95,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"LA2A","sku":"LA2A","core":"LA2A","b":38492.3,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":["LA2A-REFURB"]},{"pid":"APX16DG2-ESS","sku":"UAD-2-APOLLO-X16D-ESS","core":"APX16DG2","b":37420.49,"pattern":"CORE_PREFIX_VARIANT","siblings_core":["APX16DG2-ULT"],"siblings_sku":[]},{"pid":"MIC-UASD-1","sku":"MIC-UASD-1","core":"MIC-UASD-1","b":32882.17,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":["MIC-UASD-1-REFURB"]},{"pid":"4710D","sku":"4710D","core":"4710D","b":32781.5,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":[]},{"pid":"VOLT476","sku":"VOLT-476","core":"VOLT476","b":32136.19,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":["VOLT476-REFURB"]},{"pid":"VOLT176","sku":"VOLT-176","core":"VOLT176","b":27299.96,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"TB3SATO-C","sku":"UAD-2-SATELLITE-THUNDERBOLT3-OCTO-CORE","core":"TB3SATO","b":26028.3,"pattern":"CORE_PREFIX","siblings_core":[],"siblings_sku":[]},{"pid":"APLSU-HE","sku":"UAD-2-APOLLO-SOLO-USB-HE","core":"APLSU","b":25679.11,"pattern":"CORE_PREFIX_VARIANT","siblings_core":["APLSU"],"siblings_sku":[]},{"pid":"APX16G2-ULT","sku":"UAD-2-APOLLO-X16-GEN-2-ULT","core":"APX16G2","b":23904.78,"pattern":"CORE_PREFIX_VARIANT","siblings_core":["APX16G2-ESS"],"siblings_sku":[]},{"pid":"MIC-UA251","sku":"MIC-UA251","core":"MIC-UA251","b":22496.25,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":["MIC-UA251-REFURB"]},{"pid":"1176LN","sku":"1176LN","core":"1176LN","b":22192.6,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":["1176LN-REFURB"]},{"pid":"GPM-DLVRB","sku":"DEL-VERB-PEDAL","core":"GPM-DLVRB","b":19905.71,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"APX8G2-STU","sku":"UAD-2-APOLLO-X8-GEN-2-STU","core":"APX8G2","b":19693.11,"pattern":"CORE_PREFIX","siblings_core":[],"siblings_sku":[]},{"pid":"GPM-GOLD","sku":"GOLDEN-PEDAL","core":"GPM-GOLD","b":19524.94,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"GPS-1176","sku":"1176-PEDAL","core":"GPS-1176","b":17440.25,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"APX6G2-STU","sku":"UAD-2-APOLLO-X6-GEN-2-STU","core":"APX6G2","b":15805.66,"pattern":"CORE_PREFIX_VARIANT","siblings_core":["APX6G2-ESS"],"siblings_sku":[]},{"pid":"GPM-LION","sku":"LION-PEDAL","core":"GPM-LION","b":15699.79,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"MIC-UASP-1","sku":"MIC-UASP-1","core":"MIC-UASP-1","b":15620.66,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":[]},{"pid":"GPM-RUBY","sku":"RUBY-PEDAL","core":"GPM-RUBY","b":13507.05,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"UADX-LL-VOG","sku":"UADX-LL-VOG","core":"","b":10784.9,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"GPS-LA2A","sku":"LA2A-PEDAL","core":"GPS-LA2A","b":10765.28,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"710TF","sku":"710","core":"","b":10719.04,"pattern":"DESCRIPTIVE_SKU_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"UAD-SPARK-ANNUAL","sku":"UAD-SPARK-ANNUAL","core":"","b":10000,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"GPM-ENIG","sku":"ENIGMATIC-PEDAL","core":"GPM-ENIG","b":9644.94,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"MIC-UASC-1","sku":"MIC-UASC-1","core":"MIC-UASC-1","b":8850.16,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":[]},{"pid":"LA610","sku":"LA610","core":"LA610","b":8195.9,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":[]},{"pid":"OX","sku":"OX-AMP-TOP-BOX","core":"OX","b":8041.27,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"GPS-EVMR","sku":"EVERMORE-PEDAL","core":"GPS-EVMR","b":6824.85,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"S610","sku":"S610","core":"S610","b":6714.4,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":[]},{"pid":"6176","sku":"6176","core":"6176","b":6656.06,"pattern":"FULL_MATCH","siblings_core":["6176-REFURB"],"siblings_sku":["6176-REFURB"]},{"pid":"TBOC-3","sku":"APOLLO-THUNDERBOLT","core":"TBOC","b":6348.84,"pattern":"CORE_PREFIX","siblings_core":[],"siblings_sku":[]},{"pid":"LA2A-REFURB","sku":"LA2A","core":"","b":6298.74,"pattern":"REFURB_SHARED_SKU","siblings_core":[],"siblings_sku":["LA2A"]},{"pid":"UAD-COMPLETE4","sku":"UAD-COMPLETE4","core":"","b":5997,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"GPM-STAR","sku":"STARLIGHT-PEDAL","core":"GPM-STAR","b":5881.72,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":["GPM-STAR-REFURB"]},{"pid":"MIC-UALX","sku":"MIC-UALX","core":"MIC-UALX","b":5835.11,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":[]},{"pid":"GPM-OXSTP","sku":"OX-STOMP-PEDAL","core":"GPM-OXSTP","b":5831.43,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"APE2M","sku":"UAD-2-APOLLO-E2M","core":"","b":5590.26,"pattern":"DESCRIPTIVE_SKU_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"UADX-PARADISE-GUITAR-STUDIO","sku":"UADX-PARADISE-GUITAR-STUDIO","core":"","b":4948.07,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"APX16DG2-ULT","sku":"UAD-2-APOLLO-X16D-ULT","core":"APX16DG2","b":4598.85,"pattern":"CORE_PREFIX_VARIANT","siblings_core":["APX16DG2-ESS"],"siblings_sku":[]},{"pid":"GPM-KNUC","sku":"KNUCKLES-PEDAL","core":"GPM-KNUC","b":4534.34,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"PSU-TWIN/X4-US","sku":"","core":"","b":4473.7,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"UAD-SELECT-10-MX-PRO","sku":"UAD-SELECT-10-MX-PRO","core":"","b":3837.24,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"MIC-UA167","sku":"MIC-UA167","core":"MIC-UA167","b":3748.75,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":[]},{"pid":"UAD-ULTIMATE14","sku":"UAD-ULTIMATE14","core":"","b":3596.4,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"MIC-UA251-REFURB","sku":"MIC-UA251","core":"","b":3569.41,"pattern":"REFURB_SHARED_SKU","siblings_core":[],"siblings_sku":["MIC-UA251"]},{"pid":"MIC-UA187","sku":"MIC-UA187","core":"MIC-UA187","b":3548.25,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":["MIC-UA187-REFURB"]},{"pid":"UAD-SELECT-6","sku":"UAD-SELECT-6","core":"","b":3476.7,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"LUNA-PRO-MK2","sku":"LUNA-PRO-MK2","core":"","b":3361.3,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"GPS-HVNLY","sku":"HEAVENLY-PEDAL","core":"GPS-HVNLY","b":3252.16,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"GPM-ANTI","sku":"ANTI-PEDAL","core":"GPM-ANTI","b":3087.28,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"TB3SATQ-C","sku":"UAD-2-SATELLITE-THUNDERBOLT3-QUAD-CORE","core":"TB3SATQ","b":2793.93,"pattern":"CORE_PREFIX","siblings_core":[],"siblings_sku":[]},{"pid":"GPM-GLXY","sku":"GALAXY-PEDAL","core":"GPM-GLXY","b":2403.98,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"MIC-UA187-REFURB","sku":"MIC-UA187","core":"","b":2297.88,"pattern":"REFURB_SHARED_SKU","siblings_core":[],"siblings_sku":["MIC-UA187"]},{"pid":"UAD-SELECT-2","sku":"UAD-SELECT-2","core":"","b":2124.78,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"PCI2O-C","sku":"UAD-2-OCTO-CORE","core":"PCI2O","b":2097.9,"pattern":"CORE_PREFIX","siblings_core":[],"siblings_sku":[]},{"pid":"1176LN-REFURB","sku":"1176LN","core":"","b":1889.37,"pattern":"REFURB_SHARED_SKU","siblings_core":[],"siblings_sku":["1176LN"]},{"pid":"UAD-APXG2-STUDIO-PLUS","sku":"UAD-APXG2-STUDIO-PLUS","core":"","b":1794,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"6176-REFURB","sku":"6176","core":"6176","b":1784.41,"pattern":"CORE_PREFIX_VARIANT","siblings_core":["6176"],"siblings_sku":["6176"]},{"pid":"UAD-SIGNATURE3","sku":"UAD-SIGNATURE3","core":"","b":1773.87,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"GPS-ORN","sku":"ORION-PEDAL","core":"GPS-ORN","b":1742.63,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"","sku":"LUNA-UPGRADE","core":"","b":1625.72,"pattern":"MISSING_PID","siblings_core":[],"siblings_sku":[]},{"pid":"PSU-TWIN/X4-EU","sku":"","core":"","b":1608.22,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"MIC-UASD-7","sku":"MIC-UASD-7","core":"MIC-UASD-7","b":1596.8,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":[]},{"pid":"GPM-WDR","sku":"WOODROW-PEDAL","core":"GPM-WDR","b":1557.49,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"UADX-TOPLINE-VOCAL-SUITE","sku":"UADX-TOPLINE-VOCAL-SUITE","core":"","b":1464.56,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"APX4G2-ESS-REFURB","sku":"UAD-2-APOLLO-X4-GEN-2-ESS","core":"","b":1448.37,"pattern":"REFURB_SHARED_SKU","siblings_core":[],"siblings_sku":["APX4G2-ESS"]},{"pid":"USBSATO-C","sku":"UAD-2-SATELLITE-USB-OCTO","core":"USBSATO","b":1370.05,"pattern":"CORE_PREFIX","siblings_core":[],"siblings_sku":[]},{"pid":"APE1X","sku":"","core":"","b":1360.85,"pattern":"NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"APLTWDU-REFURB","sku":"UAD-2-APOLLO-TWIN-DUO-USB","core":"","b":1340.92,"pattern":"REFURB_SHARED_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"PSU-APXR-US","sku":"","core":"","b":1299.4,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"UAD-SIGNATURE3-CROSSGRADE","sku":"UAD-SIGNATURE3-CROSSGRADE","core":"","b":1269.9,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"UAD-PRODUCER","sku":"UAD-PRODUCER","core":"","b":1250,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"PSU-TB3SAT-EU","sku":"","core":"","b":1182.66,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"UAD-STUDIO-CLASSICS-BNDL","sku":"UAD-STUDIO-CLASSICS-BNDL","core":"","b":997.1,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"UADX-GUITAR-BNDL-MK2","sku":"UADX-GUITAR-BNDL-MK2","core":"","b":980.45,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"UAD-SIGNATURE3-UPGRADE","sku":"UAD-SIGNATURE3-UPGRADE","core":"","b":762.45,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"UAD-APXG2-ULTIMATE-PLUS","sku":"UAD-APXG2-ULTIMATE-PLUS","core":"","b":750,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"UAD-CUSTOM-3-PLUS","sku":"UAD-CUSTOM-3-PLUS","core":"","b":746.25,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"UAD-SELECT-3","sku":"UAD-SELECT-3","core":"","b":726.3,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"VOLT4","sku":"VOLT-4","core":"VOLT4","b":725.2,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"UADX-TAPE-BUNDLE","sku":"UADX-TAPE-BUNDLE","core":"","b":720.17,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"UADX-ANALOG-CLASSICS-PRO","sku":"UADX-ANALOG-CLASSICS-PRO","core":"","b":702.65,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"MIC-UASD-5","sku":"MIC-UASD-5","core":"MIC-UASD-5","b":702.56,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":["MIC-UASD-5-REFURB"]},{"pid":"CBL-SPHERE25","sku":"","core":"","b":628.05,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"MIC-UASD-3X3","sku":"MIC-UASD-3X3","core":"MIC-UASD-3X3","b":618.29,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":[]},{"pid":"PSU-GP1-WW","sku":"","core":"","b":576.59,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"APLSU","sku":"UAD-2-APOLLO-SOLO-USB","core":"APLSU","b":450,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":["APLSU-HE"],"siblings_sku":[]},{"pid":"UADX-PARADISE-BDL-CROSSGRADE","sku":"UADX-PARADISE-BDL-CROSSGRADE","core":"","b":438.45,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"PSU-TB3SAT-US","sku":"","core":"","b":327.75,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"CBL-SPHERE10","sku":"","core":"","b":327.6,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"MIC-UASD-3","sku":"MIC-UASD-3","core":"MIC-UASD-3","b":322.31,"pattern":"FULL_MATCH","siblings_core":[],"siblings_sku":[]},{"pid":"LUNA-UAUDIO-VERVE","sku":"LUNA-UAUDIO-VERVE","core":"","b":320.45,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"VOLT476P-REFURB","sku":"VOLT-476P","core":"","b":314.37,"pattern":"REFURB_SHARED_SKU","siblings_core":[],"siblings_sku":["VOLT476P"]},{"pid":"VOLT476-REFURB","sku":"VOLT-476","core":"","b":309,"pattern":"REFURB_SHARED_SKU","siblings_core":[],"siblings_sku":["VOLT476"]},{"pid":"GPM-STAR-REFURB","sku":"STARLIGHT-PEDAL","core":"","b":299,"pattern":"REFURB_SHARED_SKU","siblings_core":[],"siblings_sku":["GPM-STAR"]},{"pid":"UAD-SELECT-10","sku":"UAD-SELECT-10","core":"","b":298.5,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"UADX-SSL-4000-BUNDLE","sku":"UADX-SSL-4000-BUNDLE","core":"","b":287.57,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"UAD-TRI-COMP-BNDL","sku":"UAD-TRI-COMP-BNDL","core":"","b":286.65,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"SM-UAMIC-SLVR","sku":"","core":"","b":277.2,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"UAD-COMPRESSOR-BNDL","sku":"UAD-COMPRESSOR-BNDL","core":"","b":251.55,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"GPS-FLOW","sku":"FLOW-PEDAL","core":"GPS-FLOW","b":219.7,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"1176SA","sku":"1176AE","core":"1176SA","b":218.9,"pattern":"CORE_EXACT_DIFF_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"PSU-APXR-EU","sku":"","core":"","b":211.37,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"MIC-UASD-1-REFURB","sku":"MIC-UASD-1","core":"","b":188.37,"pattern":"REFURB_SHARED_SKU","siblings_core":[],"siblings_sku":["MIC-UASD-1"]},{"pid":"MM-UAMIC-BLK","sku":"","core":"","b":182.7,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"PSU-OX/TBSAT-US","sku":"","core":"","b":163.8,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"MIC-UASD-5-REFURB","sku":"MIC-UASD-5","core":"","b":161.1,"pattern":"REFURB_SHARED_SKU","siblings_core":[],"siblings_sku":["MIC-UASD-5"]},{"pid":"UAD-SYNTH-BNDL-MK2","sku":"UAD-SYNTH-BNDL-MK2","core":"","b":149.25,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"GPS-BRGD-REFURB","sku":"BRIGADE-PEDAL","core":"","b":139,"pattern":"REFURB_SHARED_SKU","siblings_core":[],"siblings_sku":[]},{"pid":"SM-251","sku":"","core":"","b":138.6,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"PSU-APLSU/APLTW","sku":"","core":"","b":97.56,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"PSU-OX/TBSAT-EU","sku":"","core":"","b":82.59,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"UADX-VIBE","sku":"UADX-VIBE","core":"","b":76.85,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]},{"pid":"SM-UAMIC-BLK","sku":"","core":"","b":69.3,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"PSU-APXR-UK","sku":"","core":"","b":69.07,"pattern":"ACCESSORY_NO_IDS","siblings_core":[],"siblings_sku":[]},{"pid":"UADX-SHOWTIME-AMP","sku":"UADX-SHOWTIME-AMP","core":"","b":36.75,"pattern":"SKU_EXACT_NO_CORE","siblings_core":[],"siblings_sku":[]}];
+
+const ANOMALY_PIDS = new Set(['APX8G2-ESS','APX4G2-ESS','APTXQG2-ESS','710TF','','APE1X']);
+
+const PATTERN_META = {
+  FULL_MATCH:            { label:'Full Match',          color:'#22c55e', tagClass:'tag-green' },
+  CORE_EXACT_DIFF_SKU:   { label:'Core = PID',          color:'#3b82f6', tagClass:'tag-blue' },
+  CORE_PREFIX:           { label:'Core Prefix',         color:'#06b6d4', tagClass:'tag-teal' },
+  CORE_PREFIX_VARIANT:   { label:'Shared Core',         color:'#8b5cf6', tagClass:'tag-purple' },
+  SKU_EXACT_NO_CORE:     { label:'Bundle/Sub',          color:'#f59e0b', tagClass:'tag-amber' },
+  DESCRIPTIVE_SKU_NO_CORE:{ label:'⚠ Missing Core',    color:'#f97316', tagClass:'tag-orange' },
+  REFURB_SHARED_SKU:     { label:'Refurb',              color:'#ec4899', tagClass:'tag-pink' },
+  ACCESSORY_NO_IDS:      { label:'Accessory',           color:'#475569', tagClass:'tag-gray' },
+  NO_IDS:                { label:'⚠ No IDs',            color:'#dc2626', tagClass:'tag-red' },
+  MISSING_PID:           { label:'⚠ No Product ID',    color:'#dc2626', tagClass:'tag-red' },
+};
+
+const GROUP_ORDER = ['FULL_MATCH','CORE_EXACT_DIFF_SKU','CORE_PREFIX','CORE_PREFIX_VARIANT','SKU_EXACT_NO_CORE','DESCRIPTIVE_SKU_NO_CORE','REFURB_SHARED_SKU','ACCESSORY_NO_IDS','NO_IDS','MISSING_PID'];
+const GROUP_LABELS = {
+  FULL_MATCH: 'Full Match — Product ID = SKU ID = Core Product ID',
+  CORE_EXACT_DIFF_SKU: 'Core = Product ID — SKU is readable/alternate form',
+  CORE_PREFIX: 'Core Prefix — Core is base of Product ID (suffix stripped)',
+  CORE_PREFIX_VARIANT: 'Shared Core Variants — Multiple products share one Core ID',
+  SKU_EXACT_NO_CORE: 'Bundles & Subscriptions — SKU = Product ID, no Core (expected)',
+  DESCRIPTIVE_SKU_NO_CORE: '⚠ Descriptive SKU, Missing Core — hardware products without Core ID',
+  REFURB_SHARED_SKU: 'Refurbished — shares parent SKU, Core absent (except 6176-Refurb)',
+  ACCESSORY_NO_IDS: 'Accessories — no SKU or Core ID (expected)',
+  NO_IDS: '⚠ No SKU or Core ID — active hardware product',
+  MISSING_PID: '⚠ Missing Product ID — revenue orphaned'
+};
+
+function fmtB(b) {
+  if (b <= 0) return '<span style="color:#475569">—</span>';
+  if (b >= 50000) return `<span style="color:#86efac">$${Math.round(b).toLocaleString()}</span>`;
+  if (b >= 10000) return `<span style="color:#fde68a">$${Math.round(b).toLocaleString()}</span>`;
+  return `<span style="color:#64748b">$${Math.round(b).toLocaleString()}</span>`;
+}
+
+function skuTagClass(r) {
+  if (!r.sku) return 'tag-empty';
+  if (r.sku === r.pid) return r.pattern === 'SKU_EXACT_NO_CORE' ? 'tag-amber' : 'tag-green';
+  if (r.siblings_sku.length > 0) return 'tag-shared';
+  if (r.sku.startsWith('UAD-2-') || r.sku.startsWith('UAD-')) return 'tag-blue';
+  if (r.sku.endsWith('-PEDAL') || r.sku.endsWith('-PEDAL')) return 'tag-blue';
+  return 'tag-teal';
+}
+
+function coreTagClass(r) {
+  if (!r.core) {
+    if (ANOMALY_PIDS.has(r.pid) && r.b > 1000) return 'tag-anomaly';
+    return 'tag-empty';
+  }
+  if (r.core === r.pid) return 'tag-green';
+  if (r.siblings_core.length > 0) return 'tag-purple';
+  return 'tag-teal';
+}
+
+function noteFor(r) {
+  if (ANOMALY_PIDS.has(r.pid) && r.b > 1000 && !r.core) return '<span style="color:#fca5a5;font-size:0.7rem">⚠ Sibling has Core</span>';
+  if (r.siblings_core.length > 0) return `<span style="color:#d8b4fe;font-size:0.7rem">↔ ${r.siblings_core.join(', ')}</span>`;
+  if (r.siblings_sku.length > 0) return `<span style="color:#fbcfe8;font-size:0.7rem">SKU shared w/ ${r.siblings_sku.join(', ')}</span>`;
+  if (r.pid === '1176SA' && r.sku === '1176AE') return '<span style="color:#fde68a;font-size:0.7rem">⚠ SKU mismatch</span>';
+  return '';
+}
+
+let currentFilter = 'all';
+
+function buildTable(filter) {
+  const body = document.getElementById('tableBody');
+  body.innerHTML = '';
+
+  const isAnomaly = filter === 'anomaly';
+  const anomalySet = new Set(['APX8G2-ESS','APX4G2-ESS','APTXQG2-ESS','710TF','','APE1X']);
+
+  const groups = filter === 'all' || isAnomaly ? GROUP_ORDER : [filter];
+
+  groups.forEach(pat => {
+    let rows = DATA.filter(r => r.pattern === pat);
+    if (isAnomaly) {
+      rows = DATA.filter(r => anomalySet.has(r.pid));
+    }
+    if (filter !== 'all' && !isAnomaly) {
+      rows = DATA.filter(r => r.pattern === filter);
+    }
+    if (isAnomaly) {
+      if (pat !== GROUP_ORDER[0]) return;
+    } else if (filter === 'all') {
+      rows = DATA.filter(r => r.pattern === pat);
+    }
+
+    if (rows.length === 0) return;
+
+    // Group header
+    const patLabel = isAnomaly ? '⚠ Active Anomalies — Missing Core or Product ID' : GROUP_LABELS[pat];
+    const meta = PATTERN_META[pat] || {};
+    const gr = document.createElement('tr');
+    gr.className = 'group-row';
+    gr.innerHTML = `<td colspan="6" style="color:${meta.color||'#94a3b8'}">${patLabel} &nbsp;<span style="color:#334155">(${isAnomaly ? rows.length : rows.length})</span></td>`;
+    body.appendChild(gr);
+
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      tr.dataset.pattern = r.pattern;
+
+      const pidClass = `pat-${r.pattern.toLowerCase()} ${PATTERN_META[r.pattern]?.tagClass||'tag-gray'}`;
+      const skuClass = skuTagClass(r);
+      const coreClass = coreTagClass(r);
+      const meta2 = PATTERN_META[r.pattern] || {};
+
+      const pidDisplay = r.pid || '<em style="color:#475569">— empty —</em>';
+      const skuDisplay = r.sku || '<em style="color:#334155">— none —</em>';
+      const coreDisplay = r.core || '<em style="color:#334155">— none —</em>';
+
+      tr.innerHTML = `
+        <td><div class="cell cell-pid pat-${r.pattern.toLowerCase()}">
+          <span class="tag ${PATTERN_META[r.pattern]?.tagClass||'tag-gray'}">${pidDisplay}</span>
+        </div></td>
+        <td><div class="cell"><span class="tag ${skuClass}">${skuDisplay}</span></div></td>
+        <td><div class="cell"><span class="tag ${coreClass}">${coreDisplay}</span></div></td>
+        <td><div class="cell"><span class="tag" style="background:#0f172a;color:${meta2.color||'#64748b'};border:1px solid ${meta2.color||'#334155'};font-size:0.68rem">${meta2.label||r.pattern}</span></div></td>
+        <td><div class="cell" style="font-size:0.72rem">${noteFor(r)}</div></td>
+        <td class="booked">${fmtB(r.b)}</td>
+      `;
+      body.appendChild(tr);
+    });
+  });
+}
+
+function filterTable(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  buildTable(filter);
+}
+
+buildTable('all');
+</script>
+</body>
+</html>

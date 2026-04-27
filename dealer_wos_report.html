@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dealer Weeks of Supply — B&H Photo</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f0f2f5; color: #1a1a2e; }
+  header { background: #1a1a2e; color: white; padding: 24px 40px; }
+  header h1 { font-size: 1.4rem; font-weight: 600; }
+  header p { font-size: 0.85rem; color: #94a3b8; margin-top: 4px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+  .section-title { font-size: 1rem; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .card { background: white; border-radius: 12px; box-shadow: 0 1px 8px rgba(0,0,0,0.07); padding: 28px; margin-bottom: 28px; }
+
+  /* TIER 1 */
+  #tier1 canvas { max-height: 320px; }
+
+  /* TIER 2 */
+  .group-block { margin-bottom: 20px; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+  .group-header { background: #1a1a2e; color: white; padding: 12px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+  .group-header h3 { font-size: 0.95rem; font-weight: 600; }
+  .group-header span { font-size: 0.8rem; color: #94a3b8; }
+  .group-header .toggle { font-size: 1.1rem; transition: transform 0.2s; }
+  .group-header.open .toggle { transform: rotate(180deg); }
+  .group-body { display: none; }
+  .group-body.open { display: block; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  table thead th { background: #f8fafc; padding: 10px 16px; text-align: left; font-weight: 600; color: #64748b; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #e2e8f0; }
+  table thead th:not(:first-child) { text-align: right; }
+  table tbody td { padding: 10px 16px; border-bottom: 1px solid #f1f5f9; }
+  table tbody td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+  table tbody tr:last-child td { border-bottom: none; }
+  table tbody tr:hover td { background: #f8fafc; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+  .badge-high { background: #fee2e2; color: #dc2626; }
+  .badge-med { background: #fef3c7; color: #d97706; }
+  .badge-ok { background: #dcfce7; color: #16a34a; }
+  .badge-na { background: #f1f5f9; color: #94a3b8; }
+
+  /* TIER 3 */
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .controls label { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; background: #f8fafc; border: 1px solid #e2e8f0; padding: 5px 10px; border-radius: 6px; transition: all 0.15s; }
+  .controls label:hover { border-color: #94a3b8; }
+  .controls label.active { border-color: currentColor; font-weight: 600; }
+  .controls label input { display: none; }
+  .color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .group-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .grp-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid #e2e8f0; background: white; font-size: 0.82rem; cursor: pointer; transition: all 0.15s; }
+  .grp-btn.active { background: #1a1a2e; color: white; border-color: #1a1a2e; }
+  #lineChart { max-height: 440px; }
+  .workbook-link { font-size: 0.82rem; color: #3b82f6; margin-top: 16px; }
+  .workbook-link a { color: #3b82f6; text-decoration: none; }
+  .workbook-link a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Dealer Weeks of Supply — B&H Photo</h1>
+  <p>Monthly data · Last 15 months (Feb 2025 – Feb 2026) · Internal Sales Report</p>
+</header>
+
+<div class="container">
+
+  <!-- TIER 1: Bar Chart by Product Group -->
+  <div class="card" id="tier1">
+    <div class="section-title">Tier 1 — Months of Supply by Product Group (Feb 2026)</div>
+    <canvas id="barChart"></canvas>
+    <div class="workbook-link">View in Omni: <a href="https://universalaudio.omniapp.co/e/1:Lo3X7dMl/1" target="_blank">B&H Photo Inventory Workbook</a></div>
+  </div>
+
+  <!-- TIER 2: SKU Breakdown by Group -->
+  <div class="card">
+    <div class="section-title">Tier 2 — SKU Breakdown by Product Group</div>
+    <div id="sku-tables"></div>
+  </div>
+
+  <!-- TIER 3: Line Graph -->
+  <div class="card">
+    <div class="section-title">Tier 3 — Months of Supply Trend by SKU (15 Months)</div>
+    <div class="group-filter" id="groupFilter"></div>
+    <div class="controls" id="skuToggles"></div>
+    <canvas id="lineChart"></canvas>
+  </div>
+
+</div>
+
+<script>
+const MONTHS = ["Feb 2025","Mar 2025","Apr 2025","May 2025","Jun 2025","Jul 2025","Aug 2025","Sep 2025","Oct 2025","Nov 2025","Dec 2025","Jan 2026","Feb 2026"];
+const GROUPS_ORDER = ["Apollo Desktop","Volt","Apollo Rackmount","Modeling Mics","GPS","AIB","GPM","Analog","UAD","Accessories","Analog Mics","Amp Top Box","Other"];
+const BAR_LABELS = ["Apollo Desktop","Volt","Apollo Rackmount","Modeling Mics","GPS","AIB","GPM","Analog","UAD","Accessories","Analog Mics","Amp Top Box","Other"];
+const BAR_MOS = [21.0,36.0,0,11.3,0,0,0,0,4.0,12.0,0,1.0,0];
+const BAR_OH = [105,72,36,34,23,23,15,17,12,12,7,1,0];
+const BAR_SOLD = [5,2,0,3,0,0,0,0,3,1,0,1,0];
+
+const SKU_DATA = {"Analog":{"1176LN":{"on_hand":32,"sold":1},"4710D":{"on_hand":43,"sold":9},"6176":{"on_hand":17,"sold":3},"710TF":{"on_hand":14,"sold":1},"LA2A":{"on_hand":23,"sold":2},"LA610":{"on_hand":35,"sold":3},"S610":{"on_hand":37,"sold":2}},"Apollo Desktop":{"APLS-HE":{"on_hand":137,"sold":71},"APLSU-HE":{"on_hand":48,"sold":7},"APLTWDU-HE":{"on_hand":67,"sold":1},"APLTWXD-HE":{"on_hand":10,"sold":1},"APLTWXDU-HE":{"on_hand":60,"sold":10},"APTXDG2-ESS":{"on_hand":256,"sold":61},"APTXDG2-STU":{"on_hand":68,"sold":17},"APTXQG2-ESS":{"on_hand":55,"sold":15},"APTXQG2-STU":{"on_hand":63,"sold":2},"APX4-HE":{"on_hand":6,"sold":2},"APX4G2-ESS":{"on_hand":62,"sold":15},"APX4G2-STU":{"on_hand":60,"sold":6},"APE1X":{"on_hand":55,"sold":9},"APE2M":{"on_hand":40,"sold":21}},"Apollo Rackmount":{"APX16-HE":{"on_hand":6,"sold":2},"APX16DG2-ESS":{"on_hand":36,"sold":7},"APX16DG2-ULT":{"on_hand":43,"sold":1},"APX16G2-ESS":{"on_hand":39,"sold":3},"APX16G2-ULT":{"on_hand":26,"sold":3},"APX6":{"on_hand":14,"sold":1},"APX6-HE":{"on_hand":16,"sold":0},"APX6G2-ESS":{"on_hand":38,"sold":4},"APX6G2-STU":{"on_hand":31,"sold":2},"APX8G2-ESS":{"on_hand":48,"sold":9},"APX8G2-STU":{"on_hand":44,"sold":5},"APX8P":{"on_hand":36,"sold":7},"APX8P-HE":{"on_hand":17,"sold":1},"APX8PG2-STU":{"on_hand":42,"sold":3},"TBOC-3":{"on_hand":57,"sold":5},"APX8PG2-ESS":{"on_hand":36,"sold":8}},"Accessories":{"CBL-SPHERE25":{"on_hand":17,"sold":5},"PSU-GP1-WW":{"on_hand":81,"sold":6},"CBL-SPHERE10":{"on_hand":0,"sold":17},"SM-UAMIC-BLK":{"on_hand":0,"sold":1},"SM-251":{"on_hand":0,"sold":1},"MM-UAMIC-BLK":{"on_hand":0,"sold":1},"PSU-TWIN/X4-EU":{"on_hand":4,"sold":1},"PSU-TWIN/X4-UK":{"on_hand":4,"sold":0},"PSU-TWIN/X4-ANZ":{"on_hand":2,"sold":0},"PSU-TWIN/X4-JP":{"on_hand":2,"sold":0}},"AIB":{"GPM-ANTI":{"on_hand":26,"sold":0},"GPM-DRM":{"on_hand":36,"sold":4},"GPM-ENIG":{"on_hand":86,"sold":4},"GPM-KNUC":{"on_hand":37,"sold":2},"GPM-LION":{"on_hand":39,"sold":7},"GPM-RUBY":{"on_hand":24,"sold":2},"GPM-WDR":{"on_hand":48,"sold":0}},"GPM":{"GPM-ASTRA":{"on_hand":44,"sold":1},"GPM-DLVRB":{"on_hand":16,"sold":4},"GPM-GLXY":{"on_hand":38,"sold":0},"GPM-GOLD":{"on_hand":26,"sold":4},"GPM-MAX":{"on_hand":43,"sold":0},"GPM-OXSTP":{"on_hand":40,"sold":3},"GPM-STAR":{"on_hand":21,"sold":1}},"GPS":{"GPS-1176":{"on_hand":45,"sold":5},"GPS-BRGD":{"on_hand":65,"sold":3},"GPS-EVMR":{"on_hand":34,"sold":4},"GPS-FLOW":{"on_hand":86,"sold":2},"GPS-HVNLY":{"on_hand":38,"sold":4},"GPS-LA2A":{"on_hand":37,"sold":7},"GPS-ORN":{"on_hand":38,"sold":4}},"Analog Mics":{"MIC-UA167":{"on_hand":24,"sold":0},"MIC-UA187":{"on_hand":54,"sold":1},"MIC-UA251":{"on_hand":12,"sold":0}},"Modeling Mics":{"MIC-UALX":{"on_hand":20,"sold":10},"MIC-UASC-1":{"on_hand":39,"sold":8},"MIC-UASD-1":{"on_hand":31,"sold":10},"MIC-UASD-3":{"on_hand":41,"sold":0},"MIC-UASD-3X3":{"on_hand":26,"sold":4},"MIC-UASD-5":{"on_hand":23,"sold":8},"MIC-UASD-7":{"on_hand":34,"sold":7},"MIC-UASP-1":{"on_hand":32,"sold":11},"MIC-UADLX":{"on_hand":45,"sold":8},"MIC-UADLX-P":{"on_hand":15,"sold":2},"MIC-UALX-P":{"on_hand":93,"sold":5}},"Amp Top Box":{"OX":{"on_hand":30,"sold":6}},"Other":{"PSU-TWX/X4-US":{"on_hand":24,"sold":16}},"UAD":{"TB3SATO-C":{"on_hand":50,"sold":17},"TB3SATQ-C":{"on_hand":36,"sold":9}},"Volt":{"VOLT-SB2":{"on_hand":2,"sold":1},"VOLT-SB276":{"on_hand":61,"sold":22},"VOLT1":{"on_hand":193,"sold":50},"VOLT176":{"on_hand":120,"sold":35},"VOLT2":{"on_hand":163,"sold":43},"VOLT276":{"on_hand":130,"sold":15},"VOLT4":{"on_hand":7,"sold":0},"VOLT476":{"on_hand":115,"sold":12},"VOLT476P":{"on_hand":111,"sold":23},"VOLT876":{"on_hand":34,"sold":10}}};
+
+const SKU_MOS_SERIES = {"1176LN":[null,null,null,null,null,1.0,null,null,null,null,null,null,null],"4710D":[null,null,null,null,null,null,0.5,2.0,2.0,null,3.0,null,null],"6176":[null,null,null,null,null,null,0.5,null,null,2.0,null,null,null],"710TF":[null,null,null,1.0,null,null,null,null,null,null,null,null,null],"APLS-HE":[5.3,10.0,5.7,15.0,2.3,2.3,1.4,0.0,null,0.5,null,null,15.0],"APLSU-HE":[null,null,2.0,5.0,2.0,null,null,1.7,6.0,null,null,null,null],"APLTWDU-HE":[null,null,null,null,3.0,null,null,null,null,null,null,null,null],"APLTWXD-HE":[9.0,null,null,null,null,null,null,null,null,null,null,null,null],"APLTWXDU-HE":[null,5.0,1.5,null,7.0,null,1.5,5.0,null,4.0,0.5,null,null],"APTXDG2-ESS":[25.0,2.2,6.0,5.5,10.3,16.0,1.3,4.5,3.8,0.9,17.0,null,16.5],"APTXDG2-STU":[2.0,5.0,null,6.0,null,null,4.0,1.2,1.3,1.0,6.0,null,null],"APTXQG2-ESS":[3.0,0.5,2.0,1.7,null,null,5.0,0.2,3.0,7.0,null,null,null],"APTXQG2-STU":[null,null,null,null,null,null,null,null,3.0,2.0,null,null,null],"APX16-HE":[null,null,0.0,null,null,null,null,null,null,null,null,null,null],"APX16DG2-ESS":[null,null,0.5,4.0,null,null,null,3.0,2.0,0.0,null,null,null],"APX16DG2-ULT":[null,1.0,null,null,null,null,null,null,null,null,null,null,null],"APX16G2-ESS":[1.0,null,null,null,null,null,4.0,null,3.0,null,null,null,null],"APX16G2-ULT":[null,3.0,2.0,null,null,null,1.0,null,null,null,null,null,null],"APX4-HE":[null,0.0,null,null,null,null,null,null,null,null,null,null,null],"APX4G2-ESS":[null,null,8.0,3.0,0.0,null,7.0,6.0,0.5,6.0,4.0,null,1.5],"APX4G2-STU":[6.0,null,null,null,null,null,0.3,8.0,null,7.0,null,null,null],"APX6":[null,null,2.0,null,null,null,null,null,null,null,null,null,null],"APX6G2-ESS":[0.0,null,null,null,null,null,null,null,null,0.3,null,null,null],"APX6G2-STU":[null,null,null,null,null,null,2.0,null,null,1.0,null,null,null],"APX8G2-ESS":[4.0,3.0,null,5.0,4.0,4.0,null,null,null,1.2,null,null,null],"APX8G2-STU":[null,null,1.0,0.0,null,null,2.0,5.0,null,null,null,null,null],"APX8P":[2.5,null,5.0,null,null,null,null,1.0,0.0,null,null,null,null],"APX8P-HE":[null,null,null,null,null,null,1.0,null,null,null,null,null,null],"APX8PG2-STU":[null,null,null,null,null,null,null,null,2.0,1.0,null,null,null],"CBL-SPHERE25":[null,1.0,null,null,4.0,3.0,null,0.0,null,0.0,null,null,null],"GPM-ASTRA":[null,null,null,null,null,null,null,null,null,null,3.0,null,null],"GPM-DLVRB":[null,0.0,null,null,null,null,null,2.0,1.0,null,null,null,null],"GPM-DRM":[null,4.0,null,null,null,null,2.0,null,3.0,null,null,null,null],"GPM-ENIG":[null,5.0,null,null,null,null,null,8.0,null,7.0,5.0,null,null],"GPM-GOLD":[null,null,null,0.0,null,null,null,3.0,2.0,1.0,null,null,null],"GPM-KNUC":[null,null,null,null,null,3.0,null,null,2.0,null,null,null,null],"GPM-LION":[null,null,null,1.0,null,null,null,1.0,3.0,1.5,2.0,null,null],"GPM-OXSTP":[3.0,null,null,4.0,null,null,null,null,3.0,null,null,null,null],"GPM-RUBY":[null,null,null,null,null,null,null,1.0,null,null,null,null,null],"GPM-STAR":[null,null,null,null,null,null,null,null,null,1.0,null,null,null],"GPS-1176":[null,0.0,null,null,6.0,null,null,6.0,null,null,null,null,null],"GPS-BRGD":[null,7.0,6.0,null,null,null,null,null,null,4.0,null,null,null],"GPS-EVMR":[null,null,null,3.0,null,null,null,null,null,0.3,null,null,null],"GPS-FLOW":[null,7.0,7.0,null,null,null,null,null,null,null,null,null,null],"GPS-HVNLY":[null,null,null,3.0,null,null,4.0,null,3.0,3.0,null,null,null],"GPS-LA2A":[null,null,2.0,null,null,null,null,0.7,1.0,3.0,null,null,null],"GPS-ORN":[null,0.5,null,null,2.0,null,null,null,null,3.0,null,null,null],"LA2A":[null,null,null,null,null,null,null,null,null,1.0,null,null,null],"LA610":[null,null,null,null,null,null,2.0,null,null,1.0,null,null,null],"MIC-UA187":[null,null,null,null,null,null,4.0,null,null,null,null,null,null],"MIC-UALX":[null,null,null,0.0,0.5,0.0,0.5,3.0,0.5,null,null,null,null],"MIC-UASC-1":[null,null,null,null,null,1.0,1.7,null,null,null,3.0,null,0.0],"MIC-UASD-1":[null,null,null,0.0,3.0,null,4.0,null,1.0,0.0,null,null,2.0],"MIC-UASD-3X3":[null,null,null,null,0.0,3.0,2.0,null,3.0,null,null,null,null],"MIC-UASD-5":[null,null,null,null,0.0,0.0,1.0,null,3.0,null,null,null,null],"MIC-UASD-7":[null,null,null,null,0.0,0.0,4.0,null,null,null,null,null,null],"MIC-UASP-1":[null,null,null,1.0,0.0,1.0,1.5,null,1.5,0.7,null,null,null],"OX":[null,null,null,null,null,null,null,1.0,1.0,4.0,null,null,1.0],"PSU-GP1-WW":[null,7.0,null,null,null,null,null,4.0,3.0,0.0,null,null,null],"PSU-TWX/X4-US":[0.0,null,null,4.0,null,0.2,null,null,null,0.0,0.0,null,null],"S610":[null,null,null,null,null,null,4.0,null,null,3.0,null,null,null],"TB3SATO-C":[null,null,0.0,null,null,4.0,5.0,1.2,1.3,1.5,null,null,3.0],"TB3SATQ-C":[null,null,2.0,null,null,null,2.0,3.0,2.0,2.0,1.0,null,6.0],"TBOC-3":[4.0,6.0,null,null,3.0,null,null,5.0,null,4.0,null,null,null],"VOLT-SB2":[null,0.0,null,null,null,null,null,null,null,null,null,null,null],"VOLT-SB276":[null,1.5,0.2,null,0.0,null,1.3,7.0,6.0,5.0,0.0,null,null],"VOLT1":[12.0,14.0,8.7,null,17.0,null,0.6,1.6,10.0,3.0,2.7,null,null],"VOLT176":[1.3,null,8.0,2.3,1.5,null,10.0,1.2,null,0.7,null,null,null],"VOLT2":[1.5,null,19.0,null,0.9,null,2.5,2.1,2.5,1.7,5.5,null,16.0],"VOLT276":[null,11.0,18.0,5.3,null,null,13.0,12.0,11.0,1.2,1.0,null,null],"VOLT476":[1.0,7.0,null,4.0,null,null,15.0,14.0,13.0,3.3,2.5,null,null],"VOLT476P":[5.0,5.5,null,6.0,1.0,null,8.0,4.3,5.5,0.2,10.0,null,7.0],"APX8PG2-ESS":[null,1.0,null,null,null,null,3.0,3.0,2.0,3.0,null,null,null],"MIC-UADLX":[null,null,null,3.0,null,null,2.0,1.7,1.0,null,null,null,null],"MIC-UADLX-P":[null,null,null,null,null,null,null,null,null,0.5,null,null,null],"MIC-UALX-P":[null,null,null,null,null,null,null,null,null,2.8,null,null,null],"APE1X":[null,null,null,null,0.0,null,3.0,5.0,null,4.0,null,null,null],"APE2M":[null,null,null,null,null,null,0.6,2.0,1.0,8.0,0.0,null,null],"VOLT876":[null,null,null,null,null,null,null,null,null,0.1,null,null,null],"PSU-TWIN/X4-EU":[null,null,null,null,null,null,null,null,null,null,null,null,0.0]};
+
+const SELLING_SKUS = {"1176LN":"Analog","4710D":"Analog","6176":"Analog","710TF":"Analog","LA2A":"Analog","LA610":"Analog","S610":"Analog","APLS-HE":"Apollo Desktop","APLSU-HE":"Apollo Desktop","APLTWDU-HE":"Apollo Desktop","APLTWXD-HE":"Apollo Desktop","APLTWXDU-HE":"Apollo Desktop","APTXDG2-ESS":"Apollo Desktop","APTXDG2-STU":"Apollo Desktop","APTXQG2-ESS":"Apollo Desktop","APTXQG2-STU":"Apollo Desktop","APX4-HE":"Apollo Desktop","APX4G2-ESS":"Apollo Desktop","APX4G2-STU":"Apollo Desktop","APE1X":"Apollo Desktop","APE2M":"Apollo Desktop","APX16-HE":"Apollo Rackmount","APX16DG2-ESS":"Apollo Rackmount","APX16DG2-ULT":"Apollo Rackmount","APX16G2-ESS":"Apollo Rackmount","APX16G2-ULT":"Apollo Rackmount","APX6":"Apollo Rackmount","APX6G2-ESS":"Apollo Rackmount","APX6G2-STU":"Apollo Rackmount","APX8G2-ESS":"Apollo Rackmount","APX8G2-STU":"Apollo Rackmount","APX8P":"Apollo Rackmount","APX8P-HE":"Apollo Rackmount","APX8PG2-STU":"Apollo Rackmount","TBOC-3":"Apollo Rackmount","APX8PG2-ESS":"Apollo Rackmount","CBL-SPHERE25":"Accessories","PSU-GP1-WW":"Accessories","CBL-SPHERE10":"Accessories","SM-UAMIC-BLK":"Accessories","SM-251":"Accessories","MM-UAMIC-BLK":"Accessories","PSU-TWIN/X4-EU":"Accessories","GPM-DRM":"AIB","GPM-ENIG":"AIB","GPM-KNUC":"AIB","GPM-LION":"AIB","GPM-RUBY":"AIB","GPM-ASTRA":"GPM","GPM-DLVRB":"GPM","GPM-GOLD":"GPM","GPM-OXSTP":"GPM","GPM-STAR":"GPM","GPS-1176":"GPS","GPS-BRGD":"GPS","GPS-EVMR":"GPS","GPS-FLOW":"GPS","GPS-HVNLY":"GPS","GPS-LA2A":"GPS","GPS-ORN":"GPS","MIC-UA187":"Analog Mics","MIC-UALX":"Modeling Mics","MIC-UASC-1":"Modeling Mics","MIC-UASD-1":"Modeling Mics","MIC-UASD-3X3":"Modeling Mics","MIC-UASD-5":"Modeling Mics","MIC-UASD-7":"Modeling Mics","MIC-UASP-1":"Modeling Mics","MIC-UADLX":"Modeling Mics","MIC-UADLX-P":"Modeling Mics","MIC-UALX-P":"Modeling Mics","OX":"Amp Top Box","PSU-TWX/X4-US":"Other","TB3SATO-C":"UAD","TB3SATQ-C":"UAD","VOLT-SB2":"Volt","VOLT-SB276":"Volt","VOLT1":"Volt","VOLT176":"Volt","VOLT2":"Volt","VOLT276":"Volt","VOLT476":"Volt","VOLT476P":"Volt","VOLT876":"Volt"};
+
+// Color palette
+function generateColors(n) {
+  const palette = ["#2563eb","#dc2626","#16a34a","#d97706","#7c3aed","#0891b2","#db2777","#65a30d","#ea580c","#0284c7","#9333ea","#059669","#ca8a04","#e11d48","#1d4ed8","#15803d","#b45309","#6d28d9","#0e7490","#be185d","#4d7c0f"];
+  return Array.from({length: n}, (_, i) => palette[i % palette.length]);
+}
+
+// ===== TIER 1: BAR CHART =====
+const barColors = BAR_MOS.map(v => v >= 20 ? '#dc2626' : v >= 8 ? '#d97706' : v > 0 ? '#16a34a' : '#e2e8f0');
+new Chart(document.getElementById('barChart'), {
+  type: 'bar',
+  data: {
+    labels: BAR_LABELS,
+    datasets: [{
+      label: 'Months of Supply',
+      data: BAR_MOS,
+      backgroundColor: barColors,
+      borderRadius: 6,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            const i = ctx.dataIndex;
+            const mos = BAR_MOS[i];
+            return [
+              ` MOS: ${mos > 0 ? mos : 'N/A (no sales)'}`,
+              ` On Hand: ${BAR_OH[i].toLocaleString()}`,
+              ` Sold: ${BAR_SOLD[i].toLocaleString()}`
+            ];
+          }
+        }
+      }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 12 } } },
+      y: { beginAtZero: true, grid: { color: '#f0f0f0' }, title: { display: true, text: 'Months of Supply', font: { size: 12 } }, ticks: { callback: v => v + 'mo' } }
+    }
+  }
+});
+
+// ===== TIER 2: SKU TABLES =====
+function mosBadge(oh, sold) {
+  if (sold === 0) return '<span class="badge badge-na">No Sales</span>';
+  const m = Math.round(oh / sold * 10) / 10;
+  const cls = m >= 20 ? 'badge-high' : m >= 8 ? 'badge-med' : 'badge-ok';
+  return `<span class="badge ${cls}">${m}mo</span>`;
+}
+
+const skuContainer = document.getElementById('sku-tables');
+const groupsWithData = GROUPS_ORDER.filter(g => SKU_DATA[g]);
+groupsWithData.forEach(group => {
+  const skus = SKU_DATA[group];
+  const totalOH = Object.values(skus).reduce((a, v) => a + v.on_hand, 0);
+  const totalSold = Object.values(skus).reduce((a, v) => a + v.sold, 0);
+
+  const block = document.createElement('div');
+  block.className = 'group-block';
+
+  const header = document.createElement('div');
+  header.className = 'group-header';
+  header.innerHTML = `<h3>${group}</h3><div style="display:flex;gap:20px;align-items:center"><span>On Hand: ${totalOH.toLocaleString()} · Sold: ${totalSold.toLocaleString()}</span><span class="toggle">▼</span></div>`;
+  header.onclick = () => {
+    header.classList.toggle('open');
+    body.classList.toggle('open');
+  };
+
+  const body = document.createElement('div');
+  body.className = 'group-body';
+
+  const rows = Object.entries(skus).sort((a, b) => b[1].on_hand - a[1].on_hand)
+    .map(([sku, d]) => `<tr><td>${sku}</td><td>${d.on_hand.toLocaleString()}</td><td>${d.sold.toLocaleString()}</td><td>${mosBadge(d.on_hand, d.sold)}</td></tr>`).join('');
+
+  body.innerHTML = `<table><thead><tr><th>SKU</th><th>On Hand (15mo Sum)</th><th>Units Sold (15mo)</th><th>Supply Coverage</th></tr></thead><tbody>${rows}</tbody></table>`;
+
+  block.appendChild(header);
+  block.appendChild(body);
+  skuContainer.appendChild(block);
+});
+
+// ===== TIER 3: LINE CHART =====
+const skuList = Object.keys(SKU_MOS_SERIES);
+const groupSet = [...new Set(Object.values(SELLING_SKUS))].sort();
+const allColors = generateColors(skuList.length);
+const skuColorMap = {};
+skuList.forEach((sku, i) => skuColorMap[sku] = allColors[i]);
+
+let activeGroup = 'All';
+let activeSkus = new Set(skuList.slice(0, 10)); // default: first 10
+
+// Group filter buttons
+const groupFilter = document.getElementById('groupFilter');
+['All', ...groupSet].forEach(g => {
+  const btn = document.createElement('button');
+  btn.className = 'grp-btn' + (g === 'All' ? ' active' : '');
+  btn.textContent = g;
+  btn.onclick = () => {
+    activeGroup = g;
+    document.querySelectorAll('.grp-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filtered = g === 'All' ? skuList : skuList.filter(s => SELLING_SKUS[s] === g);
+    activeSkus = new Set(filtered);
+    renderToggles(filtered);
+    updateLineChart();
+  };
+  groupFilter.appendChild(btn);
+});
+
+const toggleContainer = document.getElementById('skuToggles');
+
+function renderToggles(skus) {
+  toggleContainer.innerHTML = '';
+  skus.forEach(sku => {
+    const color = skuColorMap[sku];
+    const label = document.createElement('label');
+    label.className = 'active';
+    label.style.color = color;
+    label.style.borderColor = color;
+    label.innerHTML = `<input type="checkbox" checked><span class="color-dot" style="background:${color}"></span>${sku}`;
+    label.querySelector('input').onchange = (e) => {
+      if (e.target.checked) activeSkus.add(sku); else activeSkus.delete(sku);
+      label.classList.toggle('active', e.target.checked);
+      updateLineChart();
+    };
+    toggleContainer.appendChild(label);
+  });
+}
+
+// Initial toggles: all groups
+renderToggles(skuList);
+
+const lineCtx = document.getElementById('lineChart').getContext('2d');
+const lineChart = new Chart(lineCtx, {
+  type: 'line',
+  data: { labels: MONTHS, datasets: [] },
+  options: {
+    responsive: true,
+    spanGaps: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y != null ? ctx.parsed.y + ' mo' : 'N/A'}`
+        }
+      }
+    },
+    scales: {
+      x: { grid: { color: '#f5f5f5' }, ticks: { font: { size: 11 } } },
+      y: { beginAtZero: true, title: { display: true, text: 'Months of Supply', font: { size: 12 } }, ticks: { callback: v => v + 'mo' } }
+    }
+  }
+});
+
+function updateLineChart() {
+  lineChart.data.datasets = [...activeSkus].map(sku => ({
+    label: sku,
+    data: SKU_MOS_SERIES[sku] || [],
+    borderColor: skuColorMap[sku],
+    backgroundColor: skuColorMap[sku] + '22',
+    borderWidth: 2,
+    pointRadius: 3,
+    tension: 0.3,
+  }));
+  lineChart.update();
+}
+updateLineChart();
+</script>
+</body>
+</html>
