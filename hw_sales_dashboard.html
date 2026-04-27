@@ -354,46 +354,46 @@ const REG_UNITS = {
   'Analog Mics':      [3,    1,    0,    1],
 };
 const REG_DOLLARS = {
-  'Apollo Desktop':   [274790, 267650, 277027, 241474],
-  'Apollo Rackmount': [236445, 207274, 188849, 179637],
-  'Volt Desktop':     [161354, 162049, 152742, 145148],
-  'AIB':              [53589,  45899,  45403,  37450],
-  'Modeling Mics':    [59254,  65891,  64498,  47246],
-  'GPM':              [18095,  21222,  21203,  23629],
-  'UAD':              [27794,  20003,  17980,  16366],
-  'GPS':              [7902,   8465,   8024,   7078],
-  'Amp Top Box':      [9594,   16309,  16309,  16309],
-  'Analog Mics':      [4078,   799,    0,      1919],
+  'Apollo Desktop':   [522019, 499768, 503416, 241474],
+  'Apollo Rackmount': [315921, 277615, 252098, 179637],
+  'Volt Desktop':     [184274, 182192, 179853, 145148],
+  'AIB':              [56281,  48503,  47856,  37450],
+  'Modeling Mics':    [41133,  56276,  45676,  47246],
+  'GPM':              [20325,  24028,  23955,  23629],
+  'UAD':              [28065,  22252,  19993,  16366],
+  'GPS':              [6599,   7105,   6700,   7078],
+  'Amp Top Box':      [9768,   16605,  16605,  16309],
+  'Analog Mics':      [2588,   802,    0,      1919],
 };
-// Q2 only weekly oplan pace (13 weeks: Apr 6 → Jun 29)
+// Q2 only weekly oplan pace (13 weeks: Apr 6 → Jun 29) — hardware sell-in OPlan evenly paced within each fiscal period
 const Q2_WEEKS = ['Apr 6','Apr 13','Apr 20*','Apr 27','May 4','May 11','May 18','May 25','Jun 1','Jun 8','Jun 15','Jun 22','Jun 29'];
-const OPLAN_PACE = [1124679,1124679,1124679,1124679, 1557985,1557985,1557985,1557985, 1285910,1285910,1285910,1285910,1285910];
-const REG_DOLLARS_Q2_ACTUAL = [815561, 792035, 716256, null, null, null, null, null, null, null, null, null, null];
+const OPLAN_PACE = [1124679,1124679,1124679, 1250865,1250865,1250865,1250865,1250865, 1625465,1625465,1625465,1625465, 1084783];
+const REG_DOLLARS_Q2_ACTUAL = [1135146, 1096152, 716256, null, null, null, null, null, null, null, null, null, null];
 
 // --- REVENUE VS PLAN ---
 const MONTHS = ['Apr 2026','May 2026','Jun 2026'];
-const TOTAL_ACTUAL    = [3435778, 0, 0];
-const TOTAL_OPLAN     = [4498716, 6231939, 6429551];
-const TOTAL_COMMITTED = [4769621, 6143432, 7131785];
+const TOTAL_ACTUAL    = [3487734, 0, 0];
+const TOTAL_OPLAN     = [4498716, 6254324, 6501860];
+const TOTAL_COMMITTED = [4769621, 6010187, 6619714];
 
 const PRODUCT_LINES = [
-  { line:'Apollo Desktop',   actual:1341014, oplan:2017620, committed:1999405, var$:-676606,  varPct:-33.5 },
-  { line:'Apollo Rackmount', actual:620326,  oplan:1276984, committed:968577,  var$:-656657,  varPct:-51.4 },
-  { line:'Volt Desktop',     actual:585864,  oplan:626234,  committed:975161,  var$:-40371,   varPct:-6.4  },
-  { line:'Analog',           actual:232699,  oplan:68517,   committed:167542,  var$:164182,   varPct:239.6 },
-  { line:'Modeling Mics',    actual:190836,  oplan:107211,  committed:217324,  var$:83625,    varPct:78.0  },
-  { line:'AIB',              actual:122044,  oplan:176711,  committed:226195,  var$:-54667,   varPct:-30.9 },
-  { line:'GPM',              actual:100730,  oplan:88710,   committed:73017,   var$:12020,    varPct:13.5  },
-  { line:'GPS',              actual:49554,   oplan:50883,   committed:47083,   var$:-1328,    varPct:-2.6  },
-  { line:'UAD',              actual:45691,   oplan:40061,   committed:44417,   var$:5630,     varPct:14.1  },
-  { line:'Amp Top Box',      actual:12760,   oplan:32732,   committed:31468,   var$:-19973,   varPct:-61.0 },
-  { line:'Analog Mics',      actual:-10284,  oplan:13053,   committed:19432,   var$:-23337,   varPct:-178.8},
+  { line:'Apollo Desktop',   actual:1402486, oplan:2017620, committed:1999405, var$:-615134,  varPct:-30.5 },
+  { line:'Apollo Rackmount', actual:702507,  oplan:1276984, committed:968577,  var$:-574477,  varPct:-45.0 },
+  { line:'Volt Desktop',     actual:605346,  oplan:626234,  committed:975161,  var$:-20888,   varPct:-3.3  },
+  { line:'Analog',           actual:236062,  oplan:68517,   committed:167542,  var$:167545,   varPct:244.5 },
+  { line:'Modeling Mics',    actual:195050,  oplan:107211,  committed:217324,  var$:87839,    varPct:81.9  },
+  { line:'AIB',              actual:128930,  oplan:176711,  committed:226195,  var$:-47781,   varPct:-27.0 },
+  { line:'GPM',              actual:107312,  oplan:88710,   committed:73017,   var$:18602,    varPct:21.0  },
+  { line:'GPS',              actual:54133,   oplan:50883,   committed:47083,   var$:3250,     varPct:6.4   },
+  { line:'UAD',              actual:46950,   oplan:40061,   committed:44417,   var$:6889,     varPct:17.2  },
+  { line:'Amp Top Box',      actual:13714,   oplan:32732,   committed:31468,   var$:-19018,   varPct:-58.1 },
+  { line:'Analog Mics',      actual:-4756,   oplan:13053,   committed:19432,   var$:-17809,   varPct:-136.4},
 ];
 
 const Q2_SUMMARY = [
-  { month:'Apr 2026', actual:3435778, oplan:4498716, committed:4769621 },
-  { month:'May 2026', actual:0,       oplan:6231939, committed:6143432 },
-  { month:'Jun 2026', actual:0,       oplan:6429551, committed:7131785 },
+  { month:'Apr 2026', actual:3487734, oplan:4498716, committed:4769621 },
+  { month:'May 2026', actual:0,       oplan:6254324, committed:6010187 },
+  { month:'Jun 2026', actual:0,       oplan:6501860, committed:6619714 },
 ];
 
 // --- INVENTORY ---

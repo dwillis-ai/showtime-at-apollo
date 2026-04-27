@@ -64,7 +64,7 @@
 </head>
 <body>
   <h1>Bomisco Inventory — Top 5 Adaptive Insights Accounts</h1>
-  <p class="subtitle">On-hand quantity by account (monthly sum)</p>
+  <p class="subtitle">On-hand quantity by account · As of Apr 26, 2026</p>
 
   <div class="chart-container">
     <canvas id="inventoryChart"></canvas>
@@ -79,11 +79,11 @@
       </tr>
     </thead>
     <tbody>
-      <tr><td>1</td><td>Guitar Center</td><td>640,426</td></tr>
-      <tr><td>2</td><td>Sweetwater</td><td>216,497</td></tr>
-      <tr><td>3</td><td>Amazon</td><td>196,623</td></tr>
-      <tr><td>4</td><td>DMT</td><td>124,479</td></tr>
-      <tr><td>5</td><td>Hook Up</td><td>108,510</td></tr>
+      <tr><td>1</td><td>Guitar Center Incorporated</td><td>179,197</td></tr>
+      <tr><td>2</td><td>Amazon</td><td>91,330</td></tr>
+      <tr><td>3</td><td>Sweetwater Sound</td><td>76,931</td></tr>
+      <tr><td>4</td><td>Musical Fulfillment Services</td><td>50,838</td></tr>
+      <tr><td>5</td><td>Hook Up, Inc.</td><td>43,502</td></tr>
     </tbody>
   </table>
 
@@ -92,10 +92,10 @@
     new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: ['Guitar Center', 'Sweetwater', 'Amazon', 'DMT', 'Hook Up'],
+        labels: ['Guitar Center', 'Amazon', 'Sweetwater Sound', 'Musical Fulfillment', 'Hook Up, Inc.'],
         datasets: [{
           label: 'On Hand Quantity',
-          data: [640426, 216497, 196623, 124479, 108510],
+          data: [179197, 91330, 76931, 50838, 43502],
           backgroundColor: [
             '#2563eb',
             '#3b82f6',
