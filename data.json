@@ -25,6 +25,8 @@
     "2026-05": 3786328.75,
     "2026-06": 4316612.38
   },
+  "bookingsLevelCodes": [],
+  "bookingsRows": [],
   "registrationsByProductLine": [
     {
       "weekStart": "2026-03-30", "isContextWeek": true, "isPartial": false,

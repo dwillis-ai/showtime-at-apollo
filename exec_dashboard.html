@@ -361,6 +361,77 @@
     border-color: rgba(59,130,246,0.3);
   }
 
+  /* ── Bookings tab filters ── */
+  .bk-top-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: #1e2a40;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+  }
+  .bk-apollo-btn {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #64748b;
+    background: rgba(255,255,255,0.04);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .bk-apollo-btn.active {
+    background: rgba(59,130,246,0.15);
+    border-color: rgba(59,130,246,0.4);
+    color: #93c5fd;
+  }
+  .bk-month-pills { display: flex; gap: 4px; }
+  .bk-month-pill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 5px 13px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #64748b;
+    background: rgba(255,255,255,0.04);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .bk-month-pill.active {
+    background: rgba(59,130,246,0.15);
+    border-color: rgba(59,130,246,0.4);
+    color: #93c5fd;
+  }
+  .bk-dealer-select {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #94a3b8;
+    background: rgba(255,255,255,0.06);
+    cursor: pointer;
+    font-family: inherit;
+    outline: none;
+    margin-left: auto;
+  }
+  .bk-dealer-select option { background: #1a1a2e; color: #94a3b8; }
+  .bk-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #475569;
+    font-size: 0.78rem;
+    font-style: italic;
+  }
+  .var-pos { color: #4ade80; }
+  .var-neg { color: #f87171; }
+
   /* ── Skeleton loader ── */
   .skeleton {
     background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 75%);
@@ -485,10 +556,51 @@
   </div>
 
   <div class="panel" id="panel-bookings">
-    <div class="placeholder">
-      <h3>Bookings vs Plan</h3>
-      <p>Bookings vs plan data will appear here once connected to Omni.</p>
+
+    <!-- Top filter row -->
+    <div class="bk-top-filters">
+      <button id="bkApolloBtn" class="bk-apollo-btn active" onclick="bkToggleApollo()">Apollo Only</button>
+      <div id="bkMonthPills" class="bk-month-pills"></div>
+      <select id="bkDealerSelect" class="bk-dealer-select" onchange="bkOnDealerChange()">
+        <option value="">All Dealers</option>
+      </select>
     </div>
+
+    <!-- Product line / product ID filter (collapsible) -->
+    <div class="filter-bar" id="bkProductFilterBar">
+      <div class="filter-bar-top" onclick="bkToggleProductFilter()">
+        <span class="filter-bar-label">Filter by Product Line / Product ID
+          <span id="bkProductBadge" class="filter-count-badge" style="display:none"></span>
+        </span>
+        <svg class="filter-toggle-icon" id="bkFilterIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="filter-panel-body" id="bkProductFilterBody" style="display:none">
+        <input type="text" class="filter-search" id="bkProductSearch" placeholder="Search product lines or IDs…" oninput="bkRenderProductChips()">
+        <div class="filter-groups" id="bkProductChips"></div>
+      </div>
+    </div>
+
+    <!-- Q2 monthly overview -->
+    <div class="chart-section">
+      <div class="chart-title">Q2 2026 Total Revenue — Actual vs OPlan vs Sales Target (by Month)</div>
+      <canvas id="bkChartQ2" height="80"></canvas>
+      <div class="chart-note">Future month actuals = $0. OPlan and Sales Target shown for full quarter context.</div>
+    </div>
+
+    <!-- Product line detail for selected month -->
+    <div class="chart-section">
+      <div class="chart-title" id="bkChartPLTitle">Actual vs OPlan by Product Line</div>
+      <canvas id="bkChartPL" height="100"></canvas>
+    </div>
+
+    <!-- Variance table -->
+    <div class="chart-section">
+      <div class="chart-title" id="bkTableTitle">Product Line Variance Detail</div>
+      <div class="reg-table-wrap">
+        <table class="reg-table" id="bkTable"></table>
+      </div>
+    </div>
+
   </div>
 
   <div class="panel" id="panel-inventory">
@@ -976,6 +1088,324 @@
     }
   }
 
+  // ── Bookings vs Plan tab ──
+  const BK_MONTHS      = ['2026-04','2026-05','2026-06'];
+  const BK_MONTH_LABEL = {'2026-04':'Apr 2026','2026-05':'May 2026','2026-06':'Jun 2026'};
+
+  let bkMonth       = null;   // selected month ISO string
+  let bkApolloOnly  = true;
+  let bkDealer      = '';     // empty = all dealers
+  let bkSelPL       = null;   // Set of product lines, null = all
+  let bkSelPID      = null;   // Set of product IDs, null = all
+  let bkChartQ2     = null;
+  let bkChartPL     = null;
+
+  function bkCurrentMonth() {
+    const t = new Date();
+    const m = t.getFullYear() + '-' + String(t.getMonth()+1).padStart(2,'0');
+    return BK_MONTHS.includes(m) ? m : BK_MONTHS[0];
+  }
+
+  function initBookings(data) {
+    if (!bkMonth) bkMonth = bkCurrentMonth();
+
+    // Populate dealer dropdown
+    const sel = document.getElementById('bkDealerSelect');
+    sel.innerHTML = '<option value="">All Dealers</option>';
+    (data.bookingsLevelCodes || []).sort().forEach(c => {
+      const o = document.createElement('option');
+      o.value = c; o.textContent = c;
+      sel.appendChild(o);
+    });
+
+    bkRenderMonthPills();
+    bkRenderProductChips();
+    renderBookingsCharts(data);
+  }
+
+  function bkRenderMonthPills() {
+    document.getElementById('bkMonthPills').innerHTML = BK_MONTHS.map(m =>
+      `<button class="bk-month-pill ${m===bkMonth?'active':''}" onclick="bkSelectMonth('${m}')">${BK_MONTH_LABEL[m].slice(0,3)}</button>`
+    ).join('');
+  }
+
+  function bkSelectMonth(m) { bkMonth = m; bkRenderMonthPills(); bkRefresh(); }
+
+  function bkToggleApollo() {
+    bkApolloOnly = !bkApolloOnly;
+    bkSelPL  = null; // reset product line selection when toggling
+    bkSelPID = null;
+    document.getElementById('bkApolloBtn').classList.toggle('active', bkApolloOnly);
+    bkRenderProductChips();
+    bkRefresh();
+  }
+
+  function bkOnDealerChange() {
+    bkDealer = document.getElementById('bkDealerSelect').value;
+    bkRefresh();
+  }
+
+  function bkToggleProductFilter() {
+    const body = document.getElementById('bkProductFilterBody');
+    const icon = document.getElementById('bkFilterIcon');
+    const open = body.style.display === 'none';
+    body.style.display = open ? 'block' : 'none';
+    icon.classList.toggle('open', open);
+  }
+
+  function bkGetVisibleProductLines(data) {
+    const rows = data.bookingsRows || [];
+    const lines = [...new Set(rows
+      .filter(r => !bkApolloOnly || (r.productLine && r.productLine.includes('Apollo')))
+      .map(r => r.productLine).filter(Boolean)
+    )].sort();
+    return lines;
+  }
+
+  function bkGetVisibleProductIds(data, forLines) {
+    const rows = data.bookingsRows || [];
+    return [...new Set(rows
+      .filter(r => forLines.includes(r.productLine))
+      .map(r => r.productId).filter(Boolean)
+    )].sort();
+  }
+
+  function bkRenderProductChips() {
+    if (!_lastData) return;
+    const data   = _lastData;
+    const search = (document.getElementById('bkProductSearch')?.value || '').toLowerCase();
+    const lines  = bkGetVisibleProductLines(data);
+
+    // Determine active product lines for PID filtering
+    const activePL = (bkSelPL && bkSelPL.size) ? [...bkSelPL] : lines;
+    const allPIDs  = bkGetVisibleProductIds(data, activePL);
+
+    let html = '';
+
+    // Product Line group
+    const visLines = search ? lines.filter(l => l.toLowerCase().includes(search)) : lines;
+    if (visLines.length) {
+      html += `<div class="filter-group">
+        <div class="filter-group-header">
+          <span class="filter-group-name">Product Line</span>
+          <button class="filter-btn" onclick="bkSelectAllPL(${JSON.stringify(lines)})">All</button>
+          <button class="filter-btn" onclick="bkClearPL()">Clear</button>
+        </div>
+        <div class="filter-chips">
+          ${visLines.map(l => {
+            const checked = bkSelPL !== null && bkSelPL.has(l);
+            return `<label class="filter-chip ${checked?'checked':''}" onclick="bkTogglePL(event,'${l.replace(/'/g,"\\'")}'">${l}</label>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }
+
+    // Product ID group
+    const visPIDs = search ? allPIDs.filter(id => id.toLowerCase().includes(search)) : allPIDs;
+    if (visPIDs.length) {
+      html += `<div class="filter-group">
+        <div class="filter-group-header">
+          <span class="filter-group-name">Product ID</span>
+          <button class="filter-btn" onclick="bkSelectAllPID(${JSON.stringify(allPIDs)})">All</button>
+          <button class="filter-btn" onclick="bkClearPID()">Clear</button>
+        </div>
+        <div class="filter-chips">
+          ${visPIDs.map(id => {
+            const checked = bkSelPID !== null && bkSelPID.has(id);
+            return `<label class="filter-chip ${checked?'checked':''}" onclick="bkTogglePID(event,'${id}')">${id}</label>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }
+
+    if (!html) html = `<div class="bk-empty">No data — run /refresh-exec to load bookings data.</div>`;
+    document.getElementById('bkProductChips').innerHTML = html;
+
+    // Badge
+    const totalSel = (bkSelPL ? bkSelPL.size : 0) + (bkSelPID ? bkSelPID.size : 0);
+    const badge = document.getElementById('bkProductBadge');
+    badge.style.display = totalSel ? 'inline' : 'none';
+    if (totalSel) badge.textContent = `${totalSel} filter${totalSel!==1?'s':''} active`;
+  }
+
+  function bkTogglePL(e, line) {
+    e.preventDefault();
+    if (!bkSelPL) bkSelPL = new Set([line]);
+    else if (bkSelPL.has(line)) { bkSelPL.delete(line); if (!bkSelPL.size) bkSelPL = null; }
+    else bkSelPL.add(line);
+    bkSelPID = null; // reset PID when PL changes
+    bkRenderProductChips();
+    bkRefresh();
+  }
+  function bkSelectAllPL(lines) {
+    bkSelPL = null;
+    bkRenderProductChips(); bkRefresh();
+  }
+  function bkClearPL() {
+    bkSelPL = null;
+    bkRenderProductChips(); bkRefresh();
+  }
+  function bkTogglePID(e, id) {
+    e.preventDefault();
+    if (!bkSelPID) bkSelPID = new Set([id]);
+    else if (bkSelPID.has(id)) { bkSelPID.delete(id); if (!bkSelPID.size) bkSelPID = null; }
+    else bkSelPID.add(id);
+    bkRenderProductChips(); bkRefresh();
+  }
+  function bkSelectAllPID(ids) { bkSelPID = null; bkRenderProductChips(); bkRefresh(); }
+  function bkClearPID()         { bkSelPID = null; bkRenderProductChips(); bkRefresh(); }
+
+  function bkRefresh() { renderBookingsCharts(_lastData); }
+
+  function bkGetFilteredRows(data) {
+    let rows = data.bookingsRows || [];
+    if (bkDealer)   rows = rows.filter(r => r.levelCode === bkDealer);
+    if (bkApolloOnly) rows = rows.filter(r => r.productLine?.includes('Apollo'));
+    if (bkSelPL?.size) rows = rows.filter(r => bkSelPL.has(r.productLine));
+    if (bkSelPID?.size) rows = rows.filter(r => bkSelPID.has(r.productId));
+    return rows;
+  }
+
+  function bkAggregate(rows, keyFn) {
+    const map = {};
+    rows.forEach(r => {
+      const k = keyFn(r);
+      if (!map[k]) map[k] = { key: k, actual:0, salesTarget:0, oplan:0 };
+      map[k].actual      += r.actual      || 0;
+      map[k].salesTarget += r.salesTarget || 0;
+      map[k].oplan       += r.oplan       || 0;
+    });
+    return Object.values(map);
+  }
+
+  function renderBookingsCharts(data) {
+    if (!data) return;
+    const rows    = bkGetFilteredRows(data);
+    const isEmpty = !rows.length;
+
+    const fmtV = v => {
+      if (!v) return '—';
+      return v >= 1e6 ? '$'+(v/1e6).toFixed(2)+'M' : '$'+Math.round(v/1e3)+'K';
+    };
+    const fmtPctSgn = v => v==null ? '—' : (v>=0?'+':'')+(v*100).toFixed(1)+'%';
+    const fmtPctOf  = v => v==null ? '—' : (v*100).toFixed(0)+'%';
+
+    // ── Chart 1: Q2 monthly ──
+    const monthly = BK_MONTHS.map(m => {
+      const mr = rows.filter(r => r.month === m);
+      return {
+        actual:      mr.reduce((s,r)=>s+(r.actual||0),0),
+        oplan:       mr.reduce((s,r)=>s+(r.oplan||0),0),
+        salesTarget: mr.reduce((s,r)=>s+(r.salesTarget||0),0),
+      };
+    });
+
+    const ctx1 = document.getElementById('bkChartQ2').getContext('2d');
+    if (bkChartQ2) bkChartQ2.destroy();
+    bkChartQ2 = new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: BK_MONTHS.map(m => BK_MONTH_LABEL[m]),
+        datasets: [
+          { label:'Actual Revenue', data: monthly.map(m=>m.actual),      backgroundColor:'#3b82f6', borderWidth:0 },
+          { label:'OPlan',          data: monthly.map(m=>m.oplan),        backgroundColor:'#475569', borderWidth:0 },
+          { label:'Sales Target',   data: monthly.map(m=>m.salesTarget),  backgroundColor:'#22c55e', borderWidth:0 },
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position:'bottom', labels:{ color:'#94a3b8', font:{size:11}, boxWidth:12, padding:14 } },
+          tooltip: { mode:'index', callbacks:{ label: c => c.dataset.label+': '+fmtV(c.raw) } }
+        },
+        scales: {
+          x: { ticks:{color:'#94a3b8'}, grid:{display:false} },
+          y: { ticks:{color:'#64748b', callback: v=>fmtV(v)}, grid:{color:'rgba(255,255,255,0.05)'} }
+        }
+      }
+    });
+
+    // ── Chart 2: Product line for selected month ──
+    const monthRows = rows.filter(r => r.month === bkMonth);
+    const plData    = bkAggregate(monthRows, r => r.productLine).sort((a,b)=>b.actual-a.actual);
+    const mlabel    = BK_MONTH_LABEL[bkMonth] || bkMonth;
+
+    document.getElementById('bkChartPLTitle').textContent = `${mlabel} — Actual vs OPlan by Product Line`;
+
+    const ctx2 = document.getElementById('bkChartPL').getContext('2d');
+    if (bkChartPL) bkChartPL.destroy();
+    bkChartPL = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: plData.map(d=>d.key || '—'),
+        datasets: [
+          { label:'Actual', data: plData.map(d=>d.actual), backgroundColor:'#3b82f6', borderWidth:0 },
+          { label:'OPlan',  data: plData.map(d=>d.oplan),  backgroundColor:'#475569', borderWidth:0 },
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position:'bottom', labels:{ color:'#94a3b8', font:{size:11}, boxWidth:12, padding:14 } },
+          tooltip: { mode:'index', callbacks:{ label: c => c.dataset.label+': '+fmtV(c.raw) } }
+        },
+        scales: {
+          x: { ticks:{color:'#94a3b8'}, grid:{display:false} },
+          y: { ticks:{color:'#64748b', callback: v=>fmtV(v)}, grid:{color:'rgba(255,255,255,0.05)'} }
+        }
+      }
+    });
+
+    // ── Table ──
+    document.getElementById('bkTableTitle').textContent = `${mlabel} — Product Line Variance Detail`;
+
+    if (isEmpty) {
+      document.getElementById('bkTable').innerHTML =
+        `<tr><td colspan="7" class="bk-empty">No data — run /refresh-exec to load bookings data.</td></tr>`;
+      return;
+    }
+
+    let thead = `<thead><tr>
+      <th style="text-align:left">Product Line</th>
+      <th>Actual Revenue</th><th>OPlan</th><th>Sales Target</th>
+      <th>$ Var vs OPlan</th><th>% Var vs OPlan</th><th>% of OPlan</th>
+    </tr></thead>`;
+
+    let tbody = '<tbody>';
+    let tA=0, tO=0, tS=0;
+
+    plData.forEach(row => {
+      const vd  = row.actual - row.oplan;
+      const vp  = row.oplan  ? (row.actual-row.oplan)/row.oplan : null;
+      const pof = row.oplan  ? row.actual/row.oplan : null;
+      const cls = vd >= 0 ? 'var-pos' : 'var-neg';
+      tA+=row.actual; tO+=row.oplan; tS+=row.salesTarget;
+      tbody += `<tr>
+        <td>${row.key||'—'}</td>
+        <td>${fmtV(row.actual)}</td>
+        <td>${fmtV(row.oplan)}</td>
+        <td>${fmtV(row.salesTarget)}</td>
+        <td class="${cls}">${vd>=0?'+':''}${fmtV(Math.abs(vd))}</td>
+        <td class="${cls}">${fmtPctSgn(vp)}</td>
+        <td>${fmtPctOf(pof)}</td>
+      </tr>`;
+    });
+
+    const tvd  = tA-tO;
+    const tvp  = tO ? (tA-tO)/tO : null;
+    const tpof = tO ? tA/tO : null;
+    const tcls = tvd>=0?'var-pos':'var-neg';
+    tbody += `<tr class="total-row">
+      <td>TOTAL</td>
+      <td>${fmtV(tA)}</td><td>${fmtV(tO)}</td><td>${fmtV(tS)}</td>
+      <td class="${tcls}">${tvd>=0?'+':''}${fmtV(Math.abs(tvd))}</td>
+      <td class="${tcls}">${fmtPctSgn(tvp)}</td>
+      <td>${fmtPctOf(tpof)}</td>
+    </tr></tbody>`;
+
+    document.getElementById('bkTable').innerHTML = thead + tbody;
+  }
+
   // ── Reg dollars vs OPlan pace chart ──
   let regPaceChartInstance = null;
 
@@ -1095,6 +1525,7 @@
       initFilter(data);
       renderRegistrationCharts(data);
       renderRegPaceChart(data);
+      initBookings(data);
       document.getElementById('lastUpdated').textContent =
         'Data as of ' + (data.lastFetched || '—');
     } catch (e) {
