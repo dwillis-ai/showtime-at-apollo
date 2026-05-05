@@ -262,6 +262,105 @@
     border-bottom: none;
   }
 
+  /* ── Product filter panel ── */
+  .filter-bar {
+    background: #1e2a40;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .filter-bar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .filter-bar-top:hover { background: rgba(255,255,255,0.04); }
+  .filter-bar-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+  }
+  .filter-count-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(59,130,246,0.2);
+    color: #60a5fa;
+    margin-left: 8px;
+  }
+  .filter-toggle-icon { color: #64748b; transition: transform 0.2s; }
+  .filter-toggle-icon.open { transform: rotate(180deg); }
+  .filter-panel-body {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 14px 16px;
+  }
+  .filter-search {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 7px 11px;
+    color: #f1f5f9;
+    font-size: 0.75rem;
+    font-family: inherit;
+    margin-bottom: 14px;
+    outline: none;
+  }
+  .filter-search::placeholder { color: #475569; }
+  .filter-search:focus { border-color: rgba(59,130,246,0.5); }
+  .filter-groups { display: flex; gap: 20px; flex-wrap: wrap; }
+  .filter-group { flex: 1; min-width: 240px; }
+  .filter-group-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .filter-group-name {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+    flex: 1;
+  }
+  .filter-btn {
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: #64748b;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 2px 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .filter-btn:hover { color: #94a3b8; border-color: rgba(255,255,255,0.2); }
+  .filter-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #475569;
+    background: rgba(255,255,255,0.03);
+    transition: all 0.1s;
+    user-select: none;
+  }
+  .filter-chip input { display: none; }
+  .filter-chip.checked {
+    color: #93c5fd;
+    background: rgba(59,130,246,0.12);
+    border-color: rgba(59,130,246,0.3);
+  }
+
   /* ── Skeleton loader ── */
   .skeleton {
     background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 75%);
@@ -351,6 +450,19 @@
 <div class="panels">
   <div class="panel active" id="panel-registrations">
     <div class="reg-strip" id="reg-cards"></div>
+
+    <div class="filter-bar" id="filterBar" style="display:none">
+      <div class="filter-bar-top" onclick="toggleFilterPanel()">
+        <span class="filter-bar-label">Filter by Product ID
+          <span id="filterCountBadge" class="filter-count-badge" style="display:none"></span>
+        </span>
+        <svg class="filter-toggle-icon" id="filterToggleIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <div class="filter-panel-body" id="filterPanelBody" style="display:none">
+        <input type="text" class="filter-search" id="filterSearch" placeholder="Search product IDs…" oninput="renderFilterChips()">
+        <div class="filter-groups" id="filterGroups"></div>
+      </div>
+    </div>
 
     <div class="chart-section">
       <div class="chart-title">Weekly Registrations — Units by Product Line</div>
@@ -528,39 +640,205 @@
   const PL_COLORS = {
     'Apollo Desktop':   '#3b82f6',
     'Apollo Rackmount': '#93c5fd',
-    'Volt Desktop':     '#22c55e',
-    'AIB':              '#f97316',
-    'Modeling Mics':    '#ec4899',
-    'GPM':              '#a855f7',
-    'UAD':              '#16a34a',
-    'GPS':              '#84cc16',
-    'Amp Top Box':      '#eab308',
-    'Analog Mics':      '#94a3b8',
   };
-  const PL_ORDER = Object.keys(PL_COLORS).filter(pl => pl.includes('Apollo'));
+  const ALL_WEEKS = ['2026-03-30','2026-04-06','2026-04-13','2026-04-20','2026-04-27','2026-05-04'];
 
   let regChartInstance = null;
+  let _lastData = null;
+
+  // ── Filter state ──
+  let selectedProductIds = null; // Set; null until data loads
+
+  function toggleFilterPanel() {
+    const body = document.getElementById('filterPanelBody');
+    const icon = document.getElementById('filterToggleIcon');
+    const open = body.style.display === 'none';
+    body.style.display = open ? 'block' : 'none';
+    icon.classList.toggle('open', open);
+  }
+
+  function renderFilterChips() {
+    if (!_lastData || !_lastData.registrationsByProductId) return;
+    const products = _lastData.registrationsByProductId;
+    const search = (document.getElementById('filterSearch').value || '').toLowerCase();
+
+    const groups = {};
+    products.forEach(p => {
+      if (!groups[p.productLine]) groups[p.productLine] = [];
+      groups[p.productLine].push(p.productId);
+    });
+
+    let html = '';
+    Object.entries(groups).forEach(([line, ids]) => {
+      const visible = search ? ids.filter(id => id.toLowerCase().includes(search)) : ids;
+      if (!visible.length) return;
+      const lineKey = line.replace(/\s+/g, '_');
+      html += `<div class="filter-group">
+        <div class="filter-group-header">
+          <span class="filter-group-name">${line}</span>
+          <button class="filter-btn" onclick="selectGroupAll(${JSON.stringify(ids)})">All</button>
+          <button class="filter-btn" onclick="selectGroupNone(${JSON.stringify(ids)})">None</button>
+        </div>
+        <div class="filter-chips">
+          ${visible.map(id => `
+            <label class="filter-chip ${selectedProductIds.has(id) ? 'checked' : ''}" onclick="toggleProduct(event,'${id}')">
+              ${id}
+            </label>`).join('')}
+        </div>
+      </div>`;
+    });
+    document.getElementById('filterGroups').innerHTML = html;
+
+    // Badge
+    const total = products.length;
+    const sel   = selectedProductIds.size;
+    const badge = document.getElementById('filterCountBadge');
+    if (sel < total) {
+      badge.textContent = `${sel} of ${total}`;
+      badge.style.display = 'inline';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  function toggleProduct(e, id) {
+    e.preventDefault();
+    if (selectedProductIds.has(id)) selectedProductIds.delete(id);
+    else selectedProductIds.add(id);
+    onFilterChange();
+  }
+
+  function selectGroupAll(ids) {
+    ids.forEach(id => selectedProductIds.add(id));
+    onFilterChange();
+  }
+
+  function selectGroupNone(ids) {
+    ids.forEach(id => selectedProductIds.delete(id));
+    onFilterChange();
+  }
+
+  function onFilterChange() {
+    renderFilterChips();
+    renderRegistrationCharts(_lastData);
+  }
+
+  function initFilter(data) {
+    if (!data.registrationsByProductId) return;
+    if (!selectedProductIds) {
+      selectedProductIds = new Set(data.registrationsByProductId.map(p => p.productId));
+    }
+    document.getElementById('filterBar').style.display = '';
+    renderFilterChips();
+  }
+
+  // ── Build filtered week data from product-ID records ──
+  function buildWeeksFromProductIds(data) {
+    const products = data.registrationsByProductId || [];
+    const active   = products.filter(p => selectedProductIds.has(p.productId));
+
+    const metaMap = {};
+    (data.registrationsByProductLine || []).forEach(w => {
+      metaMap[w.weekStart] = { isContextWeek: w.isContextWeek, isPartial: w.isPartial };
+    });
+
+    return ALL_WEEKS.map(ws => {
+      const meta = metaMap[ws] || {};
+      const products_ = {};
+      active.forEach(p => {
+        const wk = p.weeks.find(ww => ww.weekStart === ws);
+        if (!products_[p.productLine]) products_[p.productLine] = { units: 0, dollars: 0 };
+        if (wk) {
+          products_[p.productLine].units   += wk.units;
+          products_[p.productLine].dollars += wk.dollars;
+        }
+      });
+      return { weekStart: ws, isContextWeek: !!meta.isContextWeek, isPartial: !!meta.isPartial, products: products_ };
+    });
+  }
+
+  // ── Build filtered product-ID rows for table ──
+  function buildTableRowsFromProductIds(data, q2WeekStarts, tableWeekStarts, curWeekISO) {
+    const products = data.registrationsByProductId || [];
+    const active   = products.filter(p => selectedProductIds.has(p.productId));
+    const fmtK = n => n >= 1000 ? '$' + Math.round(n / 1000) + 'K' : '$' + Math.round(n);
+
+    const rows = [];
+    const totUnits = {}, totDollars = {};
+    tableWeekStarts.forEach(ws => { totUnits[ws] = 0; totDollars[ws] = 0; });
+    let grandQtdU = 0, grandQtdD = 0;
+
+    // Group by product line for visual separation
+    const lineOrder = ['Apollo Desktop', 'Apollo Rackmount'];
+    lineOrder.forEach(line => {
+      const lineProducts = active.filter(p => p.productLine === line);
+      if (!lineProducts.length) return;
+
+      lineProducts.forEach(p => {
+        const qtdU = q2WeekStarts.reduce((s, ws) => {
+          const wk = p.weeks.find(ww => ww.weekStart === ws);
+          return s + (wk ? wk.units : 0);
+        }, 0);
+        const qtdD = q2WeekStarts.reduce((s, ws) => {
+          const wk = p.weeks.find(ww => ww.weekStart === ws);
+          return s + (wk ? wk.dollars : 0);
+        }, 0);
+        if (qtdU === 0 && qtdD === 0) return;
+
+        grandQtdU += qtdU;
+        grandQtdD += qtdD;
+
+        let row = `<tr><td style="font-size:0.68rem">${p.productId}</td>`;
+        tableWeekStarts.forEach(ws => {
+          const wk = p.weeks.find(ww => ww.weekStart === ws);
+          const u = wk ? wk.units : 0;
+          totUnits[ws] += u;
+          row += `<td>${u > 0 ? u.toLocaleString() : '—'}</td>`;
+        });
+        row += `<td class="bold">${qtdU.toLocaleString()}</td>`;
+        tableWeekStarts.forEach(ws => {
+          const wk = p.weeks.find(ww => ww.weekStart === ws);
+          const d_ = wk ? wk.dollars : 0;
+          totDollars[ws] += d_;
+          row += `<td>${d_ > 0 ? fmtK(d_) : '—'}</td>`;
+        });
+        row += `<td class="bold">${qtdD > 0 ? fmtK(qtdD) : '—'}</td></tr>`;
+        rows.push(row);
+      });
+    });
+
+    const totalRow = `<tr class="total-row"><td>TOTAL (${active.length} SKUs)</td>` +
+      tableWeekStarts.map(ws => `<td>${totUnits[ws].toLocaleString()}</td>`).join('') +
+      `<td>${grandQtdU.toLocaleString()}</td>` +
+      tableWeekStarts.map(ws => `<td>${fmtK(totDollars[ws])}</td>`).join('') +
+      `<td>${fmtK(grandQtdD)}</td></tr>`;
+
+    return { rows, totalRow };
+  }
 
   // ── Render registration chart + table ──
   function renderRegistrationCharts(d) {
-    if (!d.registrationsByProductLine) return;
-    const weeks = d.registrationsByProductLine;
+    // Use product-ID data if available, falling back to product-line data
+    const weeks = d.registrationsByProductId
+      ? buildWeeksFromProductIds(d)
+      : (d.registrationsByProductLine || []);
+    if (!weeks.length) return;
 
-    const today        = new Date();
-    const curWeekISO   = toISO(getMondayOfWeek(today));
-    const w1ISO        = toISO(new Date(getMondayOfWeek(today).setDate(getMondayOfWeek(today).getDate() - 7)));
-    const w2ISO        = toISO(new Date(new Date(curWeekISO).setDate(new Date(curWeekISO).getDate() - 14)));
+    const today      = new Date();
+    const curWeekISO = toISO(getMondayOfWeek(today));
+    const w1ISO      = toISO(new Date(getMondayOfWeek(today).setDate(getMondayOfWeek(today).getDate() - 7)));
+    const w2ISO      = toISO(new Date(new Date(curWeekISO).setDate(new Date(curWeekISO).getDate() - 14)));
 
     // ── Stacked bar chart ──
     const chartLabels = weeks.map(w => {
-      const d = new Date(w.weekStart + 'T00:00:00');
-      let label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const dt = new Date(w.weekStart + 'T00:00:00');
+      let label = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       if (w.isContextWeek) label += '†';
       if (w.weekStart === curWeekISO) label += '*';
       return label;
     });
 
-    const datasets = PL_ORDER.map(pl => ({
+    const datasets = Object.keys(PL_COLORS).map(pl => ({
       label: pl,
       data: weeks.map(w => (w.products[pl] || {}).units || 0),
       backgroundColor: PL_COLORS[pl],
@@ -588,14 +866,13 @@
       }
     });
 
-    // footnotes
     const notes = [];
     if (weeks.some(w => w.isContextWeek)) notes.push('† Q1 context week');
     if (weeks.some(w => w.weekStart === curWeekISO)) notes.push('* Partial week (current)');
     document.getElementById('regChartNote').textContent = notes.join('. ') + (notes.length ? '.' : '');
 
     // ── Summary table ──
-    const q2Weeks   = weeks.filter(w => !w.isContextWeek);
+    const q2Weeks    = weeks.filter(w => !w.isContextWeek);
     const tableWeeks = [
       weeks.find(w => w.weekStart === w2ISO),
       weeks.find(w => w.weekStart === w1ISO),
@@ -611,55 +888,66 @@
       return l;
     };
 
-    let thead = '<thead><tr><th>Product Line</th>';
+    const q2WeekStarts    = q2Weeks.map(w => w.weekStart);
+    const tableWeekStarts = tableWeeks.map(w => w.weekStart);
+
+    let thead = '<thead><tr><th>Product</th>';
     tableWeeks.forEach(w => { thead += `<th>${headerDate(w)} Units</th>`; });
     thead += '<th>QTD Units</th>';
     tableWeeks.forEach(w => { thead += `<th>${headerDate(w)} $</th>`; });
     thead += '<th>QTD $</th></tr></thead>';
 
     let tbody = '<tbody>';
-    let totUnits = {}, totDollars = {};
-    tableWeeks.forEach(w => { totUnits[w.weekStart] = 0; totDollars[w.weekStart] = 0; });
-    let grandQtdUnits = 0, grandQtdDollars = 0;
 
-    PL_ORDER.forEach(pl => {
-      const qtdUnits   = q2Weeks.reduce((s, w) => s + ((w.products[pl] || {}).units   || 0), 0);
-      const qtdDollars = q2Weeks.reduce((s, w) => s + ((w.products[pl] || {}).dollars || 0), 0);
-      if (qtdUnits === 0 && qtdDollars === 0) return;
+    if (d.registrationsByProductId && selectedProductIds) {
+      // Product-ID level rows
+      const { rows, totalRow } = buildTableRowsFromProductIds(d, q2WeekStarts, tableWeekStarts, curWeekISO);
+      tbody += rows.join('') + totalRow;
+    } else {
+      // Product-line level rows (fallback)
+      let totUnits = {}, totDollars = {};
+      tableWeeks.forEach(w => { totUnits[w.weekStart] = 0; totDollars[w.weekStart] = 0; });
+      let grandQtdUnits = 0, grandQtdDollars = 0;
 
-      grandQtdUnits   += qtdUnits;
-      grandQtdDollars += qtdDollars;
-
-      tbody += `<tr><td>${pl}</td>`;
-      tableWeeks.forEach(w => {
-        const u = (w.products[pl] || {}).units || 0;
-        totUnits[w.weekStart] += u;
-        tbody += `<td>${u.toLocaleString()}</td>`;
+      Object.keys(PL_COLORS).forEach(pl => {
+        const qtdUnits   = q2Weeks.reduce((s, w) => s + ((w.products[pl] || {}).units   || 0), 0);
+        const qtdDollars = q2Weeks.reduce((s, w) => s + ((w.products[pl] || {}).dollars || 0), 0);
+        if (qtdUnits === 0 && qtdDollars === 0) return;
+        grandQtdUnits += qtdUnits; grandQtdDollars += qtdDollars;
+        tbody += `<tr><td>${pl}</td>`;
+        tableWeeks.forEach(w => {
+          const u = (w.products[pl] || {}).units || 0;
+          totUnits[w.weekStart] += u;
+          tbody += `<td>${u.toLocaleString()}</td>`;
+        });
+        tbody += `<td class="bold">${qtdUnits.toLocaleString()}</td>`;
+        tableWeeks.forEach(w => {
+          const dol = (w.products[pl] || {}).dollars || 0;
+          totDollars[w.weekStart] += dol;
+          tbody += `<td>${fmtK(dol)}</td>`;
+        });
+        tbody += `<td class="bold">${fmtK(qtdDollars)}</td></tr>`;
       });
-      tbody += `<td class="bold">${qtdUnits.toLocaleString()}</td>`;
-      tableWeeks.forEach(w => {
-        const dol = (w.products[pl] || {}).dollars || 0;
-        totDollars[w.weekStart] += dol;
-        tbody += `<td>${fmtK(dol)}</td>`;
-      });
-      tbody += `<td class="bold">${fmtK(qtdDollars)}</td></tr>`;
-    });
 
-    tbody += '<tr class="total-row"><td>TOTAL</td>';
-    tableWeeks.forEach(w => { tbody += `<td>${totUnits[w.weekStart].toLocaleString()}</td>`; });
-    tbody += `<td>${grandQtdUnits.toLocaleString()}</td>`;
-    tableWeeks.forEach(w => { tbody += `<td>${fmtK(totDollars[w.weekStart])}</td>`; });
-    tbody += `<td>${fmtK(grandQtdDollars)}</td></tr></tbody>`;
+      tbody += '<tr class="total-row"><td>TOTAL</td>';
+      tableWeeks.forEach(w => { tbody += `<td>${totUnits[w.weekStart].toLocaleString()}</td>`; });
+      tbody += `<td>${grandQtdUnits.toLocaleString()}</td>`;
+      tableWeeks.forEach(w => { tbody += `<td>${fmtK(totDollars[w.weekStart])}</td>`; });
+      tbody += `<td>${fmtK(grandQtdDollars)}</td></tr>`;
+    }
 
+    tbody += '</tbody>';
     document.getElementById('regTable').innerHTML = thead + tbody;
 
-    // table title date range
     const q2Sorted = [...q2Weeks].sort((a, b) => a.weekStart.localeCompare(b.weekStart));
     if (q2Sorted.length >= 2) {
       const first = new Date(q2Sorted[0].weekStart + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
       const last  = new Date(q2Sorted[q2Sorted.length - 1].weekStart + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+      const suffix = (d.registrationsByProductId && selectedProductIds && selectedProductIds.size < d.registrationsByProductId.length)
+        ? ` — ${selectedProductIds.size} SKU${selectedProductIds.size !== 1 ? 's' : ''} selected`
+        : ' by Product Line';
       document.getElementById('regTableTitle').textContent =
-        `QTD Registration Summary by Product Line — ${first} through ${last}`;
+        `QTD Registration Summary${suffix} — ${first} through ${last}`;
     }
   }
 
@@ -670,8 +958,10 @@
     btn.disabled = true;
     try {
       const data = await fetchFromOmni();
+      _lastData = data;
       renderMetrics(data);
       renderRegistrations(data);
+      initFilter(data);
       renderRegistrationCharts(data);
       document.getElementById('lastUpdated').textContent =
         'Data as of ' + (data.lastFetched || '—');
