@@ -20,6 +20,11 @@
     "apolloOplanQ2": 11397544.83,
     "apolloRebateTargetQ2": 11309694.10
   },
+  "apolloMonthlyOplan": {
+    "2026-04": 3294603.70,
+    "2026-05": 3786328.75,
+    "2026-06": 4316612.38
+  },
   "registrationsByProductLine": [
     {
       "weekStart": "2026-03-30", "isContextWeek": true, "isPartial": false,
