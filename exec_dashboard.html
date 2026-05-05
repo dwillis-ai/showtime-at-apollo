@@ -347,16 +347,14 @@
     // 2 — Pacing (Rebate Target primary, OPlan secondary)
     const rebatePct = d.qtdBookings && d.q2RebateTarget ? d.qtdBookings / d.q2RebateTarget : null;
     const oplanPct  = d.qtdBookings && d.q2OplanTarget  ? d.qtdBookings / d.q2OplanTarget  : null;
-    const paceRatio = rebatePct != null ? rebatePct / expectedPct : null;
-
     set('pacingRebate', pct(rebatePct));
     set('pacingOplan', pct(oplanPct));
 
     const badge = document.getElementById('pacingBadge');
-    if (paceRatio != null) {
-      const label = paceRatio >= 0.90 ? 'On Track' : paceRatio >= 0.75 ? 'At Risk' : 'Behind';
-      const cls   = paceRatio >= 0.90 ? 'badge-green' : paceRatio >= 0.75 ? 'badge-yellow' : 'badge-red';
-      badge.textContent = label + ' · ' + pct(paceRatio) + ' of expected pace';
+    if (rebatePct != null) {
+      const label = rebatePct >= 0.667 ? 'On Track' : rebatePct >= 0.333 ? 'At Risk' : 'Behind';
+      const cls   = rebatePct >= 0.667 ? 'badge-green' : rebatePct >= 0.333 ? 'badge-yellow' : 'badge-red';
+      badge.textContent = label;
       badge.className = 'metric-badge ' + cls;
     }
 
