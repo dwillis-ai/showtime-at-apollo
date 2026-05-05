@@ -401,7 +401,7 @@
         </div>
         <canvas id="comboChart" style="max-height:360px"></canvas>
         <div style="font-size:0.74rem;color:#94a3b8;margin-top:10px;">
-          Bars = QTD Reg Dollars (Static ASP) · Line = 2026 OPlan Sell-In (Omni: Adaptive Operating Plan History, evenly paced within each fiscal month) · Weeks after Apr 20 are forward-looking
+          Bars = QTD Reg Dollars (Static ASP) · Yellow line = 2026 OPlan Sell-In (weekly pace) · Blue/yellow dashed lines = Cumulative Reg vs Cumulative OPlan (right axis) · Red dashed = Cumulative Gap · Weeks after Apr 20 are forward-looking
         </div>
       </div>
 
@@ -1038,6 +1038,18 @@ const comboChart = new Chart(document.getElementById('comboChart'), {
         borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)',
         borderWidth: 2, borderDash: [5, 4], pointRadius: 4, pointBackgroundColor: '#ef4444',
         tension: 0.1, order: 0, fill: false, yAxisID: 'yGap'
+      },
+      {
+        type: 'line', label: 'Cumulative Reg Dollars', data: [],
+        borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)',
+        borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#3b82f6',
+        tension: 0.25, order: 0, fill: false, yAxisID: 'yCum'
+      },
+      {
+        type: 'line', label: 'Cumulative OPlan Target', data: [],
+        borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)',
+        borderWidth: 2, borderDash: [4, 3], pointRadius: 3, pointBackgroundColor: '#f59e0b',
+        tension: 0.25, order: 0, fill: false, yAxisID: 'yCum'
       }
     ]
   },
@@ -1061,6 +1073,12 @@ const comboChart = new Chart(document.getElementById('comboChart'), {
         title: { display: true, text: 'Cumulative Gap', font: { size: 11 }, color: '#ef4444' },
         ticks: { callback: v => fmtDollars(v), color: '#ef4444', font: { size: 10 } },
         grid: { display: false }
+      },
+      yCum: {
+        type: 'linear', position: 'right',
+        title: { display: true, text: 'Cumulative Dollars', font: { size: 11 }, color: '#64748b' },
+        ticks: { callback: v => fmtDollars(v), font: { size: 10 } },
+        grid: { display: false }
       }
     }
   }
@@ -1079,6 +1097,20 @@ function updateComboChart() {
     if (!rd) return null;
     cumGap += (rd - (oplanMap[w] || 0));
     return cumGap;
+  });
+
+  let cumReg = 0;
+  comboChart.data.datasets[3].data = COMBO_WEEKS.map(w => {
+    const rd = rdMap[w];
+    if (!rd) return null;
+    cumReg += rd;
+    return cumReg;
+  });
+
+  let cumOplan = 0;
+  comboChart.data.datasets[4].data = COMBO_WEEKS.map(w => {
+    cumOplan += (oplanMap[w] || 0);
+    return cumOplan;
   });
 
   const pls = effectivePLsForWeekly();
