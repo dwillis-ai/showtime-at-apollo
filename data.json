@@ -9071,40 +9071,2263 @@
   "openBacklog": 2064896.83,
   "apolloQtdBookings": 3281892.56,
   "apolloRebateTargetQ2": 11309694.1,
+  "apolloMonthlyOplan": {
+    "2026-04": 3294603.7,
+    "2026-05": 3786328.75,
+    "2026-06": 4316612.38
+  },
   "registrations": {
     "weeks": [
       {
         "weekStart": "2026-03-30",
-        "units": 789,
-        "dollars": 350175.8
+        "units": 583,
+        "dollars": 384563.53
       },
       {
         "weekStart": "2026-04-06",
         "units": 751,
-        "dollars": 334334.12
+        "dollars": 474923.91
       },
       {
         "weekStart": "2026-04-13",
         "units": 768,
-        "dollars": 345367.99
+        "dollars": 465876.48
       },
       {
         "weekStart": "2026-04-20",
         "units": 691,
-        "dollars": 313918.51
+        "dollars": 438595.85
       },
       {
         "weekStart": "2026-04-27",
         "units": 676,
-        "dollars": 294360.89
+        "dollars": 389906.44
       },
       {
         "weekStart": "2026-05-04",
         "units": 231,
-        "dollars": 99726.29
+        "dollars": 81162.52
       }
     ],
     "apolloOplanQ2": 11397544.83,
     "apolloRebateTargetQ2": 11309694.1
-  }
+  },
+  "registrationsByProductLine": [
+    {
+      "weekStart": "2026-03-30",
+      "isContextWeek": true,
+      "isPartial": false,
+      "products": {
+        "Apollo Desktop": {
+          "units": 463,
+          "dollars": 200320.33
+        },
+        "Apollo Rackmount": {
+          "units": 120,
+          "dollars": 184243.2
+        }
+      }
+    },
+    {
+      "weekStart": "2026-04-06",
+      "isContextWeek": false,
+      "isPartial": false,
+      "products": {
+        "Apollo Desktop": {
+          "units": 616,
+          "dollars": 267650.31
+        },
+        "Apollo Rackmount": {
+          "units": 135,
+          "dollars": 207273.6
+        }
+      }
+    },
+    {
+      "weekStart": "2026-04-13",
+      "isContextWeek": false,
+      "isPartial": false,
+      "products": {
+        "Apollo Desktop": {
+          "units": 645,
+          "dollars": 277027.2
+        },
+        "Apollo Rackmount": {
+          "units": 123,
+          "dollars": 188849.28
+        }
+      }
+    },
+    {
+      "weekStart": "2026-04-20",
+      "isContextWeek": false,
+      "isPartial": false,
+      "products": {
+        "Apollo Desktop": {
+          "units": 570,
+          "dollars": 252817.29
+        },
+        "Apollo Rackmount": {
+          "units": 121,
+          "dollars": 185778.56
+        }
+      }
+    },
+    {
+      "weekStart": "2026-04-27",
+      "isContextWeek": false,
+      "isPartial": false,
+      "products": {
+        "Apollo Desktop": {
+          "units": 586,
+          "dollars": 251724.04
+        },
+        "Apollo Rackmount": {
+          "units": 90,
+          "dollars": 138182.4
+        }
+      }
+    },
+    {
+      "weekStart": "2026-05-04",
+      "isContextWeek": false,
+      "isPartial": true,
+      "products": {
+        "Apollo Desktop": {
+          "units": 188,
+          "dollars": 81162.52
+        },
+        "Apollo Rackmount": {
+          "units": 43,
+          "dollars": 0.0
+        }
+      }
+    }
+  ],
+  "registrationsByProductId": [
+    {
+      "productId": "APE1X",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 5,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 17,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 4,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 4,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APE2M",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 11,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 7,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 6,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 3,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 4,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLQF",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLS",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 38,
+          "dollars": 12135.68
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 52,
+          "dollars": 16606.72
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 44,
+          "dollars": 14051.84
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 46,
+          "dollars": 14690.56
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 41,
+          "dollars": 13093.76
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 14,
+          "dollars": 4471.04
+        }
+      ]
+    },
+    {
+      "productId": "APLS-HE",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 34,
+          "dollars": 10858.24
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 34,
+          "dollars": 10858.24
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 55,
+          "dollars": 17564.8
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 44,
+          "dollars": 14051.84
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 44,
+          "dollars": 14051.84
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 8,
+          "dollars": 2554.88
+        }
+      ]
+    },
+    {
+      "productId": "APLSU",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLSU-HE",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 21,
+          "dollars": 6706.56
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 41,
+          "dollars": 13093.76
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 37,
+          "dollars": 11816.32
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 27,
+          "dollars": 8622.72
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 32,
+          "dollars": 10219.52
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 5,
+          "dollars": 1596.8
+        }
+      ]
+    },
+    {
+      "productId": "APLSU-REFURB",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 3,
+          "dollars": 958.08
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 4,
+          "dollars": 1277.44
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 5,
+          "dollars": 1596.8
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 1,
+          "dollars": 319.36
+        }
+      ]
+    },
+    {
+      "productId": "APLTWD",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLTWDII",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 3,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 5,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLTWDII-HE",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 5,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 5,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 3,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 2,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLTWDII-HE-REFURB",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLTWDU-HE",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 3,
+          "dollars": 1726.08
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 8,
+          "dollars": 4602.88
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 13,
+          "dollars": 7479.68
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 7,
+          "dollars": 4027.52
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 3,
+          "dollars": 1726.08
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 1,
+          "dollars": 575.36
+        }
+      ]
+    },
+    {
+      "productId": "APLTWDU-REFURB",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 3,
+          "dollars": 1726.08
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 1,
+          "dollars": 575.36
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 1,
+          "dollars": 575.36
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 575.36
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLTWQII",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 1,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLTWS",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLTWSII",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 1,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLTWXD",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 1,
+          "dollars": 575.36
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 4,
+          "dollars": 2301.44
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 3,
+          "dollars": 1726.08
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLTWXD-HE",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 10,
+          "dollars": 5753.6
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 7,
+          "dollars": 4027.52
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 10,
+          "dollars": 5753.6
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 10,
+          "dollars": 5753.6
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 3,
+          "dollars": 1726.08
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 5,
+          "dollars": 2876.8
+        }
+      ]
+    },
+    {
+      "productId": "APLTWXD-REFURB",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLTWXDU-HE",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 42,
+          "dollars": 26853.12
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 59,
+          "dollars": 37722.24
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 55,
+          "dollars": 35164.8
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 63,
+          "dollars": 40279.68
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 59,
+          "dollars": 37722.24
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 11,
+          "dollars": 7032.96
+        }
+      ]
+    },
+    {
+      "productId": "APLTWXDU-HE-REFURB",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLTWXQ",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 4,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 1,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLTWXQ-HE",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 3,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 3,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 4,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 1,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APLTWXQ-HE-REFURB",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APTXDG2-ESS",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 147,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 214,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 234,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 195,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 218,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 60,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APTXDG2-ESS-REFURB",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APTXDG2-STU",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 32,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 40,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 39,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 26,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 47,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 16,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APTXQG2-ESS",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 31,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 55,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 41,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 40,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 47,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 16,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APTXQG2-STU",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 22,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 20,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 14,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 19,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 18,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 11,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX4",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 1,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX4-HE",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 4,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 7,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 6,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 1,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX4-REFURB",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX4G2-ESS",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 45,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 48,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 41,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 46,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 38,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 18,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX4G2-STU",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 6,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 12,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 13,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 10,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 9,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 5,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "ARROW",
+      "productLine": "Apollo Desktop",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 3,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 1,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APL16",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APL8Q",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX16",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX16-HE",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX16-REFURB",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX16DG2-ESS",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 7,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 10,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 8,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 11,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 4,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX16DG2-ULT",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 1,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX16G2-ESS",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 8,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 17,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 9,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 7,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 11,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 6,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX16G2-ULT",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX6",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX6-HE",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX6G2-ESS",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 21,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 19,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 17,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 23,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 15,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 12,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX6G2-STU",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 6,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 6,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 4,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 4,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 1,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX8",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 2,
+          "dollars": 3070.72
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 2,
+          "dollars": 3070.72
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 4,
+          "dollars": 6141.44
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 2,
+          "dollars": 3070.72
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 1535.36
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX8-HE",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 4,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX8-REFURB",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX8G2-ESS",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 22,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 29,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 28,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 14,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 21,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 7,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX8G2-STU",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 13,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 8,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 4,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 12,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 5,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX8G2-STU-REFURB",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX8P",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 0,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 2,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX8P-HE",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 5,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 3,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 3,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 1,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 0,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX8PG2-ESS",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 24,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 29,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 28,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 25,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 25,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 6,
+          "dollars": 0.0
+        }
+      ]
+    },
+    {
+      "productId": "APX8PG2-STU",
+      "productLine": "Apollo Rackmount",
+      "weeks": [
+        {
+          "weekStart": "2026-03-30",
+          "units": 4,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-06",
+          "units": 3,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-13",
+          "units": 8,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-20",
+          "units": 10,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-04-27",
+          "units": 6,
+          "dollars": 0.0
+        },
+        {
+          "weekStart": "2026-05-04",
+          "units": 1,
+          "dollars": 0.0
+        }
+      ]
+    }
+  ]
 }
