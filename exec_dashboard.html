@@ -31,7 +31,6 @@
   .topbar-left { display: flex; align-items: center; gap: 14px; }
   .topbar h1 { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
   .topbar-meta { font-size: 0.75rem; color: #64748b; }
-
   .topbar-right { display: flex; align-items: center; gap: 12px; }
   .last-updated { font-size: 0.72rem; color: #64748b; }
   .last-updated span { color: #94a3b8; }
@@ -83,7 +82,6 @@
     transition: background 0.15s, border-color 0.15s;
   }
   .metric-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.14); }
-
   .metric-label {
     font-size: 0.65rem;
     font-weight: 700;
@@ -106,7 +104,6 @@
     margin-top: 2px;
   }
   .metric-sub strong { color: #cbd5e1; }
-
   .metric-badge {
     display: inline-flex;
     align-items: center;
@@ -134,7 +131,6 @@
     border-bottom: 1px solid #2d3a56;
   }
   .tab-bar::-webkit-scrollbar { display: none; }
-
   .tab {
     display: flex;
     align-items: center;
@@ -157,6 +153,204 @@
     background: rgba(59,130,246,0.1);
   }
 
+  /* ── App body (filter panel + content) ── */
+  .app-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .panels-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Filter panel ── */
+  .fp {
+    width: 252px;
+    background: #0d1422;
+    border-right: 1px solid #2d3a56;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow: hidden;
+    transition: width 0.22s cubic-bezier(0.4,0,0.2,1);
+  }
+  .fp.fp-collapsed { width: 38px; }
+
+  .fp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 12px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+  }
+  .fp-collapsed .fp-header {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 12px 6px 12px;
+  }
+  .fp-title {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: #64748b;
+    white-space: nowrap;
+  }
+  .fp-collapsed .fp-title {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+  .fp-toggle-btn {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #64748b;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    line-height: 1;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    font-family: inherit;
+    flex-shrink: 0;
+  }
+  .fp-toggle-btn:hover { color: #94a3b8; border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.04); }
+
+  .fp-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.08) transparent;
+  }
+  .fp-body::-webkit-scrollbar { width: 4px; }
+  .fp-body::-webkit-scrollbar-track { background: transparent; }
+  .fp-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+  .fp-collapsed .fp-body { display: none; }
+
+  .fp-section {
+    padding: 12px 12px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .fp-section-hd {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .fp-section-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    flex: 1;
+  }
+  .fp-act-btn {
+    font-size: 0.57rem;
+    font-weight: 600;
+    color: #475569;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 3px;
+    padding: 1px 5px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.12s, border-color 0.12s;
+    white-space: nowrap;
+  }
+  .fp-act-btn:hover { color: #94a3b8; border-color: rgba(255,255,255,0.18); }
+
+  .fp-period-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+  .fp-pill {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #64748b;
+    background: rgba(255,255,255,0.03);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .fp-pill.active {
+    background: rgba(59,130,246,0.16);
+    border-color: rgba(59,130,246,0.4);
+    color: #93c5fd;
+  }
+
+  .fp-search {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 5px;
+    padding: 5px 9px;
+    color: #e2e8f0;
+    font-size: 0.7rem;
+    font-family: inherit;
+    outline: none;
+    margin-bottom: 6px;
+  }
+  .fp-search::placeholder { color: #334155; }
+  .fp-search:focus { border-color: rgba(59,130,246,0.35); }
+
+  .fp-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    max-height: 180px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.06) transparent;
+  }
+  .fp-list::-webkit-scrollbar { width: 3px; }
+  .fp-list::-webkit-scrollbar-track { background: transparent; }
+  .fp-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+  .fp-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 3px;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s;
+  }
+  .fp-item:hover { background: rgba(255,255,255,0.04); }
+  .fp-item input[type="checkbox"] {
+    accent-color: #3b82f6;
+    width: 13px;
+    height: 13px;
+    cursor: pointer;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+  .fp-item-lbl {
+    font-size: 0.69rem;
+    color: #64748b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+  }
+  .fp-item.fp-checked .fp-item-lbl { color: #cbd5e1; }
+  .fp-empty {
+    font-size: 0.67rem;
+    color: #334155;
+    font-style: italic;
+    padding: 4px 3px;
+  }
+
   /* ── Tab panels ── */
   .panels {
     flex: 1;
@@ -173,7 +367,7 @@
   .panel.active { display: block; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* ── Placeholder content ── */
+  /* ── Placeholder ── */
   .placeholder {
     background: white;
     border-radius: 12px;
@@ -205,7 +399,7 @@
   .val-red    { color: #f87171; }
   .val-white  { color: #f1f5f9; }
 
-  /* ── Registration charts ── */
+  /* ── Charts ── */
   .chart-section {
     background: #1e2a40;
     border-radius: 10px;
@@ -262,175 +456,133 @@
     border-bottom: none;
   }
 
-  /* ── Product filter panel ── */
-  .filter-bar {
+  /* ── Revenue vs Plan tab ── */
+  .rv-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
     background: #1e2a40;
     border-radius: 10px;
-    margin-bottom: 16px;
-    overflow: hidden;
+    padding: 10px 16px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
   }
-  .filter-bar-top {
+  .rv-segment {
+    display: flex;
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .rv-seg-btn {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 5px 16px;
+    border-radius: 6px;
+    border: none;
+    color: #64748b;
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .rv-seg-btn.active { background: rgba(59,130,246,0.2); color: #93c5fd; }
+  .rv-table-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
-    cursor: pointer;
-    user-select: none;
+    margin-bottom: 12px;
   }
-  .filter-bar-top:hover { background: rgba(255,255,255,0.04); }
-  .filter-bar-label {
-    font-size: 0.68rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #64748b;
-  }
-  .filter-count-badge {
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 20px;
-    background: rgba(59,130,246,0.2);
-    color: #60a5fa;
-    margin-left: 8px;
-  }
-  .filter-toggle-icon { color: #64748b; transition: transform 0.2s; }
-  .filter-toggle-icon.open { transform: rotate(180deg); }
-  .filter-panel-body {
-    border-top: 1px solid rgba(255,255,255,0.06);
-    padding: 14px 16px;
-  }
-  .filter-search {
-    width: 100%;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 6px;
-    padding: 7px 11px;
-    color: #f1f5f9;
-    font-size: 0.75rem;
-    font-family: inherit;
-    margin-bottom: 14px;
-    outline: none;
-  }
-  .filter-search::placeholder { color: #475569; }
-  .filter-search:focus { border-color: rgba(59,130,246,0.5); }
-  .filter-groups { display: flex; gap: 20px; flex-wrap: wrap; }
-  .filter-group { flex: 1; min-width: 240px; }
-  .filter-group-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .filter-group-name {
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #64748b;
-    flex: 1;
-  }
-  .filter-btn {
-    font-size: 0.62rem;
-    font-weight: 600;
-    color: #64748b;
-    background: none;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 4px;
-    padding: 2px 8px;
-    cursor: pointer;
-    font-family: inherit;
-    transition: color 0.15s, border-color 0.15s;
-  }
-  .filter-btn:hover { color: #94a3b8; border-color: rgba(255,255,255,0.2); }
-  .filter-chips { display: flex; flex-wrap: wrap; gap: 5px; }
-  .filter-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.65rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: 1px solid rgba(255,255,255,0.08);
-    color: #475569;
-    background: rgba(255,255,255,0.03);
-    transition: all 0.1s;
-    user-select: none;
-  }
-  .filter-chip input { display: none; }
-  .filter-chip.checked {
-    color: #93c5fd;
-    background: rgba(59,130,246,0.12);
-    border-color: rgba(59,130,246,0.3);
-  }
+  .rv-table-header .chart-title { margin-bottom: 0; }
 
-  /* ── Bookings tab filters ── */
-  .bk-top-filters {
+  /* ── Misc ── */
+  .var-pos { color: #4ade80; }
+  .var-neg { color: #f87171; }
+
+  /* ── Channel Inventory tab ── */
+  .inv-toolbar {
     display: flex;
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
     background: #1e2a40;
     border-radius: 10px;
-    padding: 12px 16px;
+    padding: 10px 16px;
     margin-bottom: 14px;
   }
-  .bk-apollo-btn {
+  .inv-window-seg {
+    display: flex;
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .inv-window-btn {
     font-size: 0.72rem;
-    font-weight: 700;
-    padding: 5px 14px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.1);
+    font-weight: 600;
+    padding: 5px 16px;
+    border-radius: 6px;
+    border: none;
     color: #64748b;
-    background: rgba(255,255,255,0.04);
+    background: transparent;
     cursor: pointer;
     font-family: inherit;
     transition: all 0.15s;
     white-space: nowrap;
   }
-  .bk-apollo-btn.active {
-    background: rgba(59,130,246,0.15);
-    border-color: rgba(59,130,246,0.4);
-    color: #93c5fd;
-  }
-  .bk-month-pills { display: flex; gap: 4px; }
-  .bk-month-pill {
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 5px 13px;
+  .inv-window-btn.active { background: rgba(59,130,246,0.2); color: #93c5fd; }
+  .inv-wos-pills { display: flex; gap: 4px; margin-left: auto; }
+  .inv-wos-pill {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 4px 12px;
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.1);
     color: #64748b;
-    background: rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.03);
     cursor: pointer;
     font-family: inherit;
     transition: all 0.15s;
   }
-  .bk-month-pill.active {
-    background: rgba(59,130,246,0.15);
+  .inv-wos-pill.active {
+    background: rgba(59,130,246,0.16);
     border-color: rgba(59,130,246,0.4);
     color: #93c5fd;
   }
-  .bk-dealer-select {
+  .inv-flag-banner {
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
     font-size: 0.72rem;
-    font-weight: 600;
-    padding: 5px 10px;
-    border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.12);
-    color: #94a3b8;
-    background: rgba(255,255,255,0.06);
-    cursor: pointer;
-    font-family: inherit;
-    outline: none;
-    margin-left: auto;
+    color: #fca5a5;
+    line-height: 1.5;
   }
-  .bk-dealer-select option { background: #1a1a2e; color: #94a3b8; }
-  .bk-empty {
+  .inv-flag-banner strong { color: #f87171; }
+  .inv-flag-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #f87171;
+    margin-bottom: 4px;
+  }
+  .wos-badge {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    min-width: 52px;
     text-align: center;
-    padding: 40px 20px;
-    color: #475569;
-    font-size: 0.78rem;
-    font-style: italic;
   }
-  .var-pos { color: #4ade80; }
-  .var-neg { color: #f87171; }
+  .wos-critical { background: rgba(239,68,68,0.2);  color: #f87171; }
+  .wos-high     { background: rgba(234,179,8,0.18); color: #facc15; }
+  .wos-normal   { background: rgba(148,163,184,0.12); color: #94a3b8; }
+  .wos-low      { background: rgba(34,197,94,0.15); color: #4ade80; }
 
   /* ── Skeleton loader ── */
   .skeleton {
@@ -470,148 +622,207 @@
 
 <!-- ── Metric card header strip ── -->
 <div class="metric-strip">
-
   <div class="metric-card">
     <div class="metric-label">QTD Bookings</div>
     <div class="metric-value" id="qtdBookings"><div class="skeleton"></div></div>
     <div class="metric-sub" id="qtdBookingsSub">—</div>
   </div>
-
   <div class="metric-card">
     <div class="metric-label">Pacing — Rebate Target</div>
     <div class="metric-value" id="pacingRebate"><div class="skeleton"></div></div>
     <div class="metric-sub">OPlan: <strong id="pacingOplan">—</strong></div>
     <div class="metric-badge badge-yellow" id="pacingBadge">—</div>
   </div>
-
   <div class="metric-card">
     <div class="metric-label">Apollo Pacing</div>
     <div class="metric-value" id="apolloPacing"><div class="skeleton"></div></div>
     <div class="metric-sub">QTD: <strong id="apolloQtd">—</strong> vs <strong id="apolloTarget">—</strong></div>
   </div>
-
   <div class="metric-card">
     <div class="metric-label">Monthly Rebate Target</div>
     <div class="metric-value" id="monthlyAOP"><div class="skeleton"></div></div>
     <div class="metric-sub" id="monthlyAOPSub">—</div>
   </div>
-
   <div class="metric-card">
     <div class="metric-label">Q2 Sales Target</div>
     <div class="metric-value" id="q2Target"><div class="skeleton"></div></div>
     <div class="metric-sub">OPlan: <strong id="q2OplanTarget">—</strong></div>
   </div>
-
   <div class="metric-card">
     <div class="metric-label">Open Order Backlog</div>
     <div class="metric-value" id="openBacklog"><div class="skeleton"></div></div>
     <div class="metric-sub" id="openBacklogSub">—</div>
   </div>
-
 </div>
 
 <!-- ── Tab bar ── -->
 <div class="tab-bar">
   <div class="tab active" onclick="switchTab('registrations', this)">Registrations</div>
-  <div class="tab" onclick="switchTab('bookings', this)">Bookings vs Plan</div>
+  <div class="tab" onclick="switchTab('revenue', this)">Bookings vs Plan</div>
   <div class="tab" onclick="switchTab('inventory', this)">Channel Inventory</div>
 </div>
 
-<!-- ── Tab panels ── -->
-<div class="panels">
-  <div class="panel active" id="panel-registrations">
-    <div class="reg-strip" id="reg-cards"></div>
+<!-- ── App body: filter panel + tab panels ── -->
+<div class="app-body">
 
-    <div class="filter-bar" id="filterBar" style="display:none">
-      <div class="filter-bar-top" onclick="toggleFilterPanel()">
-        <span class="filter-bar-label">Filter by Product ID
-          <span id="filterCountBadge" class="filter-count-badge" style="display:none"></span>
-        </span>
-        <svg class="filter-toggle-icon" id="filterToggleIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+  <!-- ── Left filter panel ── -->
+  <aside class="fp" id="fp">
+    <div class="fp-header">
+      <span class="fp-title">Filters</span>
+      <button class="fp-toggle-btn" id="fpToggleBtn" onclick="fpToggle()" title="Collapse">‹</button>
+    </div>
+    <div class="fp-body">
+
+      <!-- Period -->
+      <div class="fp-section">
+        <div class="fp-section-hd">
+          <span class="fp-section-label">Period</span>
+        </div>
+        <div class="fp-period-pills" id="fpPeriodPills"></div>
       </div>
-      <div class="filter-panel-body" id="filterPanelBody" style="display:none">
-        <input type="text" class="filter-search" id="filterSearch" placeholder="Search product IDs…" oninput="renderFilterChips()">
-        <div class="filter-groups" id="filterGroups"></div>
+
+      <!-- Dealer -->
+      <div class="fp-section">
+        <div class="fp-section-hd">
+          <span class="fp-section-label">Dealer</span>
+          <button class="fp-act-btn" onclick="fpDealerAll()">Select All</button>
+          <button class="fp-act-btn" onclick="fpDealerClear()">Clear</button>
+        </div>
+        <input type="text" class="fp-search" id="fpDealerSearch" placeholder="Search dealers…" oninput="fpRenderDealers()">
+        <div class="fp-list" id="fpDealerList"><div class="fp-empty">Loading…</div></div>
+      </div>
+
+      <!-- Product Line -->
+      <div class="fp-section">
+        <div class="fp-section-hd">
+          <span class="fp-section-label">Product Line</span>
+          <button class="fp-act-btn" onclick="fpPLAll()">Select All</button>
+          <button class="fp-act-btn" onclick="fpPLClear()">Clear</button>
+        </div>
+        <div class="fp-list" id="fpPLList"><div class="fp-empty">Loading…</div></div>
+      </div>
+
+      <!-- Product ID -->
+      <div class="fp-section">
+        <div class="fp-section-hd">
+          <span class="fp-section-label">Product ID</span>
+          <button class="fp-act-btn" onclick="fpPIDAll()">Select All</button>
+          <button class="fp-act-btn" onclick="fpPIDClear()">Clear</button>
+        </div>
+        <input type="text" class="fp-search" id="fpPIDSearch" placeholder="Search products…" oninput="fpRenderPIDs()">
+        <div class="fp-list" id="fpPIDList"><div class="fp-empty">Loading…</div></div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ── Tab panels ── -->
+  <div class="panels-wrap">
+  <div class="panels">
+
+    <!-- Registrations -->
+    <div class="panel active" id="panel-registrations">
+      <div class="reg-strip" id="reg-cards"></div>
+
+      <div class="chart-section">
+        <div class="chart-title">Weekly Registrations — Units by Product Line</div>
+        <canvas id="regChart" height="90"></canvas>
+        <div class="chart-note" id="regChartNote"></div>
+      </div>
+
+      <div class="chart-section">
+        <div class="chart-title">Weekly Reg Dollars vs OPlan Sell-In Pace</div>
+        <canvas id="regPaceChart" height="90"></canvas>
+        <div class="chart-note">OPlan pace = monthly sell-in plan ÷ weeks in month. Registrations measure end-user activations, which can exceed sell-in pace when channel inventory depletes.</div>
+      </div>
+
+      <div class="chart-section">
+        <div class="chart-title" id="regTableTitle">QTD Registration Summary by Product Line</div>
+        <div class="reg-table-wrap">
+          <table class="reg-table" id="regTable"></table>
+        </div>
       </div>
     </div>
 
-    <div class="chart-section">
-      <div class="chart-title">Weekly Registrations — Units by Product Line</div>
-      <canvas id="regChart" height="90"></canvas>
-      <div class="chart-note" id="regChartNote"></div>
-    </div>
+    <!-- Bookings vs Plan -->
+    <div class="panel" id="panel-revenue">
+      <div class="rv-controls">
+        <div id="rvGranularity" class="rv-segment">
+          <button class="rv-seg-btn active" data-gran="productLine" onclick="rvSetGran('productLine')">Product Line</button>
+          <button class="rv-seg-btn" data-gran="product" onclick="rvSetGran('product')">Product</button>
+          <button class="rv-seg-btn" data-gran="dealer" onclick="rvSetGran('dealer')">Dealer</button>
+        </div>
+      </div>
 
-    <div class="chart-section">
-      <div class="chart-title">Weekly Reg Dollars vs OPlan Sell-In Pace</div>
-      <canvas id="regPaceChart" height="90"></canvas>
-      <div class="chart-note">OPlan pace = monthly sell-in plan ÷ weeks in month. Registrations measure end-user activations, which can exceed sell-in pace when channel inventory depletes.</div>
-    </div>
+      <div class="chart-section">
+        <div class="chart-title">Q2 2026 Total Bookings — Actual vs AOP vs Sales Target (by Month)</div>
+        <canvas id="rvChartQ2" height="80"></canvas>
+        <div class="chart-note">Future month actuals = $0. AOP and Sales Target shown for full quarter planning context.</div>
+      </div>
 
-    <div class="chart-section">
-      <div class="chart-title" id="regTableTitle">QTD Registration Summary by Product Line</div>
-      <div class="reg-table-wrap">
-        <table class="reg-table" id="regTable"></table>
+      <div class="chart-section">
+        <div class="chart-title" id="rvChartPLTitle">Apr 2026 — Actual vs AOP by Product Line</div>
+        <canvas id="rvChartPL" height="100"></canvas>
+      </div>
+
+      <div class="chart-section">
+        <div class="chart-title" id="rvTableTitle">Apr 2026 — Product Line Variance Detail</div>
+        <div class="reg-table-wrap">
+          <table class="reg-table" id="rvTable"></table>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <div class="chart-title">Q2 2026 Full-Quarter Plan Summary</div>
+        <div class="reg-table-wrap">
+          <table class="reg-table" id="rvQ2Table"></table>
+        </div>
       </div>
     </div>
+
+    <!-- Channel Inventory -->
+    <div class="panel" id="panel-inventory">
+
+      <!-- Flag banner -->
+      <div id="invFlagBanner" style="display:none" class="inv-flag-banner">
+        <div class="inv-flag-label">⚠ Inventory Flags — WOS &gt; 26 weeks</div>
+        <div id="invFlagText"></div>
+      </div>
+
+      <!-- Toolbar: window toggle + WOS range pills -->
+      <div class="inv-toolbar">
+        <div class="inv-wos-pills">
+          <button class="inv-wos-pill active" data-range="all" onclick="invSetRange('all')">All</button>
+          <button class="inv-wos-pill" data-range="0-10" onclick="invSetRange('0-10')">0–10 wks</button>
+          <button class="inv-wos-pill" data-range="11-20" onclick="invSetRange('11-20')">11–20 wks</button>
+          <button class="inv-wos-pill" data-range="20+" onclick="invSetRange('20+')">20+ wks</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="chart-section">
+        <div class="chart-title" id="invTableTitle">Weeks of Supply by Dealer × Product Line</div>
+        <div class="reg-table-wrap">
+          <table class="reg-table" id="invTable"></table>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
   </div>
 
-  <div class="panel" id="panel-bookings">
-
-    <!-- Top filter row -->
-    <div class="bk-top-filters">
-      <button id="bkApolloBtn" class="bk-apollo-btn active" onclick="bkToggleApollo()">Apollo Only</button>
-      <div id="bkMonthPills" class="bk-month-pills"></div>
-      <select id="bkDealerSelect" class="bk-dealer-select" onchange="bkOnDealerChange()">
-        <option value="">All Dealers</option>
-      </select>
-    </div>
-
-    <!-- Product line / product ID filter (collapsible) -->
-    <div class="filter-bar" id="bkProductFilterBar">
-      <div class="filter-bar-top" onclick="bkToggleProductFilter()">
-        <span class="filter-bar-label">Filter by Product Line / Product ID
-          <span id="bkProductBadge" class="filter-count-badge" style="display:none"></span>
-        </span>
-        <svg class="filter-toggle-icon" id="bkFilterIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-      </div>
-      <div class="filter-panel-body" id="bkProductFilterBody" style="display:none">
-        <input type="text" class="filter-search" id="bkProductSearch" placeholder="Search product lines or IDs…" oninput="bkRenderProductChips()">
-        <div class="filter-groups" id="bkProductChips"></div>
-      </div>
-    </div>
-
-    <!-- Q2 monthly overview -->
-    <div class="chart-section">
-      <div class="chart-title">Q2 2026 Total Revenue — Actual vs OPlan vs Sales Target (by Month)</div>
-      <canvas id="bkChartQ2" height="80"></canvas>
-      <div class="chart-note">Future month actuals = $0. OPlan and Sales Target shown for full quarter context.</div>
-    </div>
-
-    <!-- Product line detail for selected month -->
-    <div class="chart-section">
-      <div class="chart-title" id="bkChartPLTitle">Actual vs OPlan by Product Line</div>
-      <canvas id="bkChartPL" height="100"></canvas>
-    </div>
-
-    <!-- Variance table -->
-    <div class="chart-section">
-      <div class="chart-title" id="bkTableTitle">Product Line Variance Detail</div>
-      <div class="reg-table-wrap">
-        <table class="reg-table" id="bkTable"></table>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="panel" id="panel-inventory">
-    <div class="placeholder">
-      <h3>Channel Inventory</h3>
-      <p>Channel inventory data will appear here once connected to Omni.</p>
-    </div>
-  </div>
-</div>
+</div><!-- end app-body -->
 
 <script>
+  // ── Tab switching ──
+  function switchTab(name, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
   // ── Q2 calendar ──
   const Q2_START = new Date('2026-04-01');
   const Q2_END   = new Date('2026-06-30');
@@ -641,11 +852,9 @@
     const daysLeft    = Q2_DAYS - q2DaysElapsed();
     const expectedPct = q2DaysElapsed() / Q2_DAYS;
 
-    // 1 — QTD Bookings
     set('qtdBookings', fmt(d.qtdBookings));
     set('qtdBookingsSub', daysLeft + ' days remaining in Q2');
 
-    // 2 — Pacing (Rebate Target primary, OPlan secondary)
     const rebatePct = d.qtdBookings && d.q2RebateTarget ? d.qtdBookings / d.q2RebateTarget : null;
     const oplanPct  = d.qtdBookings && d.q2OplanTarget  ? d.qtdBookings / d.q2OplanTarget  : null;
     set('pacingRebate', pct(rebatePct));
@@ -659,21 +868,17 @@
       badge.className = 'metric-badge ' + cls;
     }
 
-    // Apollo Pacing
     const apolloPct = d.apolloQtdBookings && d.apolloRebateTargetQ2 ? d.apolloQtdBookings / d.apolloRebateTargetQ2 : null;
     set('apolloPacing', pct(apolloPct));
     set('apolloQtd', fmt(d.apolloQtdBookings));
     set('apolloTarget', fmt(d.apolloRebateTargetQ2));
 
-    // 3 — Monthly Rebate Target
     set('monthlyAOP', fmt(d.monthlyRebateTarget));
     set('monthlyAOPSub', d.currentMonth || '');
 
-    // 4 — Q2 Sales Target (Rebate primary, OPlan subscript)
     set('q2Target', fmt(d.q2RebateTarget));
     set('q2OplanTarget', fmt(d.q2OplanTarget));
 
-    // 5 — Open Order Backlog
     set('openBacklog', fmt(d.openBacklog));
     set('openBacklogSub', 'Open Sales Orders');
   }
@@ -712,7 +917,250 @@
     return (n >= 0 ? '+' : '') + (n * 100).toFixed(1) + '%';
   }
 
-  // ── Render registrations tab ──
+  // ── Global filter state ──
+  // null = no filter (show all); Set = explicit selection
+  const GF = {
+    period:       'qtd',   // 'qtd' | '2026-04' | '2026-05' | '2026-06'
+    dealers:      null,    // null = all; Set of dealer names
+    productLines: null,    // null = all; Set of product line names
+    productIds:   null,    // null = all; Set of product IDs
+  };
+
+  let _lastData = null;
+
+  // ── Filter panel ──
+  let fpCollapsed = false;
+
+  function fpToggle() {
+    fpCollapsed = !fpCollapsed;
+    document.getElementById('fp').classList.toggle('fp-collapsed', fpCollapsed);
+    document.getElementById('fpToggleBtn').textContent = fpCollapsed ? '›' : '‹';
+  }
+
+  function fpSetPeriod(p) {
+    GF.period = p;
+    fpRenderPeriodPills();
+    globalRefresh();
+  }
+
+  function fpRenderPeriodPills() {
+    const periods = [
+      { val: 'qtd',     label: 'QTD' },
+      { val: '2026-04', label: 'Apr' },
+      { val: '2026-05', label: 'May' },
+      { val: '2026-06', label: 'Jun' },
+    ];
+    document.getElementById('fpPeriodPills').innerHTML = periods.map(p =>
+      `<button class="fp-pill ${GF.period === p.val ? 'active' : ''}" onclick="fpSetPeriod('${p.val}')">${p.label}</button>`
+    ).join('');
+  }
+
+  // Dealers
+  function fpGetAllDealers() {
+    return (_lastData && _lastData.bookingsLevelCodes ? [..._lastData.bookingsLevelCodes].sort() : []);
+  }
+
+  function fpRenderDealers() {
+    const all    = fpGetAllDealers();
+    const search = (document.getElementById('fpDealerSearch').value || '').toLowerCase();
+    const vis    = search ? all.filter(d => d.toLowerCase().includes(search)) : all;
+    if (!vis.length) {
+      document.getElementById('fpDealerList').innerHTML = '<div class="fp-empty">No dealers found</div>';
+      return;
+    }
+    document.getElementById('fpDealerList').innerHTML = vis.map(d => {
+      const checked = GF.dealers === null || GF.dealers.has(d);
+      return `<label class="fp-item ${checked ? 'fp-checked' : ''}" onclick="fpDealerToggle(event,${JSON.stringify(d).replace(/"/g,'&quot;')})">
+        <input type="checkbox" ${checked ? 'checked' : ''}>
+        <span class="fp-item-lbl">${d}</span>
+      </label>`;
+    }).join('');
+  }
+
+  function fpDealerToggle(e, dealer) {
+    e.preventDefault();
+    const all = fpGetAllDealers();
+    if (GF.dealers === null) {
+      GF.dealers = new Set(all.filter(d => d !== dealer));
+    } else if (GF.dealers.has(dealer)) {
+      GF.dealers.delete(dealer);
+      if (!GF.dealers.size) GF.dealers = null;
+    } else {
+      GF.dealers.add(dealer);
+      if (GF.dealers.size >= all.length) GF.dealers = null;
+    }
+    fpRenderDealers();
+    globalRefresh();
+  }
+
+  function fpDealerAll()  { GF.dealers = null; fpRenderDealers(); globalRefresh(); }
+  function fpDealerClear() { GF.dealers = new Set(); fpRenderDealers(); globalRefresh(); }
+
+  // Product Lines
+  function fpGetAllPLs() {
+    if (!_lastData) return [];
+    return [...new Set((_lastData.bookingsRows || []).map(r => r.productLine).filter(Boolean))].sort();
+  }
+
+  function fpRenderPLs() {
+    const all = fpGetAllPLs();
+    if (!all.length) {
+      document.getElementById('fpPLList').innerHTML = '<div class="fp-empty">No data loaded</div>';
+      return;
+    }
+    document.getElementById('fpPLList').innerHTML = all.map(pl => {
+      const checked = GF.productLines === null || GF.productLines.has(pl);
+      return `<label class="fp-item ${checked ? 'fp-checked' : ''}" onclick="fpPLToggle(event,${JSON.stringify(pl).replace(/"/g,'&quot;')})">
+        <input type="checkbox" ${checked ? 'checked' : ''}>
+        <span class="fp-item-lbl">${pl}</span>
+      </label>`;
+    }).join('');
+  }
+
+  function fpPLToggle(e, pl) {
+    e.preventDefault();
+    const all = fpGetAllPLs();
+    if (GF.productLines === null) {
+      GF.productLines = new Set(all.filter(p => p !== pl));
+    } else if (GF.productLines.has(pl)) {
+      GF.productLines.delete(pl);
+      if (!GF.productLines.size) GF.productLines = null;
+    } else {
+      GF.productLines.add(pl);
+      if (GF.productLines.size >= all.length) GF.productLines = null;
+    }
+    // Reset PID filter when PL changes
+    GF.productIds = null;
+    fpRenderPLs();
+    fpRenderPIDs();
+    globalRefresh();
+  }
+
+  function fpPLAll() {
+    GF.productLines = null;
+    GF.productIds = null;
+    fpRenderPLs();
+    fpRenderPIDs();
+    globalRefresh();
+  }
+
+  function fpPLClear() {
+    GF.productLines = new Set();
+    GF.productIds = null;
+    fpRenderPLs();
+    fpRenderPIDs();
+    globalRefresh();
+  }
+
+  // Product IDs (filtered by selected PLs)
+  function fpGetFilteredPIDs() {
+    if (!_lastData) return [];
+    const activePLs = GF.productLines !== null && GF.productLines.size > 0
+      ? [...GF.productLines]
+      : fpGetAllPLs();
+    return [...new Set((_lastData.bookingsRows || [])
+      .filter(r => activePLs.includes(r.productLine))
+      .map(r => r.productId).filter(Boolean)
+    )].sort();
+  }
+
+  function fpRenderPIDs() {
+    const all    = fpGetFilteredPIDs();
+    const search = (document.getElementById('fpPIDSearch').value || '').toLowerCase();
+    const vis    = search ? all.filter(id => id.toLowerCase().includes(search)) : all;
+    if (!vis.length) {
+      document.getElementById('fpPIDList').innerHTML = '<div class="fp-empty">No products match</div>';
+      return;
+    }
+    document.getElementById('fpPIDList').innerHTML = vis.map(id => {
+      const checked = GF.productIds === null || GF.productIds.has(id);
+      return `<label class="fp-item ${checked ? 'fp-checked' : ''}" onclick="fpPIDToggle(event,${JSON.stringify(id).replace(/"/g,'&quot;')})">
+        <input type="checkbox" ${checked ? 'checked' : ''}>
+        <span class="fp-item-lbl">${id}</span>
+      </label>`;
+    }).join('');
+  }
+
+  function fpPIDToggle(e, id) {
+    e.preventDefault();
+    const all = fpGetFilteredPIDs();
+    if (GF.productIds === null) {
+      GF.productIds = new Set(all.filter(p => p !== id));
+    } else if (GF.productIds.has(id)) {
+      GF.productIds.delete(id);
+      if (!GF.productIds.size) GF.productIds = null;
+    } else {
+      GF.productIds.add(id);
+      if (GF.productIds.size >= all.length) GF.productIds = null;
+    }
+    fpRenderPIDs();
+    globalRefresh();
+  }
+
+  function fpPIDAll() {
+    GF.productIds = null;
+    fpRenderPIDs();
+    globalRefresh();
+  }
+
+  function fpPIDClear() {
+    GF.productIds = new Set();
+    fpRenderPIDs();
+    globalRefresh();
+  }
+
+  function initPanel(data) {
+    fpRenderPeriodPills();
+    fpRenderDealers();
+    fpRenderPLs();
+    fpRenderPIDs();
+  }
+
+  function globalRefresh() {
+    if (!_lastData) return;
+    renderRegistrationCharts(_lastData);
+    renderRegPaceChart(_lastData);
+    renderRevenue(_lastData);
+    renderInventory(_lastData);
+  }
+
+  // ── Product line colors ──
+  const PL_COLORS = {
+    'Apollo Desktop':   '#3b82f6',
+    'Apollo Rackmount': '#93c5fd',
+  };
+  const ALL_WEEKS = ['2026-03-30','2026-04-06','2026-04-13','2026-04-20','2026-04-27','2026-05-04'];
+
+  let regChartInstance = null;
+
+  // ── Build filtered week data from product-ID records ──
+  function buildWeeksFromProductIds(data) {
+    const products = data.registrationsByProductId || [];
+    const active = GF.productIds === null
+      ? products
+      : products.filter(p => GF.productIds.has(p.productId));
+
+    const metaMap = {};
+    (data.registrationsByProductLine || []).forEach(w => {
+      metaMap[w.weekStart] = { isContextWeek: w.isContextWeek, isPartial: w.isPartial };
+    });
+
+    return ALL_WEEKS.map(ws => {
+      const meta = metaMap[ws] || {};
+      const prods = {};
+      active.forEach(p => {
+        const wk = p.weeks.find(ww => ww.weekStart === ws);
+        if (!prods[p.productLine]) prods[p.productLine] = { units: 0, dollars: 0 };
+        if (wk) {
+          prods[p.productLine].units   += wk.units;
+          prods[p.productLine].dollars += wk.dollars;
+        }
+      });
+      return { weekStart: ws, isContextWeek: !!meta.isContextWeek, isPartial: !!meta.isPartial, products: prods };
+    });
+  }
+
+  // ── Registrations: KPI cards ──
   function renderRegistrations(d) {
     if (!d.registrations) return;
     const regs = d.registrations;
@@ -735,14 +1183,14 @@
     const colorMap = { blue: 'val-blue', yellow: 'val-yellow', green: 'val-green', red: 'val-red', white: 'val-white' };
 
     const cards = [
-      { label: fmtWeekLabel(w2Start) + ' REGS (UNITS)',   value: w2  ? w2.units.toLocaleString()       : '—', color: 'blue' },
-      { label: fmtWeekLabel(w1Start) + ' REGS (UNITS)',   value: w1  ? w1.units.toLocaleString()       : '—', color: 'blue' },
-      { label: fmtWeekLabel(curWeekStart) + ' REGS (PARTIAL)', value: wCur ? wCur.units.toLocaleString() : '—', color: 'yellow' },
-      { label: '2-WK AVG FULL WEEKS',                     value: avg2Units != null ? avg2Units.toLocaleString() + ' / wk' : '—', color: 'green' },
-      { label: fmtWeekLabel(w2Start) + ' REG DOLLARS',    value: w2  ? fmtDollars(w2.dollars)          : '—', color: 'blue' },
-      { label: fmtWeekLabel(w1Start) + ' REG DOLLARS',    value: w1  ? fmtDollars(w1.dollars)          : '—', color: 'blue' },
-      { label: 'OPLAN WEEKLY PACE',                       value: fmtDollars(oplanWkly) + ' / wk', sub: 'Q2 Target: ' + fmt(regs.apolloRebateTargetQ2), color: 'white' },
-      { label: 'REG VS OPLAN PACE',                       value: fmtPctSigned(vsOplan), color: vsOplan != null && vsOplan >= 0 ? 'green' : 'red' },
+      { label: fmtWeekLabel(w2Start) + ' REGS (UNITS)',        value: w2   ? w2.units.toLocaleString()          : '—', color: 'blue' },
+      { label: fmtWeekLabel(w1Start) + ' REGS (UNITS)',        value: w1   ? w1.units.toLocaleString()          : '—', color: 'blue' },
+      { label: fmtWeekLabel(curWeekStart) + ' REGS (PARTIAL)', value: wCur ? wCur.units.toLocaleString()        : '—', color: 'yellow' },
+      { label: '2-WK AVG FULL WEEKS',                          value: avg2Units != null ? avg2Units.toLocaleString() + ' / wk' : '—', color: 'green' },
+      { label: fmtWeekLabel(w2Start) + ' REG DOLLARS',         value: w2   ? fmtDollars(w2.dollars)             : '—', color: 'blue' },
+      { label: fmtWeekLabel(w1Start) + ' REG DOLLARS',         value: w1   ? fmtDollars(w1.dollars)             : '—', color: 'blue' },
+      { label: 'OPLAN WEEKLY PACE',                            value: fmtDollars(oplanWkly) + ' / wk', sub: 'Q2 Target: ' + fmt(regs.apolloRebateTargetQ2), color: 'white' },
+      { label: 'REG VS OPLAN PACE',                            value: fmtPctSigned(vsOplan), color: vsOplan != null && vsOplan >= 0 ? 'green' : 'red' },
     ];
 
     document.getElementById('reg-cards').innerHTML = cards.map(c => `
@@ -754,211 +1202,33 @@
     `).join('');
   }
 
-  // ── Product line colors ──
-  const PL_COLORS = {
-    'Apollo Desktop':   '#3b82f6',
-    'Apollo Rackmount': '#93c5fd',
-  };
-  const ALL_WEEKS = ['2026-03-30','2026-04-06','2026-04-13','2026-04-20','2026-04-27','2026-05-04'];
-
-  let regChartInstance = null;
-  let _lastData = null;
-
-  // ── Filter state ──
-  // null = no filter active (show all); Set = one or more product IDs selected
-  let selectedProductIds = null;
-
-  function toggleFilterPanel() {
-    const body = document.getElementById('filterPanelBody');
-    const icon = document.getElementById('filterToggleIcon');
-    const open = body.style.display === 'none';
-    body.style.display = open ? 'block' : 'none';
-    icon.classList.toggle('open', open);
-  }
-
-  function clearFilter() {
-    selectedProductIds = null;
-    onFilterChange();
-  }
-
-  function renderFilterChips() {
-    if (!_lastData || !_lastData.registrationsByProductId) return;
-    const products = _lastData.registrationsByProductId;
-    const search = (document.getElementById('filterSearch').value || '').toLowerCase();
-    const isActive = selectedProductIds !== null;
-
-    const groups = {};
-    products.forEach(p => {
-      if (!groups[p.productLine]) groups[p.productLine] = [];
-      groups[p.productLine].push(p.productId);
-    });
-
-    let html = '';
-    Object.entries(groups).forEach(([line, ids]) => {
-      const visible = search ? ids.filter(id => id.toLowerCase().includes(search)) : ids;
-      if (!visible.length) return;
-      html += `<div class="filter-group">
-        <div class="filter-group-header">
-          <span class="filter-group-name">${line}</span>
-          <button class="filter-btn" onclick="selectGroupAll(${JSON.stringify(ids)})">Select All</button>
-          <button class="filter-btn" onclick="clearGroupFilter(${JSON.stringify(ids)})">Clear</button>
-        </div>
-        <div class="filter-chips">
-          ${visible.map(id => {
-            const checked = isActive && selectedProductIds.has(id);
-            return `<label class="filter-chip ${checked ? 'checked' : ''}" onclick="toggleProduct(event,'${id}')">${id}</label>`;
-          }).join('')}
-        </div>
-      </div>`;
-    });
-    document.getElementById('filterGroups').innerHTML = html;
-
-    // Badge + clear button
-    const badge = document.getElementById('filterCountBadge');
-    if (isActive && selectedProductIds.size > 0) {
-      badge.textContent = `${selectedProductIds.size} selected — clear`;
-      badge.style.display = 'inline';
-      badge.onclick = clearFilter;
-      badge.style.cursor = 'pointer';
-    } else {
-      badge.style.display = 'none';
-    }
-  }
-
-  function toggleProduct(e, id) {
-    e.preventDefault();
-    if (selectedProductIds === null) {
-      // First selection: activate filter with just this ID
-      selectedProductIds = new Set([id]);
-    } else if (selectedProductIds.has(id)) {
-      selectedProductIds.delete(id);
-      if (selectedProductIds.size === 0) selectedProductIds = null; // back to "all"
-    } else {
-      selectedProductIds.add(id);
-    }
-    onFilterChange();
-  }
-
-  function selectGroupAll(ids) {
-    if (selectedProductIds === null) selectedProductIds = new Set();
-    ids.forEach(id => selectedProductIds.add(id));
-    onFilterChange();
-  }
-
-  function clearGroupFilter(ids) {
-    if (selectedProductIds === null) return;
-    ids.forEach(id => selectedProductIds.delete(id));
-    if (selectedProductIds.size === 0) selectedProductIds = null;
-    onFilterChange();
-  }
-
-  function onFilterChange() {
-    renderFilterChips();
-    renderRegistrationCharts(_lastData);
-    renderRegPaceChart(_lastData);
-  }
-
-  function initFilter(data) {
-    if (!data.registrationsByProductId) return;
-    // selectedProductIds stays null (no filter) until user clicks a chip
-    document.getElementById('filterBar').style.display = '';
-    renderFilterChips();
-  }
-
-  // ── Build filtered week data from product-ID records ──
-  function buildWeeksFromProductIds(data) {
-    const products = data.registrationsByProductId || [];
-    // null = all products; Set = only selected
-    const active = selectedProductIds === null
-      ? products
-      : products.filter(p => selectedProductIds.has(p.productId));
-
-    const metaMap = {};
-    (data.registrationsByProductLine || []).forEach(w => {
-      metaMap[w.weekStart] = { isContextWeek: w.isContextWeek, isPartial: w.isPartial };
-    });
-
-    return ALL_WEEKS.map(ws => {
-      const meta = metaMap[ws] || {};
-      const products_ = {};
-      active.forEach(p => {
-        const wk = p.weeks.find(ww => ww.weekStart === ws);
-        if (!products_[p.productLine]) products_[p.productLine] = { units: 0, dollars: 0 };
-        if (wk) {
-          products_[p.productLine].units   += wk.units;
-          products_[p.productLine].dollars += wk.dollars;
-        }
-      });
-      return { weekStart: ws, isContextWeek: !!meta.isContextWeek, isPartial: !!meta.isPartial, products: products_ };
-    });
-  }
-
-  // ── Build filtered product-ID rows for table ──
-  function buildTableRowsFromProductIds(data, q2WeekStarts, tableWeekStarts, curWeekISO) {
-    const products = data.registrationsByProductId || [];
-    const active   = products.filter(p => selectedProductIds.has(p.productId));
-    const fmtK = n => n >= 1000 ? '$' + Math.round(n / 1000) + 'K' : '$' + Math.round(n);
-
-    const rows = [];
-    const totUnits = {}, totDollars = {};
-    tableWeekStarts.forEach(ws => { totUnits[ws] = 0; totDollars[ws] = 0; });
-    let grandQtdU = 0, grandQtdD = 0;
-
-    // Group by product line for visual separation
-    const lineOrder = ['Apollo Desktop', 'Apollo Rackmount'];
-    lineOrder.forEach(line => {
-      const lineProducts = active.filter(p => p.productLine === line);
-      if (!lineProducts.length) return;
-
-      lineProducts.forEach(p => {
-        const qtdU = q2WeekStarts.reduce((s, ws) => {
-          const wk = p.weeks.find(ww => ww.weekStart === ws);
-          return s + (wk ? wk.units : 0);
-        }, 0);
-        const qtdD = q2WeekStarts.reduce((s, ws) => {
-          const wk = p.weeks.find(ww => ww.weekStart === ws);
-          return s + (wk ? wk.dollars : 0);
-        }, 0);
-        if (qtdU === 0 && qtdD === 0) return;
-
-        grandQtdU += qtdU;
-        grandQtdD += qtdD;
-
-        let row = `<tr><td style="font-size:0.68rem">${p.productId}</td>`;
-        tableWeekStarts.forEach(ws => {
-          const wk = p.weeks.find(ww => ww.weekStart === ws);
-          const u = wk ? wk.units : 0;
-          totUnits[ws] += u;
-          row += `<td>${u > 0 ? u.toLocaleString() : '—'}</td>`;
-        });
-        row += `<td class="bold">${qtdU.toLocaleString()}</td>`;
-        tableWeekStarts.forEach(ws => {
-          const wk = p.weeks.find(ww => ww.weekStart === ws);
-          const d_ = wk ? wk.dollars : 0;
-          totDollars[ws] += d_;
-          row += `<td>${d_ > 0 ? fmtK(d_) : '—'}</td>`;
-        });
-        row += `<td class="bold">${qtdD > 0 ? fmtK(qtdD) : '—'}</td></tr>`;
-        rows.push(row);
-      });
-    });
-
-    const totalRow = `<tr class="total-row"><td>TOTAL (${active.length} SKUs)</td>` +
-      tableWeekStarts.map(ws => `<td>${totUnits[ws].toLocaleString()}</td>`).join('') +
-      `<td>${grandQtdU.toLocaleString()}</td>` +
-      tableWeekStarts.map(ws => `<td>${fmtK(totDollars[ws])}</td>`).join('') +
-      `<td>${fmtK(grandQtdD)}</td></tr>`;
-
-    return { rows, totalRow };
-  }
-
-  // ── Render registration chart + table ──
+  // ── Registration chart + table (respects GF.productLines / GF.productIds) ──
   function renderRegistrationCharts(d) {
-    const filterActive = selectedProductIds !== null && selectedProductIds.size > 0;
-    // When a filter is active, aggregate from product-ID records; otherwise use product-line totals
-    const weeks = (filterActive && d.registrationsByProductId)
-      ? buildWeeksFromProductIds(d)
-      : (d.registrationsByProductLine || []);
+    const filterByPID = GF.productIds !== null;
+    const filterByPL  = GF.productLines !== null && GF.productLines.size > 0;
+
+    let weeks;
+    if (filterByPID && d.registrationsByProductId) {
+      weeks = buildWeeksFromProductIds(d);
+    } else if (filterByPL && d.registrationsByProductLine) {
+      weeks = (d.registrationsByProductLine || []).map(w => ({
+        ...w,
+        products: Object.fromEntries(
+          Object.entries(w.products || {}).filter(([pl]) => GF.productLines.has(pl))
+        )
+      }));
+    } else {
+      weeks = d.registrationsByProductLine || [];
+    }
+
+    // Period filter for registrations (week-level)
+    if (GF.period !== 'qtd') {
+      weeks = weeks.filter(w => {
+        if (w.isContextWeek) return false;
+        return w.weekStart.startsWith(GF.period);
+      });
+    }
+
     if (!weeks.length) return;
 
     const today      = new Date();
@@ -990,10 +1260,7 @@
       options: {
         responsive: true,
         plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12, padding: 14 }
-          },
+          legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12, padding: 14 } },
           tooltip: { mode: 'index' }
         },
         scales: {
@@ -1036,33 +1303,53 @@
 
     let tbody = '<tbody>';
 
-    if (filterActive && d.registrationsByProductId) {
-      // Product-ID level rows (filter is active)
-      const { rows, totalRow } = buildTableRowsFromProductIds(d, q2WeekStarts, tableWeekStarts, curWeekISO);
-      tbody += rows.join('') + totalRow;
+    if (filterByPID && d.registrationsByProductId) {
+      // Product-ID rows when filter is active
+      const products = d.registrationsByProductId || [];
+      const active   = GF.productIds === null ? products : products.filter(p => GF.productIds.has(p.productId));
+      let totUnits = {}, totDollars = {};
+      tableWeekStarts.forEach(ws => { totUnits[ws] = 0; totDollars[ws] = 0; });
+      let grandQtdU = 0, grandQtdD = 0;
+
+      ['Apollo Desktop', 'Apollo Rackmount'].forEach(line => {
+        active.filter(p => p.productLine === line).forEach(p => {
+          const qtdU = q2WeekStarts.reduce((s, ws) => { const wk = p.weeks.find(ww => ww.weekStart === ws); return s + (wk ? wk.units : 0); }, 0);
+          const qtdD = q2WeekStarts.reduce((s, ws) => { const wk = p.weeks.find(ww => ww.weekStart === ws); return s + (wk ? wk.dollars : 0); }, 0);
+          if (!qtdU && !qtdD) return;
+          grandQtdU += qtdU; grandQtdD += qtdD;
+          let row = `<tr><td style="font-size:0.68rem">${p.productId}</td>`;
+          tableWeekStarts.forEach(ws => { const wk = p.weeks.find(ww => ww.weekStart === ws); const u = wk ? wk.units : 0; totUnits[ws] += u; row += `<td>${u > 0 ? u.toLocaleString() : '—'}</td>`; });
+          row += `<td class="bold">${qtdU.toLocaleString()}</td>`;
+          tableWeekStarts.forEach(ws => { const wk = p.weeks.find(ww => ww.weekStart === ws); const dv = wk ? wk.dollars : 0; totDollars[ws] += dv; row += `<td>${dv > 0 ? fmtK(dv) : '—'}</td>`; });
+          row += `<td class="bold">${qtdD > 0 ? fmtK(qtdD) : '—'}</td></tr>`;
+          tbody += row;
+        });
+      });
+
+      tbody += `<tr class="total-row"><td>TOTAL (${active.length} SKUs)</td>` +
+        tableWeekStarts.map(ws => `<td>${totUnits[ws].toLocaleString()}</td>`).join('') +
+        `<td>${grandQtdU.toLocaleString()}</td>` +
+        tableWeekStarts.map(ws => `<td>${fmtK(totDollars[ws])}</td>`).join('') +
+        `<td>${fmtK(grandQtdD)}</td></tr>`;
     } else {
-      // Product-line level rows (fallback)
+      // Product-line rows
       let totUnits = {}, totDollars = {};
       tableWeeks.forEach(w => { totUnits[w.weekStart] = 0; totDollars[w.weekStart] = 0; });
       let grandQtdUnits = 0, grandQtdDollars = 0;
 
-      Object.keys(PL_COLORS).forEach(pl => {
+      const visiblePLs = Object.keys(PL_COLORS).filter(pl =>
+        filterByPL ? GF.productLines.has(pl) : true
+      );
+
+      visiblePLs.forEach(pl => {
         const qtdUnits   = q2Weeks.reduce((s, w) => s + ((w.products[pl] || {}).units   || 0), 0);
         const qtdDollars = q2Weeks.reduce((s, w) => s + ((w.products[pl] || {}).dollars || 0), 0);
-        if (qtdUnits === 0 && qtdDollars === 0) return;
+        if (!qtdUnits && !qtdDollars) return;
         grandQtdUnits += qtdUnits; grandQtdDollars += qtdDollars;
         tbody += `<tr><td>${pl}</td>`;
-        tableWeeks.forEach(w => {
-          const u = (w.products[pl] || {}).units || 0;
-          totUnits[w.weekStart] += u;
-          tbody += `<td>${u.toLocaleString()}</td>`;
-        });
+        tableWeeks.forEach(w => { const u = (w.products[pl] || {}).units || 0; totUnits[w.weekStart] += u; tbody += `<td>${u.toLocaleString()}</td>`; });
         tbody += `<td class="bold">${qtdUnits.toLocaleString()}</td>`;
-        tableWeeks.forEach(w => {
-          const dol = (w.products[pl] || {}).dollars || 0;
-          totDollars[w.weekStart] += dol;
-          tbody += `<td>${fmtK(dol)}</td>`;
-        });
+        tableWeeks.forEach(w => { const dv = (w.products[pl] || {}).dollars || 0; totDollars[w.weekStart] += dv; tbody += `<td>${fmtK(dv)}</td>`; });
         tbody += `<td class="bold">${fmtK(qtdDollars)}</td></tr>`;
       });
 
@@ -1080,330 +1367,12 @@
     if (q2Sorted.length >= 2) {
       const first = new Date(q2Sorted[0].weekStart + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
       const last  = new Date(q2Sorted[q2Sorted.length - 1].weekStart + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
-      const suffix = filterActive
-        ? ` — ${selectedProductIds.size} SKU${selectedProductIds.size !== 1 ? 's' : ''} selected`
-        : ' by Product Line';
+      const suffix = filterByPID && GF.productIds
+        ? ` — ${GF.productIds.size} SKU${GF.productIds.size !== 1 ? 's' : ''} selected`
+        : (filterByPL ? ' — ' + [...GF.productLines].join(', ') : ' by Product Line');
       document.getElementById('regTableTitle').textContent =
         `QTD Registration Summary${suffix} — ${first} through ${last}`;
     }
-  }
-
-  // ── Bookings vs Plan tab ──
-  const BK_MONTHS      = ['2026-04','2026-05','2026-06'];
-  const BK_MONTH_LABEL = {'2026-04':'Apr 2026','2026-05':'May 2026','2026-06':'Jun 2026'};
-
-  let bkMonth       = null;   // selected month ISO string
-  let bkApolloOnly  = true;
-  let bkDealer      = '';     // empty = all dealers
-  let bkSelPL       = null;   // Set of product lines, null = all
-  let bkSelPID      = null;   // Set of product IDs, null = all
-  let bkChartQ2     = null;
-  let bkChartPL     = null;
-
-  function bkCurrentMonth() {
-    const t = new Date();
-    const m = t.getFullYear() + '-' + String(t.getMonth()+1).padStart(2,'0');
-    return BK_MONTHS.includes(m) ? m : BK_MONTHS[0];
-  }
-
-  function initBookings(data) {
-    if (!bkMonth) bkMonth = bkCurrentMonth();
-
-    // Populate dealer dropdown
-    const sel = document.getElementById('bkDealerSelect');
-    sel.innerHTML = '<option value="">All Dealers</option>';
-    (data.bookingsLevelCodes || []).sort().forEach(c => {
-      const o = document.createElement('option');
-      o.value = c; o.textContent = c;
-      sel.appendChild(o);
-    });
-
-    bkRenderMonthPills();
-    bkRenderProductChips();
-    renderBookingsCharts(data);
-  }
-
-  function bkRenderMonthPills() {
-    document.getElementById('bkMonthPills').innerHTML = BK_MONTHS.map(m =>
-      `<button class="bk-month-pill ${m===bkMonth?'active':''}" onclick="bkSelectMonth('${m}')">${BK_MONTH_LABEL[m].slice(0,3)}</button>`
-    ).join('');
-  }
-
-  function bkSelectMonth(m) { bkMonth = m; bkRenderMonthPills(); bkRefresh(); }
-
-  function bkToggleApollo() {
-    bkApolloOnly = !bkApolloOnly;
-    bkSelPL  = null; // reset product line selection when toggling
-    bkSelPID = null;
-    document.getElementById('bkApolloBtn').classList.toggle('active', bkApolloOnly);
-    bkRenderProductChips();
-    bkRefresh();
-  }
-
-  function bkOnDealerChange() {
-    bkDealer = document.getElementById('bkDealerSelect').value;
-    bkRefresh();
-  }
-
-  function bkToggleProductFilter() {
-    const body = document.getElementById('bkProductFilterBody');
-    const icon = document.getElementById('bkFilterIcon');
-    const open = body.style.display === 'none';
-    body.style.display = open ? 'block' : 'none';
-    icon.classList.toggle('open', open);
-  }
-
-  function bkGetVisibleProductLines(data) {
-    const rows = data.bookingsRows || [];
-    const lines = [...new Set(rows
-      .filter(r => !bkApolloOnly || (r.productLine && r.productLine.includes('Apollo')))
-      .map(r => r.productLine).filter(Boolean)
-    )].sort();
-    return lines;
-  }
-
-  function bkGetVisibleProductIds(data, forLines) {
-    const rows = data.bookingsRows || [];
-    return [...new Set(rows
-      .filter(r => forLines.includes(r.productLine))
-      .map(r => r.productId).filter(Boolean)
-    )].sort();
-  }
-
-  function bkRenderProductChips() {
-    if (!_lastData) return;
-    const data   = _lastData;
-    const search = (document.getElementById('bkProductSearch')?.value || '').toLowerCase();
-    const lines  = bkGetVisibleProductLines(data);
-
-    // Determine active product lines for PID filtering
-    const activePL = (bkSelPL && bkSelPL.size) ? [...bkSelPL] : lines;
-    const allPIDs  = bkGetVisibleProductIds(data, activePL);
-
-    let html = '';
-
-    // Product Line group
-    const visLines = search ? lines.filter(l => l.toLowerCase().includes(search)) : lines;
-    if (visLines.length) {
-      html += `<div class="filter-group">
-        <div class="filter-group-header">
-          <span class="filter-group-name">Product Line</span>
-          <button class="filter-btn" onclick="bkSelectAllPL(${JSON.stringify(lines)})">All</button>
-          <button class="filter-btn" onclick="bkClearPL()">Clear</button>
-        </div>
-        <div class="filter-chips">
-          ${visLines.map(l => {
-            const checked = bkSelPL !== null && bkSelPL.has(l);
-            return `<label class="filter-chip ${checked?'checked':''}" onclick="bkTogglePL(event,'${l.replace(/'/g,"\\'")}'">${l}</label>`;
-          }).join('')}
-        </div>
-      </div>`;
-    }
-
-    // Product ID group
-    const visPIDs = search ? allPIDs.filter(id => id.toLowerCase().includes(search)) : allPIDs;
-    if (visPIDs.length) {
-      html += `<div class="filter-group">
-        <div class="filter-group-header">
-          <span class="filter-group-name">Product ID</span>
-          <button class="filter-btn" onclick="bkSelectAllPID(${JSON.stringify(allPIDs)})">All</button>
-          <button class="filter-btn" onclick="bkClearPID()">Clear</button>
-        </div>
-        <div class="filter-chips">
-          ${visPIDs.map(id => {
-            const checked = bkSelPID !== null && bkSelPID.has(id);
-            return `<label class="filter-chip ${checked?'checked':''}" onclick="bkTogglePID(event,'${id}')">${id}</label>`;
-          }).join('')}
-        </div>
-      </div>`;
-    }
-
-    if (!html) html = `<div class="bk-empty">No data — run /refresh-exec to load bookings data.</div>`;
-    document.getElementById('bkProductChips').innerHTML = html;
-
-    // Badge
-    const totalSel = (bkSelPL ? bkSelPL.size : 0) + (bkSelPID ? bkSelPID.size : 0);
-    const badge = document.getElementById('bkProductBadge');
-    badge.style.display = totalSel ? 'inline' : 'none';
-    if (totalSel) badge.textContent = `${totalSel} filter${totalSel!==1?'s':''} active`;
-  }
-
-  function bkTogglePL(e, line) {
-    e.preventDefault();
-    if (!bkSelPL) bkSelPL = new Set([line]);
-    else if (bkSelPL.has(line)) { bkSelPL.delete(line); if (!bkSelPL.size) bkSelPL = null; }
-    else bkSelPL.add(line);
-    bkSelPID = null; // reset PID when PL changes
-    bkRenderProductChips();
-    bkRefresh();
-  }
-  function bkSelectAllPL(lines) {
-    bkSelPL = null;
-    bkRenderProductChips(); bkRefresh();
-  }
-  function bkClearPL() {
-    bkSelPL = null;
-    bkRenderProductChips(); bkRefresh();
-  }
-  function bkTogglePID(e, id) {
-    e.preventDefault();
-    if (!bkSelPID) bkSelPID = new Set([id]);
-    else if (bkSelPID.has(id)) { bkSelPID.delete(id); if (!bkSelPID.size) bkSelPID = null; }
-    else bkSelPID.add(id);
-    bkRenderProductChips(); bkRefresh();
-  }
-  function bkSelectAllPID(ids) { bkSelPID = null; bkRenderProductChips(); bkRefresh(); }
-  function bkClearPID()         { bkSelPID = null; bkRenderProductChips(); bkRefresh(); }
-
-  function bkRefresh() { renderBookingsCharts(_lastData); }
-
-  function bkGetFilteredRows(data) {
-    let rows = data.bookingsRows || [];
-    if (bkDealer)   rows = rows.filter(r => r.levelCode === bkDealer);
-    if (bkApolloOnly) rows = rows.filter(r => r.productLine?.includes('Apollo'));
-    if (bkSelPL?.size) rows = rows.filter(r => bkSelPL.has(r.productLine));
-    if (bkSelPID?.size) rows = rows.filter(r => bkSelPID.has(r.productId));
-    return rows;
-  }
-
-  function bkAggregate(rows, keyFn) {
-    const map = {};
-    rows.forEach(r => {
-      const k = keyFn(r);
-      if (!map[k]) map[k] = { key: k, actual:0, salesTarget:0, oplan:0 };
-      map[k].actual      += r.actual      || 0;
-      map[k].salesTarget += r.salesTarget || 0;
-      map[k].oplan       += r.oplan       || 0;
-    });
-    return Object.values(map);
-  }
-
-  function renderBookingsCharts(data) {
-    if (!data) return;
-    const rows    = bkGetFilteredRows(data);
-    const isEmpty = !rows.length;
-
-    const fmtV = v => {
-      if (!v) return '—';
-      return v >= 1e6 ? '$'+(v/1e6).toFixed(2)+'M' : '$'+Math.round(v/1e3)+'K';
-    };
-    const fmtPctSgn = v => v==null ? '—' : (v>=0?'+':'')+(v*100).toFixed(1)+'%';
-    const fmtPctOf  = v => v==null ? '—' : (v*100).toFixed(0)+'%';
-
-    // ── Chart 1: Q2 monthly ──
-    const monthly = BK_MONTHS.map(m => {
-      const mr = rows.filter(r => r.month === m);
-      return {
-        actual:      mr.reduce((s,r)=>s+(r.actual||0),0),
-        oplan:       mr.reduce((s,r)=>s+(r.oplan||0),0),
-        salesTarget: mr.reduce((s,r)=>s+(r.salesTarget||0),0),
-      };
-    });
-
-    const ctx1 = document.getElementById('bkChartQ2').getContext('2d');
-    if (bkChartQ2) bkChartQ2.destroy();
-    bkChartQ2 = new Chart(ctx1, {
-      type: 'bar',
-      data: {
-        labels: BK_MONTHS.map(m => BK_MONTH_LABEL[m]),
-        datasets: [
-          { label:'Actual Revenue', data: monthly.map(m=>m.actual),      backgroundColor:'#3b82f6', borderWidth:0 },
-          { label:'OPlan',          data: monthly.map(m=>m.oplan),        backgroundColor:'#475569', borderWidth:0 },
-          { label:'Sales Target',   data: monthly.map(m=>m.salesTarget),  backgroundColor:'#22c55e', borderWidth:0 },
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position:'bottom', labels:{ color:'#94a3b8', font:{size:11}, boxWidth:12, padding:14 } },
-          tooltip: { mode:'index', callbacks:{ label: c => c.dataset.label+': '+fmtV(c.raw) } }
-        },
-        scales: {
-          x: { ticks:{color:'#94a3b8'}, grid:{display:false} },
-          y: { ticks:{color:'#64748b', callback: v=>fmtV(v)}, grid:{color:'rgba(255,255,255,0.05)'} }
-        }
-      }
-    });
-
-    // ── Chart 2: Product line for selected month ──
-    const monthRows = rows.filter(r => r.month === bkMonth);
-    const plData    = bkAggregate(monthRows, r => r.productLine).sort((a,b)=>b.actual-a.actual);
-    const mlabel    = BK_MONTH_LABEL[bkMonth] || bkMonth;
-
-    document.getElementById('bkChartPLTitle').textContent = `${mlabel} — Actual vs OPlan by Product Line`;
-
-    const ctx2 = document.getElementById('bkChartPL').getContext('2d');
-    if (bkChartPL) bkChartPL.destroy();
-    bkChartPL = new Chart(ctx2, {
-      type: 'bar',
-      data: {
-        labels: plData.map(d=>d.key || '—'),
-        datasets: [
-          { label:'Actual', data: plData.map(d=>d.actual), backgroundColor:'#3b82f6', borderWidth:0 },
-          { label:'OPlan',  data: plData.map(d=>d.oplan),  backgroundColor:'#475569', borderWidth:0 },
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position:'bottom', labels:{ color:'#94a3b8', font:{size:11}, boxWidth:12, padding:14 } },
-          tooltip: { mode:'index', callbacks:{ label: c => c.dataset.label+': '+fmtV(c.raw) } }
-        },
-        scales: {
-          x: { ticks:{color:'#94a3b8'}, grid:{display:false} },
-          y: { ticks:{color:'#64748b', callback: v=>fmtV(v)}, grid:{color:'rgba(255,255,255,0.05)'} }
-        }
-      }
-    });
-
-    // ── Table ──
-    document.getElementById('bkTableTitle').textContent = `${mlabel} — Product Line Variance Detail`;
-
-    if (isEmpty) {
-      document.getElementById('bkTable').innerHTML =
-        `<tr><td colspan="7" class="bk-empty">No data — run /refresh-exec to load bookings data.</td></tr>`;
-      return;
-    }
-
-    let thead = `<thead><tr>
-      <th style="text-align:left">Product Line</th>
-      <th>Actual Revenue</th><th>OPlan</th><th>Sales Target</th>
-      <th>$ Var vs OPlan</th><th>% Var vs OPlan</th><th>% of OPlan</th>
-    </tr></thead>`;
-
-    let tbody = '<tbody>';
-    let tA=0, tO=0, tS=0;
-
-    plData.forEach(row => {
-      const vd  = row.actual - row.oplan;
-      const vp  = row.oplan  ? (row.actual-row.oplan)/row.oplan : null;
-      const pof = row.oplan  ? row.actual/row.oplan : null;
-      const cls = vd >= 0 ? 'var-pos' : 'var-neg';
-      tA+=row.actual; tO+=row.oplan; tS+=row.salesTarget;
-      tbody += `<tr>
-        <td>${row.key||'—'}</td>
-        <td>${fmtV(row.actual)}</td>
-        <td>${fmtV(row.oplan)}</td>
-        <td>${fmtV(row.salesTarget)}</td>
-        <td class="${cls}">${vd>=0?'+':''}${fmtV(Math.abs(vd))}</td>
-        <td class="${cls}">${fmtPctSgn(vp)}</td>
-        <td>${fmtPctOf(pof)}</td>
-      </tr>`;
-    });
-
-    const tvd  = tA-tO;
-    const tvp  = tO ? (tA-tO)/tO : null;
-    const tpof = tO ? tA/tO : null;
-    const tcls = tvd>=0?'var-pos':'var-neg';
-    tbody += `<tr class="total-row">
-      <td>TOTAL</td>
-      <td>${fmtV(tA)}</td><td>${fmtV(tO)}</td><td>${fmtV(tS)}</td>
-      <td class="${tcls}">${tvd>=0?'+':''}${fmtV(Math.abs(tvd))}</td>
-      <td class="${tcls}">${fmtPctSgn(tvp)}</td>
-      <td>${fmtPctOf(tpof)}</td>
-    </tr></tbody>`;
-
-    document.getElementById('bkTable').innerHTML = thead + tbody;
   }
 
   // ── Reg dollars vs OPlan pace chart ──
@@ -1419,29 +1388,35 @@
     ];
     const WEEKS_PER_MONTH = { '2026-04': 4, '2026-05': 4, '2026-06': 5 };
 
+    // Period filter
+    const filteredWeeks = GF.period === 'qtd'
+      ? Q2_WEEKS
+      : Q2_WEEKS.filter(ws => ws.startsWith(GF.period));
+
     const today      = new Date();
     const curWeekISO = toISO(getMondayOfWeek(today));
 
-    // Index registrationsByProductLine by weekStart for quick lookup
     const regByWeek = {};
     d.registrationsByProductLine.forEach(w => { regByWeek[w.weekStart] = w; });
 
-    // OPlan weekly pace per week (monthly OPlan / weeks in that month)
-    const oplanPace = Q2_WEEKS.map(ws => {
-      const mo = ws.slice(0, 7); // e.g. "2026-04"
+    const oplanPace = filteredWeeks.map(ws => {
+      const mo   = ws.slice(0, 7);
       const plan = d.apolloMonthlyOplan[mo];
       return plan != null ? plan / WEEKS_PER_MONTH[mo] : null;
     });
 
-    // Actual reg dollars per Q2 week (Apollo Desktop + Apollo Rackmount summed)
-    const actualDollars = Q2_WEEKS.map(ws => {
+    const actualDollars = filteredWeeks.map(ws => {
       const w = regByWeek[ws];
       if (!w) return null;
-      return Object.values(w.products).reduce((s, p) => s + (p.dollars || 0), 0);
+      // Apply PL filter if active
+      const entries = Object.entries(w.products || {});
+      const filtered = GF.productLines !== null && GF.productLines.size > 0
+        ? entries.filter(([pl]) => GF.productLines.has(pl))
+        : entries;
+      return filtered.reduce((s, [, p]) => s + (p.dollars || 0), 0);
     });
 
-    // Chart labels
-    const labels = Q2_WEEKS.map(ws => {
+    const labels = filteredWeeks.map(ws => {
       const dt = new Date(ws + 'T00:00:00');
       let label = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       if (ws === curWeekISO) label += '*';
@@ -1454,62 +1429,395 @@
       data: {
         labels,
         datasets: [
-          {
-            type: 'bar',
-            label: 'Actual Reg Dollars',
-            data: actualDollars,
-            backgroundColor: '#3b82f6',
-            borderWidth: 0,
-            order: 2,
-          },
-          {
-            type: 'line',
-            label: 'OPlan Weekly Pace',
-            data: oplanPace,
-            borderColor: '#f97316',
-            borderWidth: 2,
-            borderDash: [6, 4],
-            pointBackgroundColor: '#f97316',
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            fill: false,
-            tension: 0,
-            order: 1,
-          }
+          { type: 'bar', label: 'Actual Reg Dollars', data: actualDollars, backgroundColor: '#3b82f6', borderWidth: 0, order: 2 },
+          { type: 'line', label: 'OPlan Weekly Pace', data: oplanPace, borderColor: '#f97316', borderWidth: 2, borderDash: [6,4], pointBackgroundColor: '#f97316', pointRadius: 4, pointHoverRadius: 6, fill: false, tension: 0, order: 1 }
         ]
       },
       options: {
         responsive: true,
         interaction: { mode: 'index', intersect: false },
         plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12, padding: 14 }
-          },
-          tooltip: {
-            callbacks: {
-              label: ctx => {
-                const v = ctx.raw;
-                if (v == null) return null;
-                return ctx.dataset.label + ': ' + (v >= 1e6
-                  ? '$' + (v / 1e6).toFixed(2) + 'M'
-                  : '$' + Math.round(v / 1000) + 'K');
-              }
-            }
-          }
+          legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12, padding: 14 } },
+          tooltip: { callbacks: { label: ctx => { const v = ctx.raw; if (v == null) return null; return ctx.dataset.label + ': ' + (v >= 1e6 ? '$'+(v/1e6).toFixed(2)+'M' : '$'+Math.round(v/1000)+'K'); } } }
         },
         scales: {
           x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
-          y: {
-            ticks: {
-              color: '#64748b',
-              callback: v => '$' + Math.round(v / 1000) + 'K'
-            },
-            grid: { color: 'rgba(255,255,255,0.05)' }
-          }
+          y: { ticks: { color: '#64748b', callback: v => '$'+Math.round(v/1000)+'K' }, grid: { color: 'rgba(255,255,255,0.05)' } }
         }
       }
     });
+  }
+
+  // ── Bookings vs Plan tab ──
+  const RV_MONTHS      = ['2026-04','2026-05','2026-06'];
+  const RV_MONTH_LABEL = {'2026-04':'Apr 2026','2026-05':'May 2026','2026-06':'Jun 2026'};
+  let rvGran    = 'productLine';
+  let rvChartQ2 = null;
+  let rvChartPL = null;
+
+  function rvIsCurrentOrPast(month) {
+    const t   = new Date();
+    const cur = t.getFullYear() + '-' + String(t.getMonth()+1).padStart(2,'0');
+    return month <= cur;
+  }
+
+  function initRevenue(data) {
+    rvRenderControls();
+    renderRevenue(data);
+  }
+
+  function rvRenderControls() {
+    document.querySelectorAll('#rvGranularity .rv-seg-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.gran === rvGran)
+    );
+  }
+
+  function rvSetGran(gran) { rvGran = gran; rvRenderControls(); renderRevenue(_lastData); }
+
+  function rvGetDetailRows(data) {
+    let rows = data.bookingsRows || [];
+    // Period
+    if (GF.period === 'qtd') {
+      rows = rows.filter(r => rvIsCurrentOrPast(r.month));
+    } else {
+      rows = rows.filter(r => r.month === GF.period);
+    }
+    // Dealer
+    if (GF.dealers && GF.dealers.size > 0) rows = rows.filter(r => GF.dealers.has(r.levelCode));
+    // Product Line
+    if (GF.productLines && GF.productLines.size > 0) rows = rows.filter(r => GF.productLines.has(r.productLine));
+    // Product ID
+    if (GF.productIds && GF.productIds.size > 0) rows = rows.filter(r => GF.productIds.has(r.productId));
+    return rows;
+  }
+
+  function rvDetailLabel() {
+    if (GF.period === 'qtd') return 'QTD';
+    return RV_MONTH_LABEL[GF.period] || GF.period;
+  }
+
+  function rvAggregate(rows) {
+    const map = {};
+    rows.forEach(r => {
+      let key, label, sub;
+      if (rvGran === 'product') {
+        key = r.productId || '—'; label = r.productId || '—'; sub = r.productLine;
+      } else if (rvGran === 'dealer') {
+        key = r.levelCode || '—'; label = r.levelCode || '—'; sub = null;
+      } else {
+        key = r.productLine || '—'; label = r.productLine || '—'; sub = null;
+      }
+      if (!map[key]) map[key] = { key, label, sub, actual:0, salesTarget:0, oplan:0 };
+      map[key].actual      += r.actual      || 0;
+      map[key].salesTarget += r.salesTarget || 0;
+      map[key].oplan       += r.oplan       || 0;
+    });
+    return Object.values(map).sort((a,b) => b.actual - a.actual);
+  }
+
+  function renderRevenue(data) {
+    if (!data || !data.bookingsRows) return;
+
+    const fmtV = v => {
+      if (v == null) return '—';
+      const abs = Math.abs(v), sign = v < 0 ? '-' : '';
+      if (abs >= 1e6) return sign + '$' + (abs/1e6).toFixed(2) + 'M';
+      if (abs >= 1e3) return sign + '$' + Math.round(abs/1e3) + 'K';
+      return sign + '$' + Math.round(abs);
+    };
+    const fmtVSgn = v => {
+      if (v == null) return '—';
+      const abs = Math.abs(v), sign = v >= 0 ? '+' : '-';
+      if (abs >= 1e6) return sign + '$' + (abs/1e6).toFixed(2) + 'M';
+      if (abs >= 1e3) return sign + '$' + Math.round(abs/1e3) + 'K';
+      return sign + '$' + Math.round(abs);
+    };
+    const fmtPctSgn = v => v == null ? '—' : (v>=0?'+':'') + (v*100).toFixed(1) + '%';
+    const fmtPctOf  = v => v == null ? '—' : (v*100).toFixed(0) + '%';
+
+    // Chart 1: Q2 overview (respects dealer/PL/PID but always all 3 months)
+    let allRows = data.bookingsRows || [];
+    if (GF.dealers && GF.dealers.size > 0) allRows = allRows.filter(r => GF.dealers.has(r.levelCode));
+    if (GF.productLines && GF.productLines.size > 0) allRows = allRows.filter(r => GF.productLines.has(r.productLine));
+    if (GF.productIds && GF.productIds.size > 0) allRows = allRows.filter(r => GF.productIds.has(r.productId));
+
+    const monthly = RV_MONTHS.map(m => {
+      const mr = allRows.filter(r => r.month === m);
+      return {
+        actual:      mr.reduce((s,r)=>s+(r.actual||0),0),
+        oplan:       mr.reduce((s,r)=>s+(r.oplan||0),0),
+        salesTarget: mr.reduce((s,r)=>s+(r.salesTarget||0),0),
+      };
+    });
+
+    const ctx1 = document.getElementById('rvChartQ2').getContext('2d');
+    if (rvChartQ2) rvChartQ2.destroy();
+    rvChartQ2 = new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: RV_MONTHS.map(m => RV_MONTH_LABEL[m]),
+        datasets: [
+          { label:'Actual Bookings', data: monthly.map(m=>m.actual),      backgroundColor:'#3b82f6', borderWidth:0 },
+          { label:'AOP',            data: monthly.map(m=>m.oplan),        backgroundColor:'#475569', borderWidth:0 },
+          { label:'Sales Target',   data: monthly.map(m=>m.salesTarget),  backgroundColor:'#22c55e', borderWidth:0 },
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position:'bottom', labels:{ color:'#94a3b8', font:{size:11}, boxWidth:12, padding:14 } },
+          tooltip: { mode:'index', callbacks:{ label: c => c.dataset.label + ': ' + fmtV(c.raw) } }
+        },
+        scales: {
+          x: { ticks:{color:'#94a3b8'}, grid:{display:false} },
+          y: { ticks:{color:'#64748b', callback: v=>fmtV(v)}, grid:{color:'rgba(255,255,255,0.05)'} }
+        }
+      }
+    });
+
+    // Chart 2: detail period
+    const detailRows = rvGetDetailRows(data);
+    const plMap = {};
+    detailRows.forEach(r => {
+      const k = r.productLine || '—';
+      if (!plMap[k]) plMap[k] = { actual:0, oplan:0 };
+      plMap[k].actual += r.actual || 0;
+      plMap[k].oplan  += r.oplan  || 0;
+    });
+    const plData = Object.entries(plMap).map(([k,v])=>({key:k,...v})).sort((a,b)=>b.actual-a.actual);
+    const mlabel = rvDetailLabel();
+
+    document.getElementById('rvChartPLTitle').textContent = `${mlabel} — Actual vs AOP by Product Line`;
+
+    const ctx2 = document.getElementById('rvChartPL').getContext('2d');
+    if (rvChartPL) rvChartPL.destroy();
+    rvChartPL = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: plData.map(d=>d.key),
+        datasets: [
+          { label:'Actual', data: plData.map(d=>d.actual), backgroundColor:'#3b82f6', borderWidth:0 },
+          { label:'AOP',    data: plData.map(d=>d.oplan),  backgroundColor:'#475569', borderWidth:0 },
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position:'bottom', labels:{ color:'#94a3b8', font:{size:11}, boxWidth:12, padding:14 } },
+          tooltip: { mode:'index', callbacks:{ label: c => c.dataset.label + ': ' + fmtV(c.raw) } }
+        },
+        scales: {
+          x: { ticks:{color:'#94a3b8'}, grid:{display:false} },
+          y: { ticks:{color:'#64748b', callback: v=>fmtV(v)}, grid:{color:'rgba(255,255,255,0.05)'} }
+        }
+      }
+    });
+
+    // Variance detail table
+    const granLabel = rvGran === 'product' ? 'Product ID' : rvGran === 'dealer' ? 'Dealer' : 'Product Line';
+    document.getElementById('rvTableTitle').textContent = `${mlabel} — ${granLabel} Variance Detail`;
+
+    const tableRows = rvAggregate(detailRows);
+    let tA=0, tO=0, tS=0;
+
+    let thead = `<thead><tr>
+      <th style="text-align:left">${granLabel}</th>
+      <th>Actual Bookings</th><th>AOP</th><th>Sales Target</th>
+      <th>$ Var vs AOP</th><th>% Var vs AOP</th><th>% of AOP</th>
+    </tr></thead>`;
+
+    let tbody = '<tbody>';
+    tableRows.forEach(row => {
+      const vd  = row.actual - row.oplan;
+      const vp  = row.oplan ? (row.actual - row.oplan) / row.oplan : null;
+      const pof = row.oplan ? row.actual / row.oplan : null;
+      const cls = vd >= 0 ? 'var-pos' : 'var-neg';
+      tA += row.actual; tO += row.oplan; tS += row.salesTarget;
+      const nameCell = row.sub
+        ? `${row.label}<br><span style="font-size:0.6rem;color:#475569">${row.sub}</span>`
+        : row.label;
+      tbody += `<tr>
+        <td>${nameCell}</td>
+        <td>${fmtV(row.actual)}</td><td>${fmtV(row.oplan)}</td><td>${fmtV(row.salesTarget)}</td>
+        <td class="${cls}">${fmtVSgn(vd)}</td><td class="${cls}">${fmtPctSgn(vp)}</td><td>${fmtPctOf(pof)}</td>
+      </tr>`;
+    });
+
+    const tvd = tA - tO;
+    const tvp = tO ? (tA - tO) / tO : null;
+    const tpof = tO ? tA / tO : null;
+    const tcls = tvd >= 0 ? 'var-pos' : 'var-neg';
+    tbody += `<tr class="total-row">
+      <td>TOTAL</td>
+      <td>${fmtV(tA)}</td><td>${fmtV(tO)}</td><td>${fmtV(tS)}</td>
+      <td class="${tcls}">${fmtVSgn(tvd)}</td><td class="${tcls}">${fmtPctSgn(tvp)}</td><td>${fmtPctOf(tpof)}</td>
+    </tr></tbody>`;
+    document.getElementById('rvTable').innerHTML = thead + tbody;
+
+    // Q2 full-quarter summary
+    let q2Html = `<thead><tr>
+      <th style="text-align:left">Month</th>
+      <th>Actual Bookings</th><th>AOP</th><th>Sales Target</th>
+      <th>VS AOP $</th><th>VS AOP %</th>
+    </tr></thead><tbody>`;
+
+    let qActualTotal = 0;
+    const qTotalOplan  = allRows.reduce((s,r)=>s+(r.oplan||0),0);
+    const qTotalTarget = allRows.reduce((s,r)=>s+(r.salesTarget||0),0);
+
+    RV_MONTHS.forEach(m => {
+      const mr      = allRows.filter(r => r.month === m);
+      const mActual = mr.reduce((s,r)=>s+(r.actual||0),0);
+      const mOplan  = mr.reduce((s,r)=>s+(r.oplan||0),0);
+      const mTarget = mr.reduce((s,r)=>s+(r.salesTarget||0),0);
+      const isPast  = rvIsCurrentOrPast(m);
+      const vd = isPast && mOplan ? mActual - mOplan : null;
+      const vp = isPast && mOplan ? (mActual - mOplan) / mOplan : null;
+      const cls = vd != null ? (vd >= 0 ? 'var-pos' : 'var-neg') : '';
+      if (isPast) qActualTotal += mActual;
+      q2Html += `<tr>
+        <td>${RV_MONTH_LABEL[m]}</td>
+        <td>${isPast ? fmtV(mActual) : '—'}</td>
+        <td>${fmtV(mOplan)}</td><td>${fmtV(mTarget)}</td>
+        <td class="${cls}">${vd != null ? fmtVSgn(vd) : '—'}</td>
+        <td class="${cls}">${vp != null ? fmtPctSgn(vp) : '—'}</td>
+      </tr>`;
+    });
+
+    const qvd  = qActualTotal - qTotalOplan;
+    const qvp  = qTotalOplan ? (qActualTotal - qTotalOplan) / qTotalOplan : null;
+    const qcls = qvd >= 0 ? 'var-pos' : 'var-neg';
+    q2Html += `<tr class="total-row">
+      <td>Q2 TOTAL</td>
+      <td>${fmtV(qActualTotal)}</td><td>${fmtV(qTotalOplan)}</td><td>${fmtV(qTotalTarget)}</td>
+      <td class="${qcls}">${fmtVSgn(qvd)}</td><td class="${qcls}">${fmtPctSgn(qvp)}</td>
+    </tr></tbody>`;
+    document.getElementById('rvQ2Table').innerHTML = q2Html;
+  }
+
+  // ── Channel Inventory tab ──
+  let invRange  = 'all'; // 'all' | '0-10' | '11-20' | '20+'
+
+  function invSetRange(r) {
+    invRange = r;
+    document.querySelectorAll('.inv-wos-pill').forEach(b =>
+      b.classList.toggle('active', b.dataset.range === r)
+    );
+    renderInventory(_lastData);
+  }
+
+  function invWosClass(wos) {
+    if (wos == null || isNaN(wos)) return 'wos-normal';
+    if (wos > 26) return 'wos-critical';
+    if (wos > 20) return 'wos-high';
+    if (wos <= 10) return 'wos-low';
+    return 'wos-normal';
+  }
+
+  function invMatchesRange(wos) {
+    if (invRange === 'all') return true;
+    if (wos == null || isNaN(wos)) return invRange === '0-10';
+    if (invRange === '0-10')  return wos <= 10;
+    if (invRange === '11-20') return wos > 10 && wos <= 20;
+    if (invRange === '20+')   return wos > 20;
+    return true;
+  }
+
+  function renderInventory(data) {
+    if (!data) return;
+    const raw = data.inventoryQ2 || [];
+    // N = complete weeks elapsed in Q2 so far
+    const q2Start = new Date('2026-04-01');
+    const N = Math.max(1, Math.floor((new Date() - q2Start) / (7 * 24 * 60 * 60 * 1000)));
+
+    // Apply left-panel filters
+    let rows = raw;
+    if (GF.dealers && GF.dealers.size > 0)      rows = rows.filter(r => GF.dealers.has(r.dealer));
+    if (GF.productLines && GF.productLines.size > 0) rows = rows.filter(r => GF.productLines.has(r.productLine));
+    if (GF.productIds && GF.productIds.size > 0) rows = rows.filter(r => GF.productIds.has(r.productId));
+
+    // Determine granularity: if product IDs are filtered show PID rows, else aggregate to PL
+    const showPID = GF.productIds !== null;
+
+    // Aggregate to dealer × PL or dealer × PID
+    const map = {};
+    rows.forEach(r => {
+      const key = showPID ? `${r.dealer}||${r.productLine}||${r.productId}` : `${r.dealer}||${r.productLine}`;
+      if (!map[key]) map[key] = { dealer: r.dealer, productLine: r.productLine, productId: showPID ? r.productId : null, onHandSum: 0, qtySoldSum: 0 };
+      map[key].onHandSum  += r.onHandSum  || 0;
+      map[key].qtySoldSum += r.qtySoldSum || 0;
+    });
+
+    // Compute WOS and apply range filter
+    let agg = Object.values(map).map(r => ({
+      ...r,
+      avgOnHand: r.onHandSum / N,
+      avgSold:   r.qtySoldSum / N,
+      wos:       r.qtySoldSum > 0 ? r.onHandSum / r.qtySoldSum : null,
+    })).filter(r => invMatchesRange(r.wos));
+
+    // Sort by WOS descending (null last)
+    agg.sort((a, b) => {
+      if (a.wos == null && b.wos == null) return 0;
+      if (a.wos == null) return 1;
+      if (b.wos == null) return -1;
+      return b.wos - a.wos;
+    });
+
+    // Flag banner — WOS > 26
+    const flagRows = agg.filter(r => r.wos != null && r.wos > 26);
+    const banner   = document.getElementById('invFlagBanner');
+    const flagText = document.getElementById('invFlagText');
+    if (flagRows.length) {
+      const parts = flagRows.map(r =>
+        `${r.dealer} ${r.productId || r.productLine} (${r.wos.toFixed(1)} wks)`
+      );
+      flagText.innerHTML = parts.join(', ') + ' — critically overstocked.';
+      banner.style.display = '';
+    } else {
+      banner.style.display = 'none';
+    }
+
+    // Title
+    const granLabel = showPID ? 'Product ID' : 'Product Line';
+    document.getElementById('invTableTitle').textContent =
+      `Weeks of Supply by Dealer × ${granLabel} — Q2 2026 (${N} weeks to date)`;
+
+    // Table
+    const fmtN  = n => n == null ? '—' : Math.round(n).toLocaleString();
+    const fmtD1 = n => n == null ? '—' : n.toFixed(1);
+
+    let thead = `<thead><tr>
+      <th style="text-align:left">Dealer</th>
+      <th style="text-align:left">${granLabel}</th>
+      <th>Avg On-Hand / Wk</th>
+      <th>Avg Sold / Wk</th>
+      <th>WOS</th>
+      <th>Q2 On-Hand Sum</th>
+      <th>Q2 Qty Sold</th>
+    </tr></thead>`;
+
+    if (!agg.length) {
+      document.getElementById('invTable').innerHTML =
+        thead + `<tbody><tr><td colspan="7" style="text-align:center;padding:24px;color:#475569;font-style:italic">No data — run /refresh-exec to load inventory data.</td></tr></tbody>`;
+      return;
+    }
+
+    let tbody = '<tbody>';
+    agg.forEach(r => {
+      const cls = invWosClass(r.wos);
+      tbody += `<tr>
+        <td>${r.dealer || '—'}</td>
+        <td>${(showPID ? r.productId : r.productLine) || '—'}</td>
+        <td>${fmtN(r.avgOnHand)}</td>
+        <td>${fmtD1(r.avgSold)}</td>
+        <td><span class="wos-badge ${cls}">${r.wos != null ? r.wos.toFixed(1) : '—'}</span></td>
+        <td>${fmtN(r.onHandSum)}</td>
+        <td>${fmtN(r.qtySoldSum)}</td>
+      </tr>`;
+    });
+    tbody += '</tbody>';
+    document.getElementById('invTable').innerHTML = thead + tbody;
   }
 
   // ── Refresh ──
@@ -1518,16 +1826,16 @@
     btn.classList.add('loading');
     btn.disabled = true;
     try {
-      const data = await fetchFromOmni();
+      const data = await fetch('data.json?t=' + Date.now()).then(r => { if (!r.ok) throw new Error('Failed'); return r.json(); });
       _lastData = data;
       renderMetrics(data);
       renderRegistrations(data);
-      initFilter(data);
       renderRegistrationCharts(data);
       renderRegPaceChart(data);
-      initBookings(data);
-      document.getElementById('lastUpdated').textContent =
-        'Data as of ' + (data.lastFetched || '—');
+      initRevenue(data);
+      initPanel(data);
+      renderInventory(data);
+      document.getElementById('lastUpdated').textContent = 'Data as of ' + (data.lastFetched || '—');
     } catch (e) {
       console.error('Refresh failed:', e);
     } finally {
@@ -1536,16 +1844,6 @@
     }
   }
 
-  // ── Omni data ──
-  // Data lives in data.json — update that file to refresh the dashboard.
-  // To update: re-run Omni MCP queries and write new values to data.json.
-  async function fetchFromOmni() {
-    const res = await fetch('data.json?t=' + Date.now());
-    if (!res.ok) throw new Error('Failed to load data.json');
-    return res.json();
-  }
-
-  // ── Init ──
   refreshData();
 </script>
 </body>
