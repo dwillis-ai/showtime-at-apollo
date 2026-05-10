@@ -88,7 +88,8 @@
     text-transform: uppercase;
     letter-spacing: 0.07em;
     color: #64748b;
-    white-space: nowrap;
+    line-height: 1.3;
+    min-height: 2.4em;
   }
   .metric-value {
     font-size: 1.45rem;
@@ -97,6 +98,28 @@
     letter-spacing: -0.02em;
     line-height: 1.1;
   }
+  .reg-strip .metric-value { font-size: 1.15rem; }
+
+  /* ── Tooltips ── */
+  #card-tooltip {
+    position: fixed;
+    z-index: 9999;
+    background: #1e2a40;
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #cbd5e1;
+    font-size: 0.72rem;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 8px 12px;
+    border-radius: 8px;
+    width: 230px;
+    white-space: normal;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.55);
+  }
+  #card-tooltip.visible { opacity: 1; }
   .metric-value.loading { opacity: 0.3; }
   .metric-sub {
     font-size: 0.68rem;
@@ -222,6 +245,12 @@
     flex-shrink: 0;
   }
   .fp-toggle-btn:hover { color: #94a3b8; border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.04); }
+  .chart-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .chart-section-header .chart-title { margin-bottom: 0; }
+  .chart-mode-toggle { display: flex; gap: 4px; }
+  .chart-mode-btn { background: none; border: 1px solid rgba(255,255,255,0.08); color: #64748b; cursor: pointer; padding: 3px 10px; border-radius: 4px; font-size: 0.75rem; font-family: inherit; transition: color 0.15s, border-color 0.15s, background 0.15s; }
+  .chart-mode-btn.active { color: #e2e8f0; border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.07); }
+  .chart-mode-btn:hover:not(.active) { color: #94a3b8; border-color: rgba(255,255,255,0.15); }
 
   .fp-body {
     flex: 1;
@@ -420,6 +449,20 @@
     margin-top: 10px;
     font-style: italic;
   }
+
+  .omni-detail-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; user-select: none;
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #64748b;
+    padding: 4px 0;
+    transition: color 0.15s;
+  }
+  .omni-detail-toggle:hover { color: #94a3b8; }
+  .omni-detail-chevron { font-size: 0.9rem; transition: transform 0.2s; display: inline-block; }
+  .pid-detail-table th[data-sortable] { cursor: pointer; }
+  .pid-detail-table th[data-sortable]:hover { color: #93c5fd; }
+  .pid-sort-icon { color: #93c5fd; margin-left: 3px; font-size: 0.65rem; }
 
   /* ── Registration table ── */
   .reg-table-wrap { overflow-x: auto; }
@@ -622,33 +665,33 @@
 
 <!-- ── Metric card header strip ── -->
 <div class="metric-strip">
-  <div class="metric-card">
+  <div class="metric-card" data-tooltip="Total dollar value of sales orders placed so far this quarter (April through today). Counts when a customer places an order, not when we ship it.">
     <div class="metric-label">QTD Bookings</div>
     <div class="metric-value" id="qtdBookings"><div class="skeleton"></div></div>
     <div class="metric-sub" id="qtdBookingsSub">—</div>
   </div>
-  <div class="metric-card">
+  <div class="metric-card" data-tooltip="If we keep selling at our current pace through June, will we hit the rebate target? Green = on track or ahead. Red = behind pace. Based on days elapsed in Q2.">
     <div class="metric-label">Pacing — Rebate Target</div>
     <div class="metric-value" id="pacingRebate"><div class="skeleton"></div></div>
     <div class="metric-sub">OPlan: <strong id="pacingOplan">—</strong></div>
     <div class="metric-badge badge-yellow" id="pacingBadge">—</div>
   </div>
-  <div class="metric-card">
+  <div class="metric-card" data-tooltip="Same pacing check, but only for Apollo products. Shows if Apollo bookings are on track to hit the Apollo rebate target by end of Q2.">
     <div class="metric-label">Apollo Pacing</div>
     <div class="metric-value" id="apolloPacing"><div class="skeleton"></div></div>
     <div class="metric-sub">QTD: <strong id="apolloQtd">—</strong> vs <strong id="apolloTarget">—</strong></div>
   </div>
-  <div class="metric-card">
+  <div class="metric-card" data-tooltip="The dollar amount we need to sell this month to stay on track for the rebate. Hitting this each month adds up to the full Q2 rebate target.">
     <div class="metric-label">Monthly Rebate Target</div>
     <div class="metric-value" id="monthlyAOP"><div class="skeleton"></div></div>
     <div class="metric-sub" id="monthlyAOPSub">—</div>
   </div>
-  <div class="metric-card">
+  <div class="metric-card" data-tooltip="The total sales goal for all of Q2 (April + May + June). The main number is the rebate target set with dealers. OPlan is our internal company plan.">
     <div class="metric-label">Q2 Sales Target</div>
     <div class="metric-value" id="q2Target"><div class="skeleton"></div></div>
     <div class="metric-sub">OPlan: <strong id="q2OplanTarget">—</strong></div>
   </div>
-  <div class="metric-card">
+  <div class="metric-card" data-tooltip="Orders customers have already placed that we haven't shipped yet. This is money we've 'won' but haven't delivered — it usually ships in the coming weeks.">
     <div class="metric-label">Open Order Backlog</div>
     <div class="metric-value" id="openBacklog"><div class="skeleton"></div></div>
     <div class="metric-sub" id="openBacklogSub">—</div>
@@ -681,8 +724,8 @@
         <div class="fp-period-pills" id="fpPeriodPills"></div>
       </div>
 
-      <!-- Dealer -->
-      <div class="fp-section">
+      <!-- Dealer (bookings tab only) -->
+      <div class="fp-section fp-bookings-only" style="display:none">
         <div class="fp-section-hd">
           <span class="fp-section-label">Dealer</span>
           <button class="fp-act-btn" onclick="fpDealerAll()">Select All</button>
@@ -692,8 +735,8 @@
         <div class="fp-list" id="fpDealerList"><div class="fp-empty">Loading…</div></div>
       </div>
 
-      <!-- Product Line -->
-      <div class="fp-section">
+      <!-- Product Line (bookings tab only) -->
+      <div class="fp-section fp-bookings-only" style="display:none">
         <div class="fp-section-hd">
           <span class="fp-section-label">Product Line</span>
           <button class="fp-act-btn" onclick="fpPLAll()">Select All</button>
@@ -702,8 +745,8 @@
         <div class="fp-list" id="fpPLList"><div class="fp-empty">Loading…</div></div>
       </div>
 
-      <!-- Product ID -->
-      <div class="fp-section">
+      <!-- Product ID (bookings tab only) -->
+      <div class="fp-section fp-bookings-only" style="display:none">
         <div class="fp-section-hd">
           <span class="fp-section-label">Product ID</span>
           <button class="fp-act-btn" onclick="fpPIDAll()">Select All</button>
@@ -724,6 +767,8 @@
     <div class="panel active" id="panel-registrations">
       <div class="reg-strip" id="reg-cards"></div>
 
+      <div class="chart-title" style="font-size:1.1rem;font-weight:700;color:#f1f5f9;margin-bottom:16px;">Apollo Registrations</div>
+
       <div class="chart-section">
         <div class="chart-title">Weekly Registrations — Units by Product Line</div>
         <canvas id="regChart" height="90"></canvas>
@@ -731,9 +776,15 @@
       </div>
 
       <div class="chart-section">
-        <div class="chart-title">Weekly Reg Dollars vs OPlan Sell-In Pace</div>
+        <div class="chart-section-header">
+          <div class="chart-title" id="paceChartTitle">Weekly Reg Dollars vs OPlan Sell-In Pace</div>
+          <div class="chart-mode-toggle">
+            <button class="chart-mode-btn active" id="paceModeBtn-dollars" onclick="setPaceMode('dollars')">$ Dollars</button>
+            <button class="chart-mode-btn" id="paceModeBtn-units" onclick="setPaceMode('units')">Units</button>
+          </div>
+        </div>
         <canvas id="regPaceChart" height="90"></canvas>
-        <div class="chart-note">OPlan pace = monthly sell-in plan ÷ weeks in month. Registrations measure end-user activations, which can exceed sell-in pace when channel inventory depletes.</div>
+        <div class="chart-note" id="paceChartNote">OPlan pace = monthly sell-in plan ÷ weeks in month. Registrations measure end-user activations, which can exceed sell-in pace when channel inventory depletes.</div>
       </div>
 
       <div class="chart-section">
@@ -746,18 +797,12 @@
 
     <!-- Bookings vs Plan -->
     <div class="panel" id="panel-revenue">
-      <div class="rv-controls">
-        <div id="rvGranularity" class="rv-segment">
-          <button class="rv-seg-btn active" data-gran="productLine" onclick="rvSetGran('productLine')">Product Line</button>
-          <button class="rv-seg-btn" data-gran="product" onclick="rvSetGran('product')">Product</button>
-          <button class="rv-seg-btn" data-gran="dealer" onclick="rvSetGran('dealer')">Dealer</button>
-        </div>
-      </div>
+      <div class="reg-strip" id="bk-cards"></div>
 
       <div class="chart-section">
         <div class="chart-title">Q2 2026 Total Bookings — Actual vs AOP vs Sales Target (by Month)</div>
         <canvas id="rvChartQ2" height="80"></canvas>
-        <div class="chart-note">Future month actuals = $0. AOP and Sales Target shown for full quarter planning context.</div>
+        <div class="chart-note">Actuals from accurate monthly aggregates. OPlan and Sales Target shown for full quarter context.</div>
       </div>
 
       <div class="chart-section">
@@ -776,6 +821,19 @@
         <div class="chart-title">Q2 2026 Full-Quarter Plan Summary</div>
         <div class="reg-table-wrap">
           <table class="reg-table" id="rvQ2Table"></table>
+        </div>
+      </div>
+
+      <div class="chart-section" id="omniDetailSection">
+        <div class="omni-detail-toggle" onclick="toggleOmniDetail()">
+          <span>Product ID Detail — Dealer × Product ID (Q2 Totals)</span>
+          <span id="omniDetailChevron" class="omni-detail-chevron">▾</span>
+        </div>
+        <div id="omniDetailPanel" style="display:none;margin-top:12px;">
+          <div id="pidDetailInfo" class="chart-note" style="margin-bottom:10px;"></div>
+          <div class="reg-table-wrap">
+            <table class="reg-table pid-detail-table" id="pidDetailTable"></table>
+          </div>
         </div>
       </div>
     </div>
@@ -821,6 +879,8 @@
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
     document.getElementById('panel-' + name).classList.add('active');
+    const showBookings = name === 'revenue';
+    document.querySelectorAll('.fp-bookings-only').forEach(s => s.style.display = showBookings ? '' : 'none');
   }
 
   // ── Q2 calendar ──
@@ -1069,7 +1129,7 @@
     const search = (document.getElementById('fpPIDSearch').value || '').toLowerCase();
     const vis    = search ? all.filter(id => id.toLowerCase().includes(search)) : all;
     if (!vis.length) {
-      document.getElementById('fpPIDList').innerHTML = '<div class="fp-empty">No products match</div>';
+      document.getElementById('fpPIDList').innerHTML = `<div class="fp-empty">${all.length === 0 ? 'Not available at current granularity' : 'No products match'}</div>`;
       return;
     }
     document.getElementById('fpPIDList').innerHTML = vis.map(id => {
@@ -1120,8 +1180,88 @@
     if (!_lastData) return;
     renderRegistrationCharts(_lastData);
     renderRegPaceChart(_lastData);
+    renderBookingsCards(_lastData);
     renderRevenue(_lastData);
     renderInventory(_lastData);
+    refreshOmniDetail();
+  }
+
+  function renderBookingsCards(d) {
+    const elapsed   = q2DaysElapsed();
+    const remaining = Q2_DAYS - elapsed;
+    const paceRatio = elapsed / Q2_DAYS;
+
+    // When filters are active, derive QTD from bookingsRows instead of top-level aggregate
+    const hasFilters = (GF.dealers && GF.dealers.size > 0) ||
+                       (GF.productLines && GF.productLines.size > 0) ||
+                       (GF.productIds && GF.productIds.size > 0);
+    let qtd = d.qtdBookings, q2Rebate = d.q2RebateTarget, q2Oplan = d.q2OplanTarget;
+    if (hasFilters) {
+      let rows = d.bookingsRows || [];
+      if (GF.dealers      && GF.dealers.size > 0)      rows = rows.filter(r => GF.dealers.has(r.levelCode));
+      if (GF.productLines && GF.productLines.size > 0)  rows = rows.filter(r => GF.productLines.has(r.productLine));
+      if (GF.productIds   && GF.productIds.size > 0)    rows = rows.filter(r => GF.productIds.has(r.productId));
+      qtd      = rows.reduce((s,r) => s + (r.actual||0), 0);
+      q2Rebate = rows.reduce((s,r) => s + (r.salesTarget||0), 0);
+      q2Oplan  = rows.reduce((s,r) => s + (r.oplan||0), 0);
+    }
+
+    const projected = paceRatio > 0 ? qtd / paceRatio : null;
+    const expRebate = q2Rebate * paceRatio;
+    const expOplan  = q2Oplan  * paceRatio;
+    const vsRebate  = expRebate > 0 ? (qtd / expRebate) - 1 : null;
+    const vsOplan   = expOplan  > 0 ? (qtd / expOplan)  - 1 : null;
+
+    const colorMap = { blue: 'val-blue', yellow: 'val-yellow', green: 'val-green', red: 'val-red', white: 'val-white' };
+
+    const filterNote = hasFilters ? ' (filtered)' : '';
+    const cards = [
+      { label: 'QTD BOOKINGS',
+        value: fmt(qtd),
+        sub: remaining + ' days remaining' + filterNote,
+        color: 'blue',
+        tooltip: 'Total dollar value of sales orders received so far this quarter (April through today).' },
+      { label: 'Q2 PROJECTED',
+        value: projected != null ? fmt(projected) : '—',
+        sub: 'At current pace' + filterNote,
+        color: 'blue',
+        tooltip: 'If bookings keep coming in at today\'s rate through June 30, this is the estimated Q2 total.' },
+      { label: 'VS REBATE TARGET',
+        value: fmtPctSigned(vsRebate),
+        sub: 'Expected by now: ' + fmt(expRebate),
+        color: vsRebate != null && vsRebate >= 0 ? 'green' : 'red',
+        tooltip: 'Compares QTD bookings to where we should be at this point in the quarter to hit the rebate target. Positive = ahead of pace; negative = behind.' },
+      { label: 'VS OPLAN',
+        value: fmtPctSigned(vsOplan),
+        sub: 'Expected by now: ' + fmt(expOplan),
+        color: vsOplan != null && vsOplan >= 0 ? 'green' : 'red',
+        tooltip: 'Same comparison but against the internal OPlan target instead of the rebate target.' },
+      { label: (d.currentMonth || 'MONTHLY') + ' TARGET',
+        value: fmt(d.monthlyRebateTarget),
+        color: 'white',
+        tooltip: 'The bookings goal for this month to stay on track for the full-quarter rebate target.' },
+      { label: 'Q2 REBATE TARGET',
+        value: fmt(q2Rebate),
+        color: 'white',
+        tooltip: 'The total Q2 sales goal agreed with dealers to qualify for the quarterly rebate.' },
+      { label: 'Q2 OPLAN',
+        value: fmt(q2Oplan),
+        color: 'white',
+        tooltip: 'The internal company operating plan target for Q2 hardware bookings.' },
+      { label: 'OPEN ORDER BACKLOG',
+        value: fmt(d.openBacklog),
+        sub: 'Orders not yet shipped',
+        color: 'blue',
+        tooltip: 'Orders placed by customers that haven\'t shipped yet — money already won but not yet recognized as revenue.' },
+    ];
+
+    document.getElementById('bk-cards').innerHTML = cards.map(c => `
+      <div class="metric-card" data-tooltip="${c.tooltip}">
+        <div class="metric-label">${c.label}</div>
+        <div class="metric-value ${colorMap[c.color]}">${c.value}</div>
+        ${c.sub ? `<div class="metric-sub">${c.sub}</div>` : ''}
+      </div>
+    `).join('');
   }
 
   // ── Product line colors ──
@@ -1183,18 +1323,18 @@
     const colorMap = { blue: 'val-blue', yellow: 'val-yellow', green: 'val-green', red: 'val-red', white: 'val-white' };
 
     const cards = [
-      { label: fmtWeekLabel(w2Start) + ' REGS (UNITS)',        value: w2   ? w2.units.toLocaleString()          : '—', color: 'blue' },
-      { label: fmtWeekLabel(w1Start) + ' REGS (UNITS)',        value: w1   ? w1.units.toLocaleString()          : '—', color: 'blue' },
-      { label: fmtWeekLabel(curWeekStart) + ' REGS (PARTIAL)', value: wCur ? wCur.units.toLocaleString()        : '—', color: 'yellow' },
-      { label: '2-WK AVG FULL WEEKS',                          value: avg2Units != null ? avg2Units.toLocaleString() + ' / wk' : '—', color: 'green' },
-      { label: fmtWeekLabel(w2Start) + ' REG DOLLARS',         value: w2   ? fmtDollars(w2.dollars)             : '—', color: 'blue' },
-      { label: fmtWeekLabel(w1Start) + ' REG DOLLARS',         value: w1   ? fmtDollars(w1.dollars)             : '—', color: 'blue' },
-      { label: 'OPLAN WEEKLY PACE',                            value: fmtDollars(oplanWkly) + ' / wk', sub: 'Q2 Target: ' + fmt(regs.apolloRebateTargetQ2), color: 'white' },
-      { label: 'REG VS OPLAN PACE',                            value: fmtPctSigned(vsOplan), color: vsOplan != null && vsOplan >= 0 ? 'green' : 'red' },
+      { label: fmtWeekLabel(w2Start) + ' REGS (UNITS)',        value: w2   ? w2.units.toLocaleString()          : '—', color: 'blue',   tooltip: 'Number of Apollo products customers registered two weeks ago. Each registration means someone activated their new Apollo device.' },
+      { label: fmtWeekLabel(w1Start) + ' REGS (UNITS)',        value: w1   ? w1.units.toLocaleString()          : '—', color: 'blue',   tooltip: 'Number of Apollo products registered last week.' },
+      { label: fmtWeekLabel(curWeekStart) + ' REGS (PARTIAL)', value: wCur ? wCur.units.toLocaleString()        : '—', color: 'yellow', tooltip: 'Registrations so far this week. Since the week isn\'t over yet, this number will keep climbing.' },
+      { label: '2-WK AVG FULL WEEKS',                          value: avg2Units != null ? avg2Units.toLocaleString() + ' / wk' : '—', color: 'green',  tooltip: 'Average weekly registrations based on the last two complete weeks. Used as the baseline for pacing.' },
+      { label: fmtWeekLabel(w2Start) + ' REG DOLLARS',         value: w2   ? fmtDollars(w2.dollars)             : '—', color: 'blue',   tooltip: 'Dollar value of products registered two weeks ago, based on the suggested retail price (static ASP) of each product.' },
+      { label: fmtWeekLabel(w1Start) + ' REG DOLLARS',         value: w1   ? fmtDollars(w1.dollars)             : '—', color: 'blue',   tooltip: 'Dollar value of products registered last week, based on suggested retail price.' },
+      { label: 'OPLAN WEEKLY PACE',                            value: fmtDollars(oplanWkly) + ' / wk', sub: 'Q2 Target: ' + fmt(regs.apolloRebateTargetQ2), color: 'white',  tooltip: 'How much we need in weekly registrations to hit the Q2 OPlan target. Calculated as Q2 OPlan ÷ 13 weeks.' },
+      { label: 'REG VS OPLAN PACE',                            value: fmtPctSigned(vsOplan), color: vsOplan != null && vsOplan >= 0 ? 'green' : 'red', tooltip: 'Compares our 2-week average registration dollars to the OPlan weekly pace. Positive = registering more than needed; negative = behind pace.' },
     ];
 
     document.getElementById('reg-cards').innerHTML = cards.map(c => `
-      <div class="metric-card">
+      <div class="metric-card" data-tooltip="${c.tooltip}">
         <div class="metric-label">${c.label}</div>
         <div class="metric-value ${colorMap[c.color]}">${c.value}</div>
         ${c.sub ? `<div class="metric-sub">${c.sub}</div>` : ''}
@@ -1375,8 +1515,17 @@
     }
   }
 
-  // ── Reg dollars vs OPlan pace chart ──
+  // ── Reg pace chart (dollars / units toggle) ──
   let regPaceChartInstance = null;
+  let paceChartMode = 'dollars';
+
+  function setPaceMode(mode) {
+    paceChartMode = mode;
+    ['dollars', 'units'].forEach(m =>
+      document.getElementById('paceModeBtn-' + m).classList.toggle('active', m === mode)
+    );
+    renderRegPaceChart(_lastData);
+  }
 
   function renderRegPaceChart(d) {
     if (!d.registrationsByProductLine || !d.apolloMonthlyOplan) return;
@@ -1388,7 +1537,6 @@
     ];
     const WEEKS_PER_MONTH = { '2026-04': 4, '2026-05': 4, '2026-06': 5 };
 
-    // Period filter
     const filteredWeeks = GF.period === 'qtd'
       ? Q2_WEEKS
       : Q2_WEEKS.filter(ws => ws.startsWith(GF.period));
@@ -1399,23 +1547,6 @@
     const regByWeek = {};
     d.registrationsByProductLine.forEach(w => { regByWeek[w.weekStart] = w; });
 
-    const oplanPace = filteredWeeks.map(ws => {
-      const mo   = ws.slice(0, 7);
-      const plan = d.apolloMonthlyOplan[mo];
-      return plan != null ? plan / WEEKS_PER_MONTH[mo] : null;
-    });
-
-    const actualDollars = filteredWeeks.map(ws => {
-      const w = regByWeek[ws];
-      if (!w) return null;
-      // Apply PL filter if active
-      const entries = Object.entries(w.products || {});
-      const filtered = GF.productLines !== null && GF.productLines.size > 0
-        ? entries.filter(([pl]) => GF.productLines.has(pl))
-        : entries;
-      return filtered.reduce((s, [, p]) => s + (p.dollars || 0), 0);
-    });
-
     const labels = filteredWeeks.map(ws => {
       const dt = new Date(ws + 'T00:00:00');
       let label = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -1425,27 +1556,104 @@
 
     const ctx = document.getElementById('regPaceChart').getContext('2d');
     if (regPaceChartInstance) regPaceChartInstance.destroy();
-    regPaceChartInstance = new Chart(ctx, {
-      data: {
-        labels,
-        datasets: [
-          { type: 'bar', label: 'Actual Reg Dollars', data: actualDollars, backgroundColor: '#3b82f6', borderWidth: 0, order: 2 },
-          { type: 'line', label: 'OPlan Weekly Pace', data: oplanPace, borderColor: '#f97316', borderWidth: 2, borderDash: [6,4], pointBackgroundColor: '#f97316', pointRadius: 4, pointHoverRadius: 6, fill: false, tension: 0, order: 1 }
-        ]
-      },
-      options: {
-        responsive: true,
-        interaction: { mode: 'index', intersect: false },
-        plugins: {
-          legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12, padding: 14 } },
-          tooltip: { callbacks: { label: ctx => { const v = ctx.raw; if (v == null) return null; return ctx.dataset.label + ': ' + (v >= 1e5 ? '$'+(v/1e6).toFixed(1)+'M' : '$'+Math.round(v/1e3)+'K'); } } }
-        },
-        scales: {
-          x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
-          y: { ticks: { color: '#64748b', callback: v => '$'+Math.round(v/1000)+'K' }, grid: { color: 'rgba(255,255,255,0.05)' } }
-        }
+
+    if (paceChartMode === 'units') {
+      document.getElementById('paceChartTitle').textContent = 'Weekly Registration Units vs Q2 Forecast';
+      document.getElementById('paceChartNote').textContent = '2026 forecast from Q2 Weekly Reg Forecast (monthly OP target distributed by historical seasonality). * Partial current week.';
+
+      const forecastByWeek = {};
+      if (d.apolloRegForecast) {
+        d.apolloRegForecast.weeks.forEach((ws, i) => {
+          forecastByWeek[ws] = {
+            desktop:   d.apolloRegForecast.desktop[i],
+            rackmount: d.apolloRegForecast.rackmount[i],
+            combined:  d.apolloRegForecast.combined[i]
+          };
+        });
       }
-    });
+
+      const actualDesktop   = filteredWeeks.map(ws => (regByWeek[ws]?.products?.['Apollo Desktop']?.units)   ?? 0);
+      const actualRackmount = filteredWeeks.map(ws => (regByWeek[ws]?.products?.['Apollo Rackmount']?.units) ?? 0);
+      const fcastDesktop    = filteredWeeks.map(ws => forecastByWeek[ws]?.desktop   ?? null);
+      const fcastRackmount  = filteredWeeks.map(ws => forecastByWeek[ws]?.rackmount ?? null);
+      const fcastCombined   = filteredWeeks.map(ws => forecastByWeek[ws]?.combined  ?? null);
+
+      regPaceChartInstance = new Chart(ctx, {
+        data: {
+          labels,
+          datasets: [
+            { type: 'bar',  label: 'Desktop Actual',    data: actualDesktop,   backgroundColor: '#3b82f6', borderWidth: 0, stack: 'actual', order: 5 },
+            { type: 'bar',  label: 'Rackmount Actual',  data: actualRackmount, backgroundColor: '#93c5fd', borderWidth: 0, stack: 'actual', order: 4 },
+            { type: 'line', label: 'Desktop Forecast',  data: fcastDesktop,    borderColor: '#60a5fa', borderWidth: 2, borderDash: [5,4], pointRadius: 3, pointBackgroundColor: '#60a5fa', fill: false, tension: 0, order: 3 },
+            { type: 'line', label: 'Rackmount Forecast',data: fcastRackmount,  borderColor: '#67e8f9', borderWidth: 2, borderDash: [5,4], pointRadius: 3, pointBackgroundColor: '#67e8f9', fill: false, tension: 0, order: 2 },
+            { type: 'line', label: 'Combined Forecast', data: fcastCombined,   borderColor: '#fbbf24', borderWidth: 2.5, borderDash: [6,3], pointRadius: 3, pointBackgroundColor: '#fbbf24', fill: false, tension: 0, order: 1 }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12, padding: 14 } },
+            tooltip: { callbacks: { label: ctx => {
+              const v = ctx.raw;
+              if (v == null) return null;
+              return ctx.dataset.label + ': ' + v.toLocaleString();
+            }}}
+          },
+          scales: {
+            x: { stacked: true, ticks: { color: '#94a3b8' }, grid: { display: false } },
+            y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+          }
+        }
+      });
+
+    } else {
+      document.getElementById('paceChartTitle').textContent = 'Weekly Reg Dollars vs OPlan Sell-In Pace';
+      document.getElementById('paceChartNote').textContent = 'OPlan pace = monthly sell-in plan ÷ weeks in month. Registrations measure end-user activations, which can exceed sell-in pace when channel inventory depletes.';
+
+      const oplanByPL = d.apolloMonthlyOplanByPL || {};
+      const fmtDollar = v => v == null ? null : (v >= 1e5 ? '$'+(v/1e6).toFixed(1)+'M' : '$'+Math.round(v/1e3)+'K');
+
+      const oplanPace = (plKey) => filteredWeeks.map(ws => {
+        const mo   = ws.slice(0, 7);
+        const plan = plKey ? oplanByPL[plKey]?.[mo] : d.apolloMonthlyOplan[mo];
+        return plan != null ? plan / WEEKS_PER_MONTH[mo] : null;
+      });
+
+      const actualByPL = (pl) => filteredWeeks.map(ws => {
+        const w = regByWeek[ws];
+        return w ? (w.products?.[pl]?.dollars ?? 0) : 0;
+      });
+
+      regPaceChartInstance = new Chart(ctx, {
+        data: {
+          labels,
+          datasets: [
+            { type: 'bar',  label: 'Desktop Actual $',    data: actualByPL('Apollo Desktop'),   backgroundColor: '#3b82f6', borderWidth: 0, stack: 'actual', order: 6 },
+            { type: 'bar',  label: 'Rackmount Actual $',  data: actualByPL('Apollo Rackmount'),  backgroundColor: '#93c5fd', borderWidth: 0, stack: 'actual', order: 5 },
+            { type: 'line', label: 'Desktop OPlan Pace',  data: oplanPace('Apollo Desktop'),    borderColor: '#60a5fa', borderWidth: 2, borderDash: [5,4], pointRadius: 3, pointBackgroundColor: '#60a5fa', fill: false, tension: 0, order: 3 },
+            { type: 'line', label: 'Rackmount OPlan Pace',data: oplanPace('Apollo Rackmount'),  borderColor: '#67e8f9', borderWidth: 2, borderDash: [5,4], pointRadius: 3, pointBackgroundColor: '#67e8f9', fill: false, tension: 0, order: 2 },
+            { type: 'line', label: 'Combined OPlan Pace', data: oplanPace(null),                borderColor: '#f97316', borderWidth: 2.5, borderDash: [6,3], pointRadius: 3, pointBackgroundColor: '#f97316', fill: false, tension: 0, order: 1 }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12, padding: 14 } },
+            tooltip: { callbacks: { label: ctx => {
+              const v = ctx.raw;
+              if (v == null) return null;
+              return ctx.dataset.label + ': ' + fmtDollar(v);
+            }}}
+          },
+          scales: {
+            x: { stacked: true, ticks: { color: '#94a3b8' }, grid: { display: false } },
+            y: { ticks: { color: '#64748b', callback: v => fmtDollar(v) }, grid: { color: 'rgba(255,255,255,0.05)' } }
+          }
+        }
+      });
+    }
   }
 
   // ── Bookings vs Plan tab ──
@@ -1535,20 +1743,79 @@
     const fmtPctSgn = v => v == null ? '—' : (v>=0?'+':'') + (v*100).toFixed(1) + '%';
     const fmtPctOf  = v => v == null ? '—' : (v*100).toFixed(0) + '%';
 
-    // Chart 1: Q2 overview (respects dealer/PL/PID but always all 3 months)
-    let allRows = data.bookingsRows || [];
-    if (GF.dealers && GF.dealers.size > 0) allRows = allRows.filter(r => GF.dealers.has(r.levelCode));
-    if (GF.productLines && GF.productLines.size > 0) allRows = allRows.filter(r => GF.productLines.has(r.productLine));
-    if (GF.productIds && GF.productIds.size > 0) allRows = allRows.filter(r => GF.productIds.has(r.productId));
+    // Chart 1: Q2 overview — default: total actual bar; stacked by PL when PL filter is active
+    const PL_COLORS_BK = {
+      'Apollo Desktop':   '#3b82f6',
+      'Apollo Rackmount': '#60a5fa',
+      'Volt Desktop':     '#a78bfa',
+      'Modeling Mics':    '#34d399',
+      'Analog':           '#fbbf24',
+      'AIB':              '#f97316',
+      'GPM':              '#e879f9',
+      'GPS':              '#22d3ee',
+      'UAD':              '#94a3b8',
+      'Amp Top Box':      '#fb923c',
+      'Accessories':      '#86efac',
+      'Analog Mics':      '#fca5a5',
+    };
 
-    const monthly = RV_MONTHS.map(m => {
-      const mr = allRows.filter(r => r.month === m);
-      return {
-        actual:      mr.reduce((s,r)=>s+(r.actual||0),0),
-        oplan:       mr.reduce((s,r)=>s+(r.oplan||0),0),
-        salesTarget: mr.reduce((s,r)=>s+(r.salesTarget||0),0),
-      };
-    });
+    const hasDealerFilter = GF.dealers && GF.dealers.size > 0;
+    const hasPLFilter     = GF.productLines && GF.productLines.size > 0;
+    const hasFilters      = hasDealerFilter || hasPLFilter ||
+                            (GF.productIds && GF.productIds.size > 0);
+
+    let byPL, plNames, oplanByMonth, targetByMonth, stackedMode;
+
+    if (hasFilters) {
+      // Derive from bookingsRows with all active filters applied
+      let allRows = data.bookingsRows || [];
+      if (hasDealerFilter)                               allRows = allRows.filter(r => GF.dealers.has(r.levelCode));
+      if (hasPLFilter)                                   allRows = allRows.filter(r => GF.productLines.has(r.productLine));
+      if (GF.productIds && GF.productIds.size > 0)       allRows = allRows.filter(r => GF.productIds.has(r.productId));
+
+      oplanByMonth  = RV_MONTHS.map(m => allRows.filter(r=>r.month===m).reduce((s,r)=>s+(r.oplan||0),0));
+      targetByMonth = RV_MONTHS.map(m => allRows.filter(r=>r.month===m).reduce((s,r)=>s+(r.salesTarget||0),0));
+
+      if (hasPLFilter) {
+        // Stacked breakdown by selected product lines
+        stackedMode = true;
+        byPL = {};
+        allRows.forEach(r => {
+          const pl = r.productLine || '—';
+          if (!byPL[pl]) byPL[pl] = {'2026-04':0,'2026-05':0,'2026-06':0};
+          byPL[pl][r.month] = (byPL[pl][r.month] || 0) + (r.actual || 0);
+        });
+        byPL = Object.fromEntries(Object.entries(byPL).sort((a,b) => Object.values(b[1]).reduce((s,v)=>s+v,0) - Object.values(a[1]).reduce((s,v)=>s+v,0)));
+        plNames = Object.keys(byPL);
+      } else {
+        // Dealer filter only — single total bar
+        stackedMode = false;
+        const totals = {'2026-04':0,'2026-05':0,'2026-06':0};
+        allRows.forEach(r => { totals[r.month] = (totals[r.month] || 0) + (r.actual || 0); });
+        byPL = { 'Total Bookings': totals };
+        plNames = ['Total Bookings'];
+      }
+    } else {
+      // No filters — single total bar from accurate pre-aggregated data
+      stackedMode = false;
+      const hasMonthlyAgg = data.monthlyOplan && data.monthlyRebateByMonth;
+      oplanByMonth  = RV_MONTHS.map(m => hasMonthlyAgg ? (data.monthlyOplan[m]||0)         : (data.bookingsRows||[]).filter(r=>r.month===m).reduce((s,r)=>s+(r.oplan||0),0));
+      targetByMonth = RV_MONTHS.map(m => hasMonthlyAgg ? (data.monthlyRebateByMonth[m]||0) : (data.bookingsRows||[]).filter(r=>r.month===m).reduce((s,r)=>s+(r.salesTarget||0),0));
+
+      const mbk = data.monthlyBookings || {};
+      const totals = {'2026-04': mbk['2026-04']||0, '2026-05': mbk['2026-05']||0, '2026-06': mbk['2026-06']||0};
+      byPL = { 'Total Bookings': totals };
+      plNames = ['Total Bookings'];
+    }
+
+    const plDatasets = plNames.map(pl => ({
+      type: 'bar',
+      label: pl,
+      data: RV_MONTHS.map(m => (byPL[pl] || {})[m] || 0),
+      backgroundColor: stackedMode ? (PL_COLORS_BK[pl] || '#64748b') : '#3b82f6',
+      borderWidth: 0,
+      stack: 'actual',
+    }));
 
     const ctx1 = document.getElementById('rvChartQ2').getContext('2d');
     if (rvChartQ2) rvChartQ2.destroy();
@@ -1557,19 +1824,19 @@
       data: {
         labels: RV_MONTHS.map(m => RV_MONTH_LABEL[m]),
         datasets: [
-          { label:'Actual Bookings', data: monthly.map(m=>m.actual),      backgroundColor:'#3b82f6', borderWidth:0 },
-          { label:'AOP',            data: monthly.map(m=>m.oplan),        backgroundColor:'#475569', borderWidth:0 },
-          { label:'Sales Target',   data: monthly.map(m=>m.salesTarget),  backgroundColor:'#22c55e', borderWidth:0 },
+          ...plDatasets,
+          { type:'line', label:'OPlan',        data: oplanByMonth,  borderColor:'#475569', backgroundColor:'transparent', borderWidth:2, borderDash:[6,3], pointRadius:4, pointBackgroundColor:'#475569', tension:0, order:0 },
+          { type:'line', label:'Sales Target', data: targetByMonth, borderColor:'#22c55e', backgroundColor:'transparent', borderWidth:2, borderDash:[6,3], pointRadius:4, pointBackgroundColor:'#22c55e', tension:0, order:0 },
         ]
       },
       options: {
         responsive: true,
         plugins: {
-          legend: { position:'bottom', labels:{ color:'#94a3b8', font:{size:11}, boxWidth:12, padding:14 } },
+          legend: { position:'bottom', labels:{ color:'#94a3b8', font:{size:11}, boxWidth:12, padding:10 } },
           tooltip: { mode:'index', callbacks:{ label: c => c.dataset.label + ': ' + fmtV(c.raw) } }
         },
         scales: {
-          x: { ticks:{color:'#94a3b8'}, grid:{display:false} },
+          x: { stacked: stackedMode, ticks:{color:'#94a3b8'}, grid:{display:false} },
           y: { ticks:{color:'#64748b', callback: v=>fmtV(v)}, grid:{color:'rgba(255,255,255,0.05)'} }
         }
       }
@@ -1832,6 +2099,7 @@
       renderRegistrations(data);
       renderRegistrationCharts(data);
       renderRegPaceChart(data);
+      renderBookingsCards(data);
       initRevenue(data);
       initPanel(data);
       renderInventory(data);
@@ -1845,6 +2113,139 @@
   }
 
   refreshData();
+
+  // ── Card tooltips ──
+  const _tt = document.createElement('div');
+  _tt.id = 'card-tooltip';
+  document.body.appendChild(_tt);
+
+  document.addEventListener('mouseover', e => {
+    const card = e.target.closest('[data-tooltip]');
+    if (!card) return;
+    _tt.textContent = card.dataset.tooltip;
+    const r = card.getBoundingClientRect();
+    const ttW = 230;
+    let left = r.left + r.width / 2 - ttW / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - ttW - 8));
+    const spaceBelow = window.innerHeight - r.bottom;
+    if (spaceBelow >= 110) {
+      _tt.style.top  = (r.bottom + 8) + 'px';
+      _tt.style.left = left + 'px';
+    } else {
+      _tt.style.top  = (r.top - 8) + 'px';
+      _tt.style.left = left + 'px';
+      _tt.style.transform = 'translateY(-100%)';
+    }
+    _tt.classList.add('visible');
+  });
+  document.addEventListener('mouseout', e => {
+    if (!e.target.closest('[data-tooltip]')) return;
+    _tt.classList.remove('visible');
+    _tt.style.transform = '';
+  });
+
+  // ── Product ID Detail table (pidDetailRows) ──
+  let omniDetailOpen = false;
+  let pidSortCol = 'booked';
+  let pidSortAsc = false;
+
+  function toggleOmniDetail() {
+    omniDetailOpen = !omniDetailOpen;
+    document.getElementById('omniDetailPanel').style.display = omniDetailOpen ? 'block' : 'none';
+    document.getElementById('omniDetailChevron').style.transform = omniDetailOpen ? 'rotate(180deg)' : '';
+    if (omniDetailOpen) renderPidDetail();
+  }
+
+  function refreshOmniDetail() {
+    if (!omniDetailOpen) return;
+    renderPidDetail();
+  }
+
+  function pidSort(col) {
+    if (pidSortCol === col) pidSortAsc = !pidSortAsc;
+    else { pidSortCol = col; pidSortAsc = false; }
+    renderPidDetail();
+  }
+
+  function renderPidDetail() {
+    const rows = (_lastData && _lastData.pidDetailRows) || [];
+    let filtered = rows;
+    if (GF.dealers && GF.dealers.size > 0)
+      filtered = filtered.filter(r => GF.dealers.has(r.dealer));
+    if (GF.productLines && GF.productLines.size > 0)
+      filtered = filtered.filter(r => GF.productLines.has(r.productLine));
+
+    const numericCols = ['booked','shipped','open','rebateTarget'];
+    filtered = [...filtered].sort((a, b) => {
+      const av = a[pidSortCol] || 0, bv = b[pidSortCol] || 0;
+      if (typeof av === 'string') return pidSortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+      return pidSortAsc ? av - bv : bv - av;
+    });
+
+    const info = document.getElementById('pidDetailInfo');
+    info.textContent = filtered.length.toLocaleString() + ' rows · Q2 2026 totals · click column headers to sort';
+
+    const showDealer = !GF.dealers || GF.dealers.size !== 1;
+    const showPL = !GF.productLines || GF.productLines.size !== 1;
+
+    const cols = [
+      ...(showDealer ? [{key:'dealer',       label:'Dealer',         align:'left',  sortable:true}] : []),
+      ...(showPL     ? [{key:'productLine',   label:'Product Line',   align:'left',  sortable:true}] : []),
+      {key:'productId',    label:'Product ID',    align:'left',  sortable:true},
+      {key:'booked',       label:'Booked',        align:'right', sortable:true, fmt:'$'},
+      {key:'shipped',      label:'Shipped',       align:'right', sortable:true, fmt:'$'},
+      {key:'open',         label:'Open',          align:'right', sortable:true, fmt:'$'},
+      {key:'rebateTarget', label:'Rebate Target', align:'right', sortable:true, fmt:'$'},
+    ];
+
+    const fmtUSD = v => v == null ? '—' : '$' + Math.round(v).toLocaleString('en-US');
+    const sortIcon = key => key === pidSortCol
+      ? `<span class="pid-sort-icon">${pidSortAsc ? '▲' : '▼'}</span>` : '';
+
+    let html = '<thead><tr>';
+    cols.forEach(c => {
+      const attrs = c.sortable ? `data-sortable onclick="pidSort('${c.key}')"` : '';
+      html += `<th ${attrs} style="text-align:${c.align}">${c.label}${sortIcon(c.key)}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    const PAGE = 500;
+    filtered.slice(0, PAGE).forEach(r => {
+      html += '<tr>';
+      cols.forEach(c => {
+        const v = r[c.key];
+        html += `<td style="text-align:${c.align}">${c.fmt === '$' ? fmtUSD(v) : (v || '—')}</td>`;
+      });
+      html += '</tr>';
+    });
+
+    // totals row
+    if (filtered.length > 0) {
+      const tot = {
+        booked:       filtered.reduce((s,r) => s+(r.booked||0), 0),
+        shipped:      filtered.reduce((s,r) => s+(r.shipped||0), 0),
+        open:         filtered.reduce((s,r) => s+(r.open||0), 0),
+        rebateTarget: filtered.reduce((s,r) => s+(r.rebateTarget||0), 0),
+      };
+      const leftCols = cols.filter(c => !['booked','shipped','open','rebateTarget'].includes(c.key));
+      html += '<tr class="total-row">';
+      leftCols.forEach((c, i) => {
+        html += `<td>${i === 0 ? 'Total (' + filtered.length.toLocaleString() + ' rows)' : ''}</td>`;
+      });
+      html += `<td style="text-align:right">${fmtUSD(tot.booked)}</td>`;
+      html += `<td style="text-align:right">${fmtUSD(tot.shipped)}</td>`;
+      html += `<td style="text-align:right">${fmtUSD(tot.open)}</td>`;
+      html += `<td style="text-align:right">${fmtUSD(tot.rebateTarget)}</td>`;
+      html += '</tr>';
+    }
+
+    if (filtered.length > PAGE) {
+      html += `<tr><td colspan="${cols.length}" style="text-align:center;color:#64748b;padding:12px 10px;">Showing ${PAGE.toLocaleString()} of ${filtered.length.toLocaleString()} rows — apply dealer / product line filters to narrow</td></tr>`;
+    }
+
+    html += '</tbody>';
+    document.getElementById('pidDetailTable').innerHTML = html;
+  }
 </script>
 </body>
 </html>
