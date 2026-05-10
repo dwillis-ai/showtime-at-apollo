@@ -9080,16 +9080,16 @@
   "registrationsByProductLine": [
     {
       "weekStart": "2026-03-30",
-      "isContextWeek": true,
+      "isContextWeek": false,
       "isPartial": false,
       "products": {
         "Apollo Desktop": {
           "units": 463,
-          "dollars": 200320.33
+          "dollars": 376890.9
         },
         "Apollo Rackmount": {
           "units": 120,
-          "dollars": 184243.2
+          "dollars": 247655.6
         }
       }
     },
@@ -9100,11 +9100,11 @@
       "products": {
         "Apollo Desktop": {
           "units": 616,
-          "dollars": 267650.31
+          "dollars": 499767.74
         },
         "Apollo Rackmount": {
           "units": 135,
-          "dollars": 207273.6
+          "dollars": 277614.97
         }
       }
     },
@@ -9115,11 +9115,11 @@
       "products": {
         "Apollo Desktop": {
           "units": 645,
-          "dollars": 277027.2
+          "dollars": 503416.41
         },
         "Apollo Rackmount": {
           "units": 123,
-          "dollars": 188849.28
+          "dollars": 252097.75
         }
       }
     },
@@ -9130,11 +9130,11 @@
       "products": {
         "Apollo Desktop": {
           "units": 570,
-          "dollars": 252817.29
+          "dollars": 454591.35
         },
         "Apollo Rackmount": {
           "units": 121,
-          "dollars": 185778.56
+          "dollars": 252378.7
         }
       }
     },
@@ -9145,11 +9145,11 @@
       "products": {
         "Apollo Desktop": {
           "units": 586,
-          "dollars": 251724.04
+          "dollars": 472782.38
         },
         "Apollo Rackmount": {
           "units": 90,
-          "dollars": 138182.4
+          "dollars": 190121.69
         }
       }
     },
@@ -9159,12 +9159,12 @@
       "isPartial": true,
       "products": {
         "Apollo Desktop": {
-          "units": 536,
-          "dollars": 237195.98
+          "units": 552,
+          "dollars": 460761.31
         },
         "Apollo Rackmount": {
-          "units": 126,
-          "dollars": 193455.36
+          "units": 129,
+          "dollars": 262848.32
         }
       }
     }
@@ -14988,32 +14988,32 @@
       {
         "weekStart": "2026-03-30",
         "units": 583,
-        "dollars": 260810.88
+        "dollars": 624546.5
       },
       {
         "weekStart": "2026-04-06",
         "units": 751,
-        "dollars": 334334.12
+        "dollars": 777382.7
       },
       {
         "weekStart": "2026-04-13",
         "units": 768,
-        "dollars": 345367.99
+        "dollars": 755514.16
       },
       {
         "weekStart": "2026-04-20",
         "units": 691,
-        "dollars": 313918.51
+        "dollars": 706970.05
       },
       {
         "weekStart": "2026-04-27",
         "units": 676,
-        "dollars": 294360.89
+        "dollars": 662904.07
       },
       {
         "weekStart": "2026-05-04",
-        "units": 662,
-        "dollars": 301941.74
+        "units": 681,
+        "dollars": 723609.63
       }
     ],
     "apolloOplanQ2": 11397544.83,
