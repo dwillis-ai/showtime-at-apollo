@@ -544,6 +544,26 @@
   .var-pos { color: #4ade80; }
   .var-neg { color: #f87171; }
 
+  /* ── Inventory chart pills ── */
+  .inv-chart-controls {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin-bottom: 14px;
+  }
+  .inv-chart-pill-group { display: flex; gap: 4px; flex-wrap: wrap; }
+  .inv-chart-pill-label {
+    font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.07em; color: #475569; align-self: center;
+    white-space: nowrap;
+  }
+  .inv-chart-pill {
+    font-size: 0.72rem; font-weight: 600; padding: 5px 12px;
+    border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);
+    color: #64748b; background: rgba(255,255,255,0.04);
+    cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap;
+  }
+  .inv-chart-pill:hover { color: #94a3b8; background: rgba(255,255,255,0.08); }
+  .inv-chart-pill.active { background: rgba(59,130,246,0.2); color: #93c5fd; border-color: rgba(59,130,246,0.3); }
+
   /* ── Channel Inventory tab ── */
   .inv-toolbar {
     display: flex;
@@ -855,6 +875,25 @@
           <button class="inv-wos-pill" data-range="11-20" onclick="invSetRange('11-20')">11–20 wks</button>
           <button class="inv-wos-pill" data-range="20+" onclick="invSetRange('20+')">20+ wks</button>
         </div>
+      </div>
+
+      <!-- Inventory charts + pill controls -->
+      <div class="chart-section">
+        <div class="inv-chart-controls">
+          <span class="inv-chart-pill-label">Product Line</span>
+          <div class="inv-chart-pill-group" id="invPlPills"></div>
+          <span class="inv-chart-pill-label" style="margin-left:8px">Dealer</span>
+          <div class="inv-chart-pill-group" id="invDealerPills"></div>
+        </div>
+        <div class="chart-title" id="invWeeklyTitle">Weekly On-Hand &amp; Sold — All Dealers · All Product Lines</div>
+        <canvas id="invWeeklyChart" height="90"></canvas>
+        <div class="chart-note" style="margin-top:6px">On-Hand = HQ aggregate on-hand units (weekly snapshot). Sold = POS units sold through channel that week.</div>
+      </div>
+
+      <div class="chart-section">
+        <div class="chart-title" id="invMonthlyTitle">Monthly On-Hand &amp; Sold — All Dealers · All Product Lines</div>
+        <canvas id="invMonthlyChart" height="80"></canvas>
+        <div class="chart-note">Monthly avg on-hand = average of weekly snapshots within the month. Total sold = sum of weekly POS units.</div>
       </div>
 
       <!-- Table -->
@@ -1183,6 +1222,7 @@
     renderBookingsCards(_lastData);
     renderRevenue(_lastData);
     renderInventory(_lastData);
+    renderInvCharts(_lastData);
     refreshOmniDetail();
   }
 
@@ -2086,6 +2126,139 @@
     document.getElementById('invTable').innerHTML = thead + tbody;
   }
 
+  // ── Inventory weekly/monthly charts ──
+  let invChartPL     = 'all';  // 'all' | 'Apollo Desktop' | 'Apollo Rackmount'
+  let invChartDealer = 'all';  // 'all' | dealer name
+  let invWeeklyChart = null;
+  let invMonthlyChart = null;
+
+  const INV_WEEK_MONTH = {
+    '2026-03-30': '2026-04', '2026-04-06': '2026-04', '2026-04-13': '2026-04',
+    '2026-04-20': '2026-04', '2026-04-27': '2026-04',
+    '2026-05-04': '2026-05', '2026-05-11': '2026-05', '2026-05-18': '2026-05', '2026-05-25': '2026-05',
+    '2026-06-01': '2026-06', '2026-06-08': '2026-06', '2026-06-15': '2026-06', '2026-06-22': '2026-06', '2026-06-29': '2026-06',
+  };
+  const INV_MONTH_LABELS = {'2026-04':'April','2026-05':'May','2026-06':'June'};
+  const INV_WEEK_LABELS  = {
+    '2026-03-30':'Mar 30','2026-04-06':'Apr 6','2026-04-13':'Apr 13',
+    '2026-04-20':'Apr 20','2026-04-27':'Apr 27','2026-05-04':'May 4',
+    '2026-05-11':'May 11','2026-05-18':'May 18','2026-05-25':'May 25',
+    '2026-06-01':'Jun 1',
+  };
+
+  function invChartSetPL(pl) {
+    invChartPL = pl;
+    document.querySelectorAll('#invPlPills .inv-chart-pill').forEach(b =>
+      b.classList.toggle('active', b.dataset.val === pl));
+    renderInvCharts(_lastData);
+  }
+  function invChartSetDealer(d) {
+    invChartDealer = d;
+    document.querySelectorAll('#invDealerPills .inv-chart-pill').forEach(b =>
+      b.classList.toggle('active', b.dataset.val === d));
+    renderInvCharts(_lastData);
+  }
+
+  function initInvCharts(data) {
+    const rows = data.inventoryWeekly || [];
+    const dealers = [...new Set(rows.map(r => r.dealer))].sort();
+    const pls     = [...new Set(rows.map(r => r.productLine))].sort();
+
+    // PL pills
+    const plEl = document.getElementById('invPlPills');
+    plEl.innerHTML = [
+      `<button class="inv-chart-pill active" data-val="all" onclick="invChartSetPL('all')">All</button>`,
+      ...pls.map(pl => `<button class="inv-chart-pill" data-val="${pl}" onclick="invChartSetPL('${pl.replace(/'/g,"\\'")}'">${pl}</button>`)
+    ].join('');
+
+    // Dealer pills
+    const dEl = document.getElementById('invDealerPills');
+    dEl.innerHTML = [
+      `<button class="inv-chart-pill active" data-val="all" onclick="invChartSetDealer('all')">All</button>`,
+      ...dealers.map(d => `<button class="inv-chart-pill" data-val="${d}" onclick="invChartSetDealer('${d.replace(/'/g,"\\'")}'">${d}</button>`)
+    ].join('');
+
+    renderInvCharts(data);
+  }
+
+  function renderInvCharts(data) {
+    if (!data || !data.inventoryWeekly) return;
+    let rows = data.inventoryWeekly;
+    if (invChartPL     !== 'all') rows = rows.filter(r => r.productLine === invChartPL);
+    if (invChartDealer !== 'all') rows = rows.filter(r => r.dealer === invChartDealer);
+
+    const dlabel = invChartDealer === 'all' ? 'All Dealers' : invChartDealer;
+    const plabel = invChartPL === 'all' ? 'All Product Lines' : invChartPL;
+    const sel = `${dlabel} · ${plabel}`;
+    document.getElementById('invWeeklyTitle').textContent  = `Weekly On-Hand & Sold — ${sel}`;
+    document.getElementById('invMonthlyTitle').textContent = `Monthly On-Hand & Sold — ${sel}`;
+
+    // ── Weekly chart ──
+    const weeks = [...new Set(rows.map(r => r.week))].sort();
+    const wkOnHand = weeks.map(w => rows.filter(r => r.week === w).reduce((s,r) => s + r.onHand, 0));
+    const wkSold   = weeks.map(w => rows.filter(r => r.week === w).reduce((s,r) => s + r.sold,   0));
+    const wkLabels = weeks.map(w => INV_WEEK_LABELS[w] || w);
+
+    if (invWeeklyChart) invWeeklyChart.destroy();
+    invWeeklyChart = new Chart(document.getElementById('invWeeklyChart').getContext('2d'), {
+      data: {
+        labels: wkLabels,
+        datasets: [
+          { type:'bar',  label:'Units Sold',  data: wkSold,   backgroundColor:'rgba(45,212,191,0.55)', borderWidth:0, order:2, yAxisID:'ySold' },
+          { type:'line', label:'On-Hand',     data: wkOnHand, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.08)', borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#3b82f6', fill:true, tension:0.3, order:1, yAxisID:'yOnHand' },
+        ]
+      },
+      options: {
+        responsive:true,
+        interaction:{ mode:'index', intersect:false },
+        plugins:{
+          legend:{ position:'bottom', labels:{ color:'#94a3b8', font:{size:11}, boxWidth:12, padding:14 }},
+          tooltip:{ callbacks:{ label: c => c.dataset.label + ': ' + Math.round(c.raw).toLocaleString() + ' units' }}
+        },
+        scales:{
+          yOnHand:{ position:'left',  ticks:{color:'#64748b'}, grid:{color:'rgba(255,255,255,0.05)'}, title:{display:true, text:'On-Hand', color:'#64748b', font:{size:10}} },
+          ySold:  { position:'right', ticks:{color:'#64748b'}, grid:{display:false}, title:{display:true, text:'Sold / Wk', color:'#64748b', font:{size:10}} },
+          x:      { ticks:{color:'#94a3b8'}, grid:{display:false} }
+        }
+      }
+    });
+
+    // ── Monthly chart ──
+    const months = ['2026-04','2026-05','2026-06'];
+    const moOnHand = months.map(mo => {
+      const wks = rows.filter(r => INV_WEEK_MONTH[r.week] === mo);
+      if (!wks.length) return 0;
+      return wks.reduce((s,r) => s + r.onHand, 0) / wks.length;
+    });
+    const moSold = months.map(mo =>
+      rows.filter(r => INV_WEEK_MONTH[r.week] === mo).reduce((s,r) => s + r.sold, 0)
+    );
+
+    if (invMonthlyChart) invMonthlyChart.destroy();
+    invMonthlyChart = new Chart(document.getElementById('invMonthlyChart').getContext('2d'), {
+      type:'bar',
+      data:{
+        labels: months.map(m => INV_MONTH_LABELS[m]),
+        datasets:[
+          { label:'Avg On-Hand', data: moOnHand, backgroundColor:'rgba(59,130,246,0.55)', borderWidth:0 },
+          { label:'Total Sold',  data: moSold,   backgroundColor:'rgba(45,212,191,0.55)', borderWidth:0 },
+        ]
+      },
+      options:{
+        responsive:true,
+        interaction:{ mode:'index', intersect:false },
+        plugins:{
+          legend:{ position:'bottom', labels:{ color:'#94a3b8', font:{size:11}, boxWidth:12, padding:14 }},
+          tooltip:{ callbacks:{ label: c => c.dataset.label + ': ' + Math.round(c.raw).toLocaleString() + ' units' }}
+        },
+        scales:{
+          x:{ ticks:{color:'#94a3b8'}, grid:{display:false} },
+          y:{ ticks:{color:'#64748b'}, grid:{color:'rgba(255,255,255,0.05)'} }
+        }
+      }
+    });
+  }
+
   // ── Refresh ──
   async function refreshData() {
     const btn = document.getElementById('refreshBtn');
@@ -2102,6 +2275,7 @@
       initRevenue(data);
       initPanel(data);
       renderInventory(data);
+      initInvCharts(data);
       document.getElementById('lastUpdated').textContent = 'Data as of ' + (data.lastFetched || '—');
     } catch (e) {
       console.error('Refresh failed:', e);
