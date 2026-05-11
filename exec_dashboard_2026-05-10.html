@@ -718,7 +718,7 @@
     <div class="fp-body">
 
       <!-- Period -->
-      <div class="fp-section">
+      <div class="fp-section fp-bookings-only" style="display:none">
         <div class="fp-section-hd">
           <span class="fp-section-label">Period</span>
         </div>
@@ -1685,10 +1685,9 @@
 
   function rvGetDetailRows(data) {
     let rows = data.bookingsRows || [];
-    // Period
-    if (GF.period === 'qtd') {
-      rows = rows.filter(r => rvIsCurrentOrPast(r.month));
-    } else {
+    // In QTD mode include all months — actuals are naturally QTD (future months = $0)
+    // and targets should reflect the full Q2, not just elapsed months.
+    if (GF.period !== 'qtd') {
       rows = rows.filter(r => r.month === GF.period);
     }
     // Dealer
