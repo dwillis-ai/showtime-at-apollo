@@ -1623,9 +1623,11 @@
         data: {
           labels,
           datasets: [
-            { type: 'bar',  label: 'Desktop Actual',   data: actualDesktop,   backgroundColor: '#3b82f6', borderWidth: 0, stack: 'actual', order: 3 },
-            { type: 'bar',  label: 'Rackmount Actual', data: actualRackmount, backgroundColor: '#93c5fd', borderWidth: 0, stack: 'actual', order: 2 },
-            { type: 'line', label: 'Forecast',         data: fcastCombined,   borderColor: '#fbbf24', borderWidth: 2.5, borderDash: [6,3], pointRadius: 3, pointBackgroundColor: '#fbbf24', fill: false, tension: 0, order: 1 }
+            { type: 'bar',  label: 'Desktop Actual',    data: actualDesktop,   backgroundColor: '#3b82f6', borderWidth: 0, stack: 'actual', order: 5 },
+            { type: 'bar',  label: 'Rackmount Actual',  data: actualRackmount, backgroundColor: '#93c5fd', borderWidth: 0, stack: 'actual', order: 4 },
+            { type: 'line', label: 'Desktop Forecast',  data: fcastDesktop,    borderColor: '#60a5fa', borderWidth: 2, borderDash: [5,4], pointRadius: 3, pointBackgroundColor: '#60a5fa', fill: false, tension: 0, order: 3 },
+            { type: 'line', label: 'Rackmount Forecast',data: fcastRackmount,  borderColor: '#67e8f9', borderWidth: 2, borderDash: [5,4], pointRadius: 3, pointBackgroundColor: '#67e8f9', fill: false, tension: 0, order: 2 },
+            { type: 'line', label: 'Combined Forecast', data: fcastCombined,   borderColor: '#fbbf24', borderWidth: 2.5, borderDash: [6,3], pointRadius: 3, pointBackgroundColor: '#fbbf24', fill: false, tension: 0, order: 1 }
           ]
         },
         options: {
