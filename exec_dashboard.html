@@ -1358,8 +1358,8 @@
 
     const avg2Units   = (w1 && w2) ? Math.round((w1.units + w2.units) / 2) : null;
     const avg2Dollars = (w1 && w2) ? (w1.dollars + w2.dollars) / 2 : null;
-    const oplanWkly   = regs.apolloOplanQ2 / 13;
-    const vsOplan     = avg2Dollars != null ? (avg2Dollars / oplanWkly) - 1 : null;
+    const salesTargetWkly = regs.apolloRebateTargetQ2 / 13;
+    const vsOplan         = avg2Dollars != null ? (avg2Dollars / salesTargetWkly) - 1 : null;
 
     const colorMap = { blue: 'val-blue', yellow: 'val-yellow', green: 'val-green', red: 'val-red', white: 'val-white' };
 
@@ -1370,8 +1370,8 @@
       { label: '2-WK AVG FULL WEEKS',                          value: avg2Units != null ? avg2Units.toLocaleString() + ' / wk' : '—', color: 'green',  tooltip: 'Average weekly registrations based on the last two complete weeks. Used as the baseline for pacing.' },
       { label: fmtWeekLabel(w2Start) + ' REG DOLLARS',         value: w2   ? fmtDollars(w2.dollars)             : '—', color: 'blue',   tooltip: 'Dollar value of products registered two weeks ago, based on the suggested retail price (static ASP) of each product.' },
       { label: fmtWeekLabel(w1Start) + ' REG DOLLARS',         value: w1   ? fmtDollars(w1.dollars)             : '—', color: 'blue',   tooltip: 'Dollar value of products registered last week, based on suggested retail price.' },
-      { label: 'OPLAN WEEKLY PACE',                            value: fmtDollars(oplanWkly) + ' / wk', sub: 'Q2 OPlan: ' + fmt(regs.apolloOplanQ2), color: 'white',  tooltip: 'How much we need in weekly registrations to hit the Q2 OPlan target. Calculated as Q2 OPlan ÷ 13 weeks.' },
-      { label: 'REG VS OPLAN PACE',                            value: fmtPctSigned(vsOplan), color: vsOplan != null && vsOplan >= 0 ? 'green' : 'red', tooltip: 'Compares our 2-week average registration dollars to the OPlan weekly pace. Positive = registering more than needed; negative = behind pace.' },
+      { label: 'SALES TARGET WEEKLY PACE',                     value: fmtDollars(salesTargetWkly) + ' / wk', sub: 'Q2 Target: ' + fmt(regs.apolloRebateTargetQ2), color: 'white',  tooltip: 'How much we need in weekly registrations to hit the full Q2 Sales Target. Calculated as Q2 Sales Target ÷ 13 weeks.' },
+      { label: 'REG VS TARGET PACE',                           value: fmtPctSigned(vsOplan), color: vsOplan != null && vsOplan >= 0 ? 'green' : 'red', tooltip: 'Compares our 2-week average registration dollars to the weekly Sales Target pace. Positive = registering ahead of target; negative = behind pace.' },
     ];
 
     document.getElementById('reg-cards').innerHTML = cards.map(c => `
