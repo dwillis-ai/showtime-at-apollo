@@ -744,8 +744,8 @@
         <div class="fp-period-pills" id="fpPeriodPills"></div>
       </div>
 
-      <!-- Dealer (bookings tab only) -->
-      <div class="fp-section fp-bookings-only" style="display:none">
+      <!-- Dealer -->
+      <div class="fp-section fp-dealer-pl" style="display:none">
         <div class="fp-section-hd">
           <span class="fp-section-label">Dealer</span>
           <button class="fp-act-btn" onclick="fpDealerAll()">Select All</button>
@@ -755,8 +755,8 @@
         <div class="fp-list" id="fpDealerList"><div class="fp-empty">Loading…</div></div>
       </div>
 
-      <!-- Product Line (bookings tab only) -->
-      <div class="fp-section fp-bookings-only" style="display:none">
+      <!-- Product Line -->
+      <div class="fp-section fp-dealer-pl" style="display:none">
         <div class="fp-section-hd">
           <span class="fp-section-label">Product Line</span>
           <button class="fp-act-btn" onclick="fpPLAll()">Select All</button>
@@ -919,7 +919,9 @@
     el.classList.add('active');
     document.getElementById('panel-' + name).classList.add('active');
     const showBookings = name === 'revenue';
+    const showDealerPL = name === 'revenue' || name === 'inventory';
     document.querySelectorAll('.fp-bookings-only').forEach(s => s.style.display = showBookings ? '' : 'none');
+    document.querySelectorAll('.fp-dealer-pl').forEach(s => s.style.display = showDealerPL ? '' : 'none');
   }
 
   // ── Q2 calendar ──
@@ -1154,13 +1156,12 @@
   // Product IDs (filtered by selected PLs)
   function fpGetFilteredPIDs() {
     if (!_lastData) return [];
-    const activePLs = GF.productLines !== null && GF.productLines.size > 0
-      ? [...GF.productLines]
-      : fpGetAllPLs();
-    return [...new Set((_lastData.bookingsRows || [])
-      .filter(r => activePLs.includes(r.productLine))
-      .map(r => r.productId).filter(Boolean)
-    )].sort();
+    let rows = _lastData.pidDetailRows || [];
+    if (GF.dealers && GF.dealers.size > 0)
+      rows = rows.filter(r => GF.dealers.has(r.dealer));
+    if (GF.productLines && GF.productLines.size > 0)
+      rows = rows.filter(r => GF.productLines.has(r.productLine));
+    return [...new Set(rows.map(r => r.productId).filter(Boolean))].sort();
   }
 
   function fpRenderPIDs() {
@@ -1723,18 +1724,30 @@
   function rvSetGran(gran) { rvGran = gran; rvRenderControls(); renderRevenue(_lastData); }
 
   function rvGetDetailRows(data) {
+    // When PID filter is active, source from pidDetailRows (Q2 totals at dealer×PID level)
+    if (GF.productIds && GF.productIds.size > 0) {
+      let rows = data.pidDetailRows || [];
+      if (GF.dealers && GF.dealers.size > 0)      rows = rows.filter(r => GF.dealers.has(r.dealer));
+      if (GF.productLines && GF.productLines.size > 0) rows = rows.filter(r => GF.productLines.has(r.productLine));
+      rows = rows.filter(r => GF.productIds.has(r.productId));
+      // Normalize to the shape the table/charts expect
+      return rows.map(r => ({
+        levelCode:   r.dealer,
+        productLine: r.productLine,
+        productId:   r.productId,
+        actual:      r.booked,
+        salesTarget: r.rebateTarget,
+        oplan:       0,   // not available at PID granularity
+        month:       'qtd',
+      }));
+    }
+    // Default: use bookingsRows (dealer × PL × month)
     let rows = data.bookingsRows || [];
-    // In QTD mode include all months — actuals are naturally QTD (future months = $0)
-    // and targets should reflect the full Q2, not just elapsed months.
     if (GF.period !== 'qtd') {
       rows = rows.filter(r => r.month === GF.period);
     }
-    // Dealer
-    if (GF.dealers && GF.dealers.size > 0) rows = rows.filter(r => GF.dealers.has(r.levelCode));
-    // Product Line
-    if (GF.productLines && GF.productLines.size > 0) rows = rows.filter(r => GF.productLines.has(r.productLine));
-    // Product ID
-    if (GF.productIds && GF.productIds.size > 0) rows = rows.filter(r => GF.productIds.has(r.productId));
+    if (GF.dealers && GF.dealers.size > 0)           rows = rows.filter(r => GF.dealers.has(r.levelCode));
+    if (GF.productLines && GF.productLines.size > 0)  rows = rows.filter(r => GF.productLines.has(r.productLine));
     return rows;
   }
 
@@ -1744,10 +1757,13 @@
   }
 
   function rvAggregate(rows) {
+    const pidActive = GF.productIds && GF.productIds.size > 0;
     const map = {};
     rows.forEach(r => {
       let key, label, sub;
-      if (rvGran === 'product') {
+      if (pidActive) {
+        key = r.productId || '—'; label = r.productId || '—'; sub = r.productLine;
+      } else if (rvGran === 'product') {
         key = r.productId || '—'; label = r.productId || '—'; sub = r.productLine;
       } else if (rvGran === 'dealer') {
         key = r.levelCode || '—'; label = r.levelCode || '—'; sub = null;
@@ -1920,8 +1936,10 @@
     });
 
     // Variance detail table
-    const granLabel = rvGran === 'product' ? 'Product ID' : rvGran === 'dealer' ? 'Dealer' : 'Product Line';
-    document.getElementById('rvTableTitle').textContent = `${mlabel} — ${granLabel} Variance Detail`;
+    const pidFilterActive = GF.productIds && GF.productIds.size > 0;
+    const granLabel = pidFilterActive || rvGran === 'product' ? 'Product ID' : rvGran === 'dealer' ? 'Dealer' : 'Product Line';
+    const tableLabel = pidFilterActive ? 'Product ID (Q2 Totals)' : mlabel;
+    document.getElementById('rvTableTitle').textContent = `${tableLabel} — ${granLabel} Variance Detail`;
 
     const tableRows = rvAggregate(detailRows);
     let tA=0, tO=0, tS=0;
@@ -1944,8 +1962,12 @@
         : row.label;
       tbody += `<tr>
         <td>${nameCell}</td>
-        <td>${fmtV(row.actual)}</td><td>${fmtV(row.oplan)}</td><td>${fmtV(row.salesTarget)}</td>
-        <td class="${cls}">${fmtVSgn(vd)}</td><td class="${cls}">${fmtPctSgn(vp)}</td><td>${fmtPctOf(pof)}</td>
+        <td>${fmtV(row.actual)}</td>
+        <td>${pidFilterActive ? '—' : fmtV(row.oplan)}</td>
+        <td>${fmtV(row.salesTarget)}</td>
+        <td class="${cls}">${pidFilterActive ? '—' : fmtVSgn(vd)}</td>
+        <td class="${cls}">${pidFilterActive ? '—' : fmtPctSgn(vp)}</td>
+        <td>${pidFilterActive ? '—' : fmtPctOf(pof)}</td>
       </tr>`;
     });
 
@@ -1955,8 +1977,12 @@
     const tcls = tvd >= 0 ? 'var-pos' : 'var-neg';
     tbody += `<tr class="total-row">
       <td>TOTAL</td>
-      <td>${fmtV(tA)}</td><td>${fmtV(tO)}</td><td>${fmtV(tS)}</td>
-      <td class="${tcls}">${fmtVSgn(tvd)}</td><td class="${tcls}">${fmtPctSgn(tvp)}</td><td>${fmtPctOf(tpof)}</td>
+      <td>${fmtV(tA)}</td>
+      <td>${pidFilterActive ? '—' : fmtV(tO)}</td>
+      <td>${fmtV(tS)}</td>
+      <td class="${tcls}">${pidFilterActive ? '—' : fmtVSgn(tvd)}</td>
+      <td class="${tcls}">${pidFilterActive ? '—' : fmtPctSgn(tvp)}</td>
+      <td>${pidFilterActive ? '—' : fmtPctOf(tpof)}</td>
     </tr></tbody>`;
     document.getElementById('rvTable').innerHTML = thead + tbody;
 
@@ -2032,9 +2058,9 @@
   function renderInventory(data) {
     if (!data) return;
     const raw = data.inventoryQ2 || [];
-    // N = complete weeks elapsed in Q2 so far
-    const q2Start = new Date('2026-04-01');
-    const N = Math.max(1, Math.floor((new Date() - q2Start) / (7 * 24 * 60 * 60 * 1000)));
+    // N = weeks elapsed; use snapshot value from data if available
+    const N = data.inventorySnapshotN || 5;
+    const snapshotWeek = data.inventorySnapshotWeek || 'latest';
 
     // Apply left-panel filters
     let rows = raw;
@@ -2046,20 +2072,20 @@
     const showPID = GF.productIds !== null;
 
     // Aggregate to dealer × PL or dealer × PID
+    // onHandLatest = point-in-time snapshot (sum across SKUs is fine); qtySoldQ2 = cumulative
     const map = {};
     rows.forEach(r => {
       const key = showPID ? `${r.dealer}||${r.productLine}||${r.productId}` : `${r.dealer}||${r.productLine}`;
-      if (!map[key]) map[key] = { dealer: r.dealer, productLine: r.productLine, productId: showPID ? r.productId : null, onHandSum: 0, qtySoldSum: 0 };
-      map[key].onHandSum  += r.onHandSum  || 0;
-      map[key].qtySoldSum += r.qtySoldSum || 0;
+      if (!map[key]) map[key] = { dealer: r.dealer, productLine: r.productLine, productId: showPID ? r.productId : null, onHandLatest: 0, qtySoldQ2: 0 };
+      map[key].onHandLatest += r.onHandLatest || 0;
+      map[key].qtySoldQ2   += r.qtySoldQ2    || 0;
     });
 
-    // Compute WOS and apply range filter
+    // Compute WOS = onHandLatest / (qtySoldQ2 / N) and apply range filter
     let agg = Object.values(map).map(r => ({
       ...r,
-      avgOnHand: r.onHandSum / N,
-      avgSold:   r.qtySoldSum / N,
-      wos:       r.qtySoldSum > 0 ? r.onHandSum / r.qtySoldSum : null,
+      avgSold: r.qtySoldQ2 / N,
+      wos:     r.qtySoldQ2 > 0 ? r.onHandLatest / (r.qtySoldQ2 / N) : null,
     })).filter(r => invMatchesRange(r.wos));
 
     // Sort by WOS descending (null last)
@@ -2087,7 +2113,7 @@
     // Title
     const granLabel = showPID ? 'Product ID' : 'Product Line';
     document.getElementById('invTableTitle').textContent =
-      `Weeks of Supply by Dealer × ${granLabel} — Q2 2026 (${N} weeks to date)`;
+      `Weeks of Supply by Dealer × ${granLabel} — Q2 2026 (snapshot: ${snapshotWeek}, ${N} wks elapsed)`;
 
     // Table
     const fmtN  = n => n == null ? '—' : Math.round(n).toLocaleString();
@@ -2096,16 +2122,15 @@
     let thead = `<thead><tr>
       <th style="text-align:left">Dealer</th>
       <th style="text-align:left">${granLabel}</th>
-      <th>Avg On-Hand / Wk</th>
+      <th>On-Hand (Latest)</th>
       <th>Avg Sold / Wk</th>
       <th>WOS</th>
-      <th>Q2 On-Hand Sum</th>
-      <th>Q2 Qty Sold</th>
+      <th>Q2 Units Sold</th>
     </tr></thead>`;
 
     if (!agg.length) {
       document.getElementById('invTable').innerHTML =
-        thead + `<tbody><tr><td colspan="7" style="text-align:center;padding:24px;color:#475569;font-style:italic">No data — run /refresh-exec to load inventory data.</td></tr></tbody>`;
+        thead + `<tbody><tr><td colspan="6" style="text-align:center;padding:24px;color:#475569;font-style:italic">No data — run /refresh-exec to load inventory data.</td></tr></tbody>`;
       return;
     }
 
@@ -2115,11 +2140,10 @@
       tbody += `<tr>
         <td>${r.dealer || '—'}</td>
         <td>${(showPID ? r.productId : r.productLine) || '—'}</td>
-        <td>${fmtN(r.avgOnHand)}</td>
+        <td>${fmtN(r.onHandLatest)}</td>
         <td>${fmtD1(r.avgSold)}</td>
         <td><span class="wos-badge ${cls}">${r.wos != null ? r.wos.toFixed(1) : '—'}</span></td>
-        <td>${fmtN(r.onHandSum)}</td>
-        <td>${fmtN(r.qtySoldSum)}</td>
+        <td>${fmtN(r.qtySoldQ2)}</td>
       </tr>`;
     });
     tbody += '</tbody>';
@@ -2224,11 +2248,14 @@
     });
 
     // ── Monthly chart ──
+    // On-hand = last snapshot week of each month (point-in-time, not average)
+    // Sold = cumulative sum across all weeks in the month
     const months = ['2026-04','2026-05','2026-06'];
     const moOnHand = months.map(mo => {
       const wks = rows.filter(r => INV_WEEK_MONTH[r.week] === mo);
       if (!wks.length) return 0;
-      return wks.reduce((s,r) => s + r.onHand, 0) / wks.length;
+      const lastWk = wks.map(r => r.week).sort().pop();
+      return rows.filter(r => r.week === lastWk).reduce((s,r) => s + r.onHand, 0);
     });
     const moSold = months.map(mo =>
       rows.filter(r => INV_WEEK_MONTH[r.week] === mo).reduce((s,r) => s + r.sold, 0)
@@ -2240,8 +2267,8 @@
       data:{
         labels: months.map(m => INV_MONTH_LABELS[m]),
         datasets:[
-          { label:'Avg On-Hand', data: moOnHand, backgroundColor:'rgba(59,130,246,0.55)', borderWidth:0 },
-          { label:'Total Sold',  data: moSold,   backgroundColor:'rgba(45,212,191,0.55)', borderWidth:0 },
+          { label:'On-Hand (End of Month)', data: moOnHand, backgroundColor:'rgba(59,130,246,0.55)', borderWidth:0 },
+          { label:'Total Sold',             data: moSold,   backgroundColor:'rgba(45,212,191,0.55)', borderWidth:0 },
         ]
       },
       options:{
