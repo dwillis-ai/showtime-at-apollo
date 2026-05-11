@@ -1371,7 +1371,7 @@
       { label: '2-WK AVG FULL WEEKS',                          value: avg2Units != null ? avg2Units.toLocaleString() + ' / wk' : '—', color: 'green',  tooltip: 'Average weekly registrations based on the last two complete weeks. Used as the baseline for pacing.' },
       { label: fmtWeekLabel(w2Start) + ' REG DOLLARS',         value: w2   ? fmtDollars(w2.dollars)             : '—', color: 'blue',   tooltip: 'Dollar value of products registered two weeks ago, based on the suggested retail price (static ASP) of each product.' },
       { label: fmtWeekLabel(w1Start) + ' REG DOLLARS',         value: w1   ? fmtDollars(w1.dollars)             : '—', color: 'blue',   tooltip: 'Dollar value of products registered last week, based on suggested retail price.' },
-      { label: 'OPLAN WEEKLY PACE',                            value: fmtDollars(oplanWkly) + ' / wk', sub: 'Q2 Target: ' + fmt(regs.apolloRebateTargetQ2), color: 'white',  tooltip: 'How much we need in weekly registrations to hit the Q2 OPlan target. Calculated as Q2 OPlan ÷ 13 weeks.' },
+      { label: 'OPLAN WEEKLY PACE',                            value: fmtDollars(oplanWkly) + ' / wk', sub: 'Q2 OPlan: ' + fmt(regs.apolloOplanQ2), color: 'white',  tooltip: 'How much we need in weekly registrations to hit the Q2 OPlan target. Calculated as Q2 OPlan ÷ 13 weeks.' },
       { label: 'REG VS OPLAN PACE',                            value: fmtPctSigned(vsOplan), color: vsOplan != null && vsOplan >= 0 ? 'green' : 'red', tooltip: 'Compares our 2-week average registration dollars to the OPlan weekly pace. Positive = registering more than needed; negative = behind pace.' },
     ];
 
